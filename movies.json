@@ -1,0 +1,41 @@
+[
+  {
+    "id": 1,
+    "title": "Inception",
+    "year": 2010,
+    "image": "/images.jfif",
+    "description": "A skilled thief who steals secrets through dream invasion is given a chance at redemption by performing the impossible: planting an idea in someone’s mind. A mind-bending thriller exploring dreams within dreams.",
+    "cast": [
+      { "actor": "Leonardo DiCaprio", "role": "Cobb" },
+      { "actor": "Cillian Murphy", "role": "Fischer" },
+      { "actor": "Tom Hardy", "role": "Eames" },
+      { "actor": "Elliot Page", "role": "Ariadne" }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Interstellar",
+    "year": 2014,
+    "image": "/interstellar.jfif",
+    "description": "In a dystopian future where Earth is dying, a group of explorers travels through a wormhole to find a new home for humanity. A visually stunning tale of love, sacrifice, and the vastness of space.",
+    "cast": [
+      { "actor": "Matthew McConaughey", "role": "Cooper" },
+      { "actor": "Timothée Chalamet", "role": "Tom" },
+      { "actor": "Anne Hathaway", "role": "Brand" },
+      { "actor": "Matt Damon", "role": "Mann" }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Se7en",
+    "year": 1995,
+    "image": "/seven.jfif",
+    "description": "Two detectives hunt a serial killer who uses the seven deadly sins as his modus operandi. A dark, gripping thriller that delves into the depths of human depravity.",
+    "cast": [
+      { "actor": "Brad Pitt", "role": "David Mills" },
+      { "actor": "Morgan Freeman", "role": "Detective Lt. William Somerset" },
+      { "actor": "Kevin Spacey", "role": "John Doe" },
+      { "actor": "Gwyneth Paltrow", "role": "Tracy Mills" }
+    ]
+  }
+]
