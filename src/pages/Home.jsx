@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -7,8 +7,8 @@ import OscarsWinners from "../components/OscarsWinners";
 import MovieFacts from "../components/MovieFacts";
 import TopRated from "../components/TopRated";
 
-
 const Home = ({ watchlist, setWatchlist }) => {
+  const swiperRef = useRef(null);
   const slides = [
     {
       title: "Inception",
@@ -101,8 +101,25 @@ const Home = ({ watchlist, setWatchlist }) => {
   return (
     <>
       <section className="w-full max-w-full lg:max-w-6xl mx-auto space-y-4 flex justify-center pt-28 md:pt-24">
+        <div className="flex w-full justify-between">
+          <button
+            className="customPrev text-white "
+            onClick={() => swiperRef.current?.slideNext(-1)}
+          >
+            Back
+          </button>
+          <button
+            className="customNext text-white"
+            onClick={() => swiperRef.current?.slideNext()}
+          >
+            Next
+          </button>
+        </div>
         <Swiper
-          navigation={true}
+          navigation={{
+            nextEl: ".customNext",
+            prevEl: ".customPrev",
+          }}
           pagination={{ dynamicBullets: true }}
           modules={[Navigation, Pagination]}
           spaceBetween={20}
