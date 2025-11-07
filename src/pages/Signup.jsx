@@ -1,9 +1,10 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 const Signup = () => {
 return(
-  <div className="flex justify-center items-center h-screen">
-      <form className="bg-indigo-50 p-10 rounded-2xl shadow-md flex flex-col gb-6 w-80 ">
+  <div className="flex justify-center items-center h-screen bg-white">
+      <form className="bg-indigo-100 p-10 rounded-2xl shadow-md flex flex-col gb-6 w-80 ">
          <p>Email:</p>
         <input
           type="email"
@@ -25,6 +26,7 @@ return(
         <button className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
           Sign up
         </button>
+        <p className='text-center underline text-blue-500 pt-5'><Link to="/log-in">You have an account? Log in here</Link></p>
       </form>
     </div>
 )

@@ -1,4 +1,10 @@
+@import "tailwindcss";
 body{
     background-color: rgb(0, 0, 0);
+  
 }
 
+.swiper-button-next,
+.swiper-button-prev {
+  color: #ff0000; /* Example: Red color */
+}

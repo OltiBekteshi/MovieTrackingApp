@@ -1,43 +1,82 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { FiMenu, FiX } from 'react-icons/fi'; 
 
 const Navbar = () => {
-  return (
-    <div className="flex flex-col md:flex-row items-center md:justify-between p-5 text-white font-bold gap-3 md:gap-0 bg-black">
-      <Link
-        to="/log-in"
-        className="bg-white text-black px-4 py-2 rounded-2xl hover:bg-green-400"
-      >
-        Log in
-      </Link>
+  const [isOpen, setIsOpen] = useState(false);
 
-      <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-5 mt-2 md:mt-0">
-        <Link
-          to="/"
-          className="bg-white text-black px-3 py-2 rounded-2xl hover:bg-gray-700"
-        >
-          Home
+  return (
+    <nav className="fixed top-0 left-0 w-full z-50 bg-white shadow-md">
+      <div className="max-w-7xl mx-auto flex items-center justify-between p-4 text-black">
+        
+        <Link to="/" className="text-xl font-bold hover:opacity-80">
+          MovieTracker
         </Link>
-        <Link
-          to="/about"
-          className="bg-white text-black px-3 py-2 rounded-2xl hover:bg-gray-700"
-        >
-          About
-        </Link>
-        <Link
-          to="/movies"
-          className="bg-white text-black px-3 py-2 rounded-2xl hover:bg-gray-700"
-        >
-          Movies
-        </Link>
-        <Link
-          to="/watchlist"
-          className="bg-white text-black px-3 py-2 rounded-2xl hover:bg-gray-700"
-        >
-          Watchlist
-        </Link>
+
+
+        <div className="hidden md:flex items-center gap-5">
+          <Link to="/" className="px-3 py-2 rounded-2xl hover:bg-gray-200">
+            Home
+          </Link>
+          <Link to="/movies" className="px-3 py-2 rounded-2xl hover:bg-gray-200">
+            Movies
+          </Link>
+          <Link to="/watchlist" className="px-3 py-2 rounded-2xl hover:bg-gray-200">
+            Watchlist
+          </Link>
+          <Link
+            to="/log-in"
+            className="bg-black text-white px-4 py-2 rounded-2xl hover:bg-gray-800"
+          >
+            Log in
+          </Link>
+        </div>
+
+        
+        <div className="md:hidden">
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="text-2xl focus:outline-none"
+          >
+            {isOpen ? <FiX /> : <FiMenu />}
+          </button>
+        </div>
       </div>
-    </div>
+
+      
+      {isOpen && (
+        <div className="md:hidden bg-white shadow-md">
+          <Link
+            to="/"
+            className="block px-4 py-3 hover:bg-gray-200"
+            onClick={() => setIsOpen(false)}
+          >
+            Home
+          </Link>
+          <Link
+            to="/movies"
+            className="block px-4 py-3 hover:bg-gray-200"
+            onClick={() => setIsOpen(false)}
+          >
+            Movies
+          </Link>
+          <Link
+            to="/watchlist"
+            className="block px-4 py-3 hover:bg-gray-200"
+            onClick={() => setIsOpen(false)}
+          >
+            Watchlist
+          </Link>
+          <Link
+            to="/log-in"
+            className="block px-4 py-3 bg-black text-white rounded-lg m-2 text-center hover:bg-gray-800"
+            onClick={() => setIsOpen(false)}
+          >
+            Log in
+          </Link>
+        </div>
+      )}
+    </nav>
   );
 };
 

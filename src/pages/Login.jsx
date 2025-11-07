@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom'
 const Login = () => {
   return (
     <>
-    <div className="flex justify-center items-center h-screen ">
-      <form className="bg-indigo-50 p-10 rounded-2xl shadow-md flex flex-col gb-6 w-80 ">
+    <div className="flex justify-center items-center h-screen bg-white">
+      <form className="bg-indigo-100 p-10 rounded-2xl shadow-md flex flex-col gb-6 w-80 ">
         <p>Username:</p>
         <input
           type="text"
