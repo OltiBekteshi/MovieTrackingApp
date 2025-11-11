@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { FiMenu, FiX } from 'react-icons/fi'; 
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { FiMenu, FiX } from "react-icons/fi";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -8,21 +8,35 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-white shadow-md">
       <div className="max-w-7xl mx-auto flex items-center justify-between p-4 text-black">
-        
-        <Link to="/" className="text-xl font-bold hover:opacity-80">
+        <Link
+          to="/"
+          className="text-xl font-bold hover:opacity-80 flex items-center"
+        >
+          <img src="/movie.png" alt="Movie Logo" className="h-7 w-7 mr-1" />
           MovieTracker
         </Link>
-
 
         <div className="hidden md:flex items-center gap-5">
           <Link to="/" className="px-3 py-2 rounded-2xl hover:bg-gray-200">
             Home
           </Link>
-          <Link to="/movies" className="px-3 py-2 rounded-2xl hover:bg-gray-200">
+          <Link
+            to="/movies"
+            className="px-3 py-2 rounded-2xl hover:bg-gray-200"
+          >
             Movies
           </Link>
-          <Link to="/watchlist" className="px-3 py-2 rounded-2xl hover:bg-gray-200">
+          <Link
+            to="/watchlist"
+            className="px-3 py-2 rounded-2xl hover:bg-gray-200"
+          >
             Watchlist
+          </Link>
+          <Link
+            to="/watch-later"
+            className="px-3 py-2 rounded-2xl hover:bg-gray-200"
+          >
+            Watch later
           </Link>
           <Link
             to="/log-in"
@@ -32,7 +46,6 @@ const Navbar = () => {
           </Link>
         </div>
 
-        
         <div className="md:hidden">
           <button
             onClick={() => setIsOpen(!isOpen)}
@@ -43,7 +56,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      
       {isOpen && (
         <div className="md:hidden bg-white shadow-md">
           <Link
@@ -66,6 +78,13 @@ const Navbar = () => {
             onClick={() => setIsOpen(false)}
           >
             Watchlist
+          </Link>
+          <Link
+            to="/watch-later"
+            className="block px-4 py-3 hover:bg-gray-200"
+            onClick={() => setIsOpen(false)}
+          >
+            Watch later
           </Link>
           <Link
             to="/log-in"

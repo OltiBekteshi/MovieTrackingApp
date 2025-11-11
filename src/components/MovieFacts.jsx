@@ -10,13 +10,13 @@ const MovieFacts = () => {
     <div
       className="p-10 flex flex-col items-center justify-center "
       style={{
-        background: "black",
+        background: "#0B0C10",
         color: "#e0e0e0",
         fontFamily: "'Poppins', sans-serif",
       }}
     >
-   <h1 className="text-4xl md:text-5xl font-bold mb-10 text-center text-white drop-shadow-lg tracking-wide">
-         Fakte rreth disa filmave
+      <h1 className="text-4xl md:text-5xl font-bold mb-10 text-center text-white drop-shadow-lg tracking-wide">
+        Fakte rreth disa filmave
       </h1>
 
       <div className="w-full max-w-6xl space-y-4">
@@ -61,7 +61,6 @@ const MovieFacts = () => {
               color: "#e0e0e0",
               borderRadius: "4px",
               boxShadow: "0 0 10px rgba(255, 255, 255, 0.05)",
-              
             }}
           >
             <AccordionSummary

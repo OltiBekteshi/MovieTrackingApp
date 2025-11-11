@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Toaster, toast } from "sonner";
+import PopUpModal from "./PopUpModal";
 
-
-const MovieCard = ({ watchlist, setWatchlist }) => {
+const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater }) => {
   const [movies, setMovies] = useState([]);
+  const [movieDetails, setMovieDetails] = useState({});
   const [page, setPage] = useState(1);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [trailerKey, setTrailerKey] = useState(null);
   const apiKey = import.meta.env.VITE_TMDB_API_KEY;
 
-  
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchMovies = async () => {
       const res = await fetch(
@@ -16,11 +20,22 @@ const MovieCard = ({ watchlist, setWatchlist }) => {
       );
       const data = await res.json();
       setMovies(data.results);
+
+      const details = {};
+      await Promise.all(
+        data.results.map(async (movie) => {
+          const res = await fetch(
+            `https://api.themoviedb.org/3/movie/${movie.id}?api_key=${apiKey}&language=en-US`
+          );
+          const movieData = await res.json();
+          details[movie.id] = movieData.runtime;
+        })
+      );
+      setMovieDetails(details);
     };
     fetchMovies();
   }, [apiKey, page]);
 
-  
   const handleWatchTrailer = async (movieId) => {
     const res = await fetch(
       `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${apiKey}&language=en-US`
@@ -30,25 +45,27 @@ const MovieCard = ({ watchlist, setWatchlist }) => {
       (vid) => vid.site === "YouTube" && vid.type === "Trailer"
     );
     if (trailer) setTrailerKey(trailer.key);
-    else alert("No trailer available for this movie 😞");
+    else toast("No trailer available for this movie");
   };
 
-  
-  const handleBackgroundClick = (e) => {
-    if (e.target.id === "modal-background") {
-      setSelectedMovie(null);
-      setTrailerKey(null);
-    }
-  };
-
-  
   const handleAddToWatchlist = (movie) => {
     if (!watchlist.find((m) => m.id === movie.id)) {
       setWatchlist([...watchlist, movie]);
-      alert (`${movie.title} added to your watchlist!`);
+      toast.success(`${movie.title} added to your watchlist!`);
     } else {
-      alert(`${movie.title} is already in your watchlist.`);
+      toast(`${movie.title} is already in your watchlist.`);
     }
+    navigate("/watchlist");
+  };
+
+  const handleAddToWatchLater = (movie) => {
+    if (!watchlater.find((m) => m.id === movie.id)) {
+      setWatchlater([...watchlater, movie]);
+      toast.success(`${movie.title} added to Watch Later!`);
+    } else {
+      toast(`${movie.title} is already in your Watch Later list.`);
+    }
+    navigate("/watch-later");
   };
 
   return (
@@ -56,8 +73,7 @@ const MovieCard = ({ watchlist, setWatchlist }) => {
       <h1 className="text-3xl font-bold mb-6 text-center text-white mt-20">
         Movies
       </h1>
-
-
+      <Toaster position="top-right" />
       <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {movies.map((movie) => (
           <div
@@ -74,6 +90,16 @@ const MovieCard = ({ watchlist, setWatchlist }) => {
               <h3 className="font-semibold text-lg truncate">{movie.title}</h3>
               <p className="truncate">{movie.overview}</p>
               <p className="text-sm text-white">{movie.release_date}</p>
+
+              <p className="text-sm text-white mt-1 font-bold">
+                Duration:{" "}
+                {movieDetails[movie.id]
+                  ? `${Math.floor(movieDetails[movie.id] / 60)}h ${
+                      movieDetails[movie.id] % 60
+                    }m`
+                  : "N/A"}
+              </p>
+
               <p className="text-yellow-500 font-bold mt-1">
                 ⭐ {movie.vote_average.toFixed(1)}
               </p>
@@ -87,10 +113,9 @@ const MovieCard = ({ watchlist, setWatchlist }) => {
         ))}
       </div>
 
-      
       <div className="flex justify-center mt-6 gap-4">
         <button
-          className="bg-white text-black px-4 py-2 rounded-[20px] hover:cursor-pointer hover:opacity-[0.5]"
+          className="bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-800 hover:cursor-pointer"
           disabled={page === 1}
           onClick={() => setPage((prev) => prev - 1)}
         >
@@ -98,76 +123,23 @@ const MovieCard = ({ watchlist, setWatchlist }) => {
         </button>
         <span className="text-white px-2 py-2">{page}</span>
         <button
-          className="bg-white text-black px-4 py-2 rounded-[20px] hover:cursor-pointer hover:opacity-[0.5]"
+          className="bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-800 hover:cursor-pointer"
           onClick={() => setPage((prev) => prev + 1)}
         >
           Next
         </button>
       </div>
 
-
-      {selectedMovie && (
-        <div
-          id="modal-background"
-          onClick={handleBackgroundClick}
-          className="fixed inset-0 flex items-center justify-center z-50 bg-black/60 backdrop-blur-sm"
-        >
-          <div className="bg-white rounded-xl max-w-lg w-full p-15 relative shadow-2xl">
-            <button
-              onClick={() => {
-                setSelectedMovie(null);
-                setTrailerKey(null);
-              }}
-              className="absolute top-3 right-3 text-gray-700 font-bold text-3xl hover:text-red-500 hover:cursor-pointer"
-            >
-              &times;
-            </button>
-
-            {!trailerKey ? (
-              <>
-                <img
-                  src={`https://image.tmdb.org/t/p/w500${selectedMovie.poster_path}`}
-                  className="w-full h-72 object-cover overflow-hidden rounded-2xl mb-4"
-                />
-                <h2 className="text-2xl font-bold mb-4">{selectedMovie.title}</h2>
-                <p className="mb-4">{selectedMovie.overview}</p>
-                <p className="text-sm text-gray-600 mb-2">
-                  Release: {selectedMovie.release_date}
-                </p>
-                <p className="text-yellow-500 font-bold mb-4">
-                  ⭐ {selectedMovie.vote_average.toFixed(1)}
-                </p>
-                
-                <div className="flex flex-wrap gap-3">
-                  <button
-                    onClick={() => handleAddToWatchlist(selectedMovie)}
-                    className="bg-gray-600 p-3 text-white font-bold rounded-xl hover:shadow-xl hover:cursor-pointer flex-1"
-                  >
-                    Add to Watchlist
-                  </button>
-                  <button
-                    onClick={() => handleWatchTrailer(selectedMovie.id)}
-                    className="bg-red-600 p-3 text-white font-bold rounded-xl hover:shadow-xl hover:cursor-pointer flex-1"
-                  >
-                    Watch Trailer
-                  </button>
-                </div>
-              </>
-            ) : (
-              <div className="aspect-video">
-                <iframe
-                  width="100%"
-                  height="315"
-                  src={`https://www.youtube.com/embed/${trailerKey}`}
-                  title="Trailer"
-                  allowFullScreen
-                  className="rounded-xl"
-                ></iframe>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      <PopUpModal
+        selectedMovie={selectedMovie}
+        setSelectedMovie={setSelectedMovie}
+        trailerKey={trailerKey}
+        setTrailerKey={setTrailerKey}
+        handleAddToWatchlist={handleAddToWatchlist}
+        handleAddToWatchLater={handleAddToWatchLater}
+        handleWatchTrailer={handleWatchTrailer}
+        apiKey={apiKey}
+      />
     </div>
   );
 };
