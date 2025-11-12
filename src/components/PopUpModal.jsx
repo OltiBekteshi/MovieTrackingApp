@@ -52,7 +52,7 @@ const MovieModal = ({
             setSelectedMovie(null);
             setTrailerKey(null);
           }}
-          className="absolute top-3 right-3 text-gray-700 font-bold text-3xl hover:text-red-500 hover:cursor-pointer"
+          className="absolute top-3 right-3 text-gray-700 font-bold text-3xl hover:text-red-500 hover:cursor-pointer "
         >
           &times;
         </button>
@@ -107,7 +107,7 @@ const MovieModal = ({
           <div className="aspect-video">
             <iframe
               width="100%"
-              height="315"
+              height="415"
               src={`https://www.youtube.com/embed/${trailerKey}`}
               title="Trailer"
               allowFullScreen

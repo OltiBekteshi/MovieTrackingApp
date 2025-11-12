@@ -25,38 +25,42 @@ const WatchLater = ({ watchlater, setWatchlater }) => {
   }
 
   return (
-    <div className="bg-black min-h-screen p-6">
-      <h1 className="text-3xl font-bold mb-6 text-white text-center mt-20">
-        Watch Later
-      </h1>
+    <>
+      <div className="bg-black min-h-screen p-6">
+        <h1 className="text-3xl font-bold mb-6 text-white text-center mt-20">
+          Watch Later
+        </h1>
 
-      <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-        {watchlater.map((movie) => (
-          <div
-            key={movie.id}
-            className="bg-red-900 text-white rounded-2xl shadow-md overflow-hidden"
-          >
-            <img
-              src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-              alt={movie.title}
-              className="w-full h-72 object-cover"
-            />
-            <div className="p-4 flex flex-col grow">
-              <h3 className="font-semibold text-lg truncate">{movie.title}</h3>
-              <h3 className=" grow text-sm text-white line-clamp-3 sm:line-clamp-none">
-                {movie.overview}
-              </h3>
-              <button
-                className="bg-gray-700 p-2 text-white rounded-lg hover:bg-gray-800 mt-4 hover:cursor-pointer"
-                onClick={() => handleRemove(movie.id)}
-              >
-                Remove
-              </button>
+        <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          {watchlater.map((movie) => (
+            <div
+              key={movie.id}
+              className="bg-red-900 text-white rounded-2xl shadow-md overflow-hidden"
+            >
+              <img
+                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                alt={movie.title}
+                className="w-full h-72 object-cover"
+              />
+              <div className="p-4 flex flex-col grow">
+                <h3 className="font-semibold text-lg truncate">
+                  {movie.title}
+                </h3>
+                <h3 className=" grow text-sm text-white line-clamp-3 sm:line-clamp-none">
+                  {movie.overview}
+                </h3>
+                <button
+                  className="bg-gray-700 p-2 text-white rounded-lg hover:bg-gray-800 mt-4 hover:cursor-pointer"
+                  onClick={() => handleRemove(movie.id)}
+                >
+                  Remove
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

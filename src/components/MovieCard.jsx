@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Toaster, toast } from "sonner";
 import PopUpModal from "./PopUpModal";
+import { FaTransgenderAlt } from "react-icons/fa";
 
 const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater }) => {
   const [movies, setMovies] = useState([]);

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FiMenu, FiX } from "react-icons/fi";
+import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -38,12 +39,25 @@ const Navbar = () => {
           >
             Watch later
           </Link>
-          <Link
-            to="/log-in"
-            className="bg-black text-white px-4 py-2 rounded-2xl hover:bg-gray-800"
-          >
-            Log in
-          </Link>
+
+          <SignedOut>
+            <Link
+              to="/sign-in"
+              className="bg-black text-white px-4 py-2 rounded-2xl hover:bg-gray-800"
+            >
+              Log in
+            </Link>
+            <Link
+              to="/sign-up"
+              className="border border-black px-4 py-2 rounded-2xl hover:bg-gray-100"
+            >
+              Sign up
+            </Link>
+          </SignedOut>
+
+          <SignedIn>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
         </div>
 
         <div className="md:hidden">
@@ -86,13 +100,29 @@ const Navbar = () => {
           >
             Watch later
           </Link>
-          <Link
-            to="/log-in"
-            className="block px-4 py-3 bg-black text-white rounded-lg m-2 text-center hover:bg-gray-800"
-            onClick={() => setIsOpen(false)}
-          >
-            Log in
-          </Link>
+
+          <SignedOut>
+            <Link
+              to="/sign-in"
+              className="block px-4 py-3 bg-black text-white rounded-lg m-2 text-center hover:bg-gray-800"
+              onClick={() => setIsOpen(false)}
+            >
+              Log in
+            </Link>
+            <Link
+              to="/sign-up"
+              className="block px-4 py-3 border border-black rounded-lg m-2 text-center hover:bg-gray-100"
+              onClick={() => setIsOpen(false)}
+            >
+              Sign up
+            </Link>
+          </SignedOut>
+
+          <SignedIn>
+            <div className="flex justify-center py-3">
+              <UserButton afterSignOutUrl="/" />
+            </div>
+          </SignedIn>
         </div>
       )}
     </nav>

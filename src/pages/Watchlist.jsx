@@ -1,15 +1,44 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaYelp } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 const Watchlist = ({ watchlist, setWatchlist }) => {
   const navigate = useNavigate();
+  const [comments, setComments] = useState({});
+  const [showInput, setShowInput] = useState({});
+  const [newComment, setNewComment] = useState({});
 
   const handleRemove = (movieId) => {
     const filtered = watchlist.filter((m) => m.id !== movieId);
     setWatchlist(filtered);
     toast.message("Movie successfully removed");
+
+    setComments((prev) => {
+      const updated = { ...prev };
+      delete updated[movieId];
+      return updated;
+    });
+  };
+
+  const handleAddComment = (movieId) => {
+    setShowInput((prev) => ({ ...prev, [movieId]: !prev[movieId] }));
+  };
+
+  const handleSaveComment = (movieId) => {
+    if (!newComment[movieId] || newComment[movieId].trim() === "") {
+      toast.error("Comment cannot be empty");
+      return;
+    }
+
+    setComments((prev) => ({
+      ...prev,
+      [movieId]: [...(prev[movieId] || []), newComment[movieId]],
+    }));
+
+    setNewComment((prev) => ({ ...prev, [movieId]: "" }));
+    setShowInput((prev) => ({ ...prev, [movieId]: false }));
+    toast.success("Comment added!");
   };
 
   if (!watchlist || watchlist.length === 0) {
@@ -54,14 +83,53 @@ const Watchlist = ({ watchlist, setWatchlist }) => {
                 {movie.description || movie.overview}
               </p>
 
+              {comments[movie.id] && comments[movie.id].length > 0 && (
+                <div className="mt-3 space-y-2">
+                  {comments[movie.id].map((c, idx) => (
+                    <p
+                      key={idx}
+                      className="bg-gray-800 p-2 rounded text-sm text-gray-200"
+                    >
+                      {c}
+                    </p>
+                  ))}
+                </div>
+              )}
+
+              {showInput[movie.id] && (
+                <div className="mt-3">
+                  <textarea
+                    value={newComment[movie.id] || ""}
+                    onChange={(e) =>
+                      setNewComment((prev) => ({
+                        ...prev,
+                        [movie.id]: e.target.value,
+                      }))
+                    }
+                    placeholder="Write a comment..."
+                    className="w-full p-2 rounded bg-gray-800 text-white text-sm"
+                  />
+                  <button
+                    className="bg-green-700 p-2 rounded-lg mt-2 hover:bg-green-800 text-sm"
+                    onClick={() => handleSaveComment(movie.id)}
+                  >
+                    Save Comment
+                  </button>
+                </div>
+              )}
+
               <button
-                className="bg-gray-700 p-2 text-white rounded-lg hover:bg-gray-800 mt-4 hover:cursor-pointer"
+                className="bg-blue-700 p-2 text-white rounded-lg hover:bg-blue-800 mt-4 hover:cursor-pointer"
+                onClick={() => handleAddComment(movie.id)}
+              >
+                {showInput[movie.id] ? "Cancel" : "Add Comment"}
+              </button>
+
+              <button
+                className="bg-gray-700 p-2 text-white rounded-lg hover:bg-gray-800 mt-2 hover:cursor-pointer"
                 onClick={() => handleRemove(movie.id)}
               >
                 Remove
-              </button>
-              <button className="bg-blue-700 p-2 text-white rounded-lg hover:bg-gray-800 mt-4 hover:cursor-pointer">
-                Add Comment
               </button>
             </div>
           </div>

@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "sonner";
+import { SignIn, SignUp } from "@clerk/clerk-react";
+
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import MovieCard from "./components/MovieCard";
 import Watchlist from "./pages/Watchlist";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import { Toaster } from "sonner";
 import WatchLater from "./pages/WatchLater";
+import SignInPage from "./pages/SignInPage";
+import SignUpPage from "./pages/SignUpPage";
 
 function App() {
   const [watchlist, setWatchlist] = useState([]);
@@ -49,11 +52,19 @@ function App() {
               />
             }
           />
-          <Route path="/log-in" element={<Login />} />
-          <Route path="/sign-up" element={<Signup />} />
+          <Route
+            path="/sign-in"
+            element={<SignInPage routing="path" path="/sign-in" />}
+          />
+          <Route
+            path="/sign-up"
+            element={<SignUpPage routing="path" path="/sign-up" />}
+          />
         </Routes>
       </BrowserRouter>
+      <Footer />
     </>
   );
 }
+
 export default App;

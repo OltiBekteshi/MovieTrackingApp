@@ -10,7 +10,7 @@ const MovieFacts = () => {
     <div
       className="p-10 flex flex-col items-center justify-center "
       style={{
-        background: "#0B0C10",
+        background: "#000000",
         color: "#e0e0e0",
         fontFamily: "'Poppins', sans-serif",
       }}

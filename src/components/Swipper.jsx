@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
-import { Navigation, Pagination } from "swiper/modules";
+import { Pagination } from "swiper/modules";
 import slides from "../../slides.json";
 import { toast } from "sonner";
 
@@ -32,7 +32,7 @@ const Swipper = ({ watchlist, setWatchlist }) => {
           prevEl: ".customPrev",
         }}
         pagination={{ dynamicBullets: true }}
-        modules={[Pagination, Navigation]}
+        modules={[Pagination]}
         spaceBetween={20}
         slidesPerView={1}
         className="pb-10"
@@ -89,21 +89,21 @@ const Swipper = ({ watchlist, setWatchlist }) => {
             </div>
           </SwiperSlide>
         ))}
+        <div className="flex justify-between items-center w-full max-w-md mx-auto mt-6 px-4">
+          <button
+            className="customPrev bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-800 hover:cursor-pointer"
+            onClick={() => swiperRef.current?.slidePrev()}
+          >
+            Back
+          </button>
+          <button
+            className="customNext bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-800 hover:cursor-pointer"
+            onClick={() => swiperRef.current?.slideNext()}
+          >
+            Next
+          </button>
+        </div>
       </Swiper>
-      <div className="flex justify-between items-center w-full max-w-md mx-auto mt-6 px-4">
-        <button
-          className="customPrev bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-800 hover:cursor-pointer"
-          onClick={() => swiperRef.current?.slidePrev()}
-        >
-          Back
-        </button>
-        <button
-          className="customNext bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-800 hover:cursor-pointer"
-          onClick={() => swiperRef.current?.slideNext()}
-        >
-          Next
-        </button>
-      </div>
     </section>
   );
 };
