@@ -10,7 +10,7 @@ const SignUpPage = () => {
         signInUrl="/sign-in"
         appearance={{
           elements: {
-            formButtonPrimary: "bg-black hover:bg-gray-800 text-white",
+            formButtonPrimary: "bg-black hover:bg-gray-800 text-white ",
           },
         }}
       />

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "sonner";
 import { SignIn, SignUp } from "@clerk/clerk-react";
-
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -18,7 +17,7 @@ function App() {
 
   return (
     <>
-      <Toaster position="top-right" />
+      <Toaster position="top-right " />
       <BrowserRouter>
         <Navbar />
         <Routes>
@@ -53,7 +52,7 @@ function App() {
             }
           />
           <Route
-            path="/sign-in"
+            path="/sign-in/*"
             element={<SignInPage routing="path" path="/sign-in" />}
           />
           <Route

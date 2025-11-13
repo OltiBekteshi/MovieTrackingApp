@@ -1,11 +1,12 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Amethysta&family=Keania+One&family=Oswald:wght@200..700&family=Young+Serif&display=swap");
+
 html,
 body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   background-color: #000000;
-
   font-family: oswald;
 }
 
@@ -13,8 +14,18 @@ body {
   box-sizing: inherit;
 }
 
-@import url("https://fonts.googleapis.com/css2?family=Amethysta&family=Keania+One&family=Oswald:wght@200..700&family=Young+Serif&display=swap");
-
 @theme {
   --font-oswald: Oswald, "sans-serif";
+}
+
+.cl-internal-1dauvpw {
+  opacity: 0;
+}
+
+.cl-internal-1dauvpw {
+  display: none;
+}
+
+.cl-internal-l2l775 {
+  display: none;
 }
