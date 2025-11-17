@@ -8,9 +8,8 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 const MovieFacts = () => {
   return (
     <div
-      className="p-10 flex flex-col items-center justify-center "
+      className="p-10 flex flex-col items-center justify-center bg-linear-to-r from-blue-500  to-green-900 shadow-md "
       style={{
-        background: "#000000",
         color: "#e0e0e0",
         fontFamily: "'Poppins', sans-serif",
       }}
@@ -64,7 +63,7 @@ const MovieFacts = () => {
             }}
           >
             <AccordionSummary
-              expandIcon={<ExpandMoreIcon sx={{ color: "red" }} />}
+              expandIcon={<ExpandMoreIcon sx={{ color: "white" }} />}
               aria-controls={`panel${index}-content`}
               id={`panel${index}-header`}
             >

@@ -4,15 +4,15 @@ import topRatedMovies from "../../topRated.json";
 
 const TopRated = () => {
   return (
-    <section className="bg-black py-12 px-6">
+    <section className="bg-linear-to-r from-blue-500  to-green-900 shadow-md py-12 px-6">
       <h2 className="text-4xl font-bold text-white mb-8 text-center drop-shadow-lg">
-        Top Rated Movies
+        Filmat më të vlerësuar
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
         {topRatedMovies.map((movie, index) => (
           <div
             key={index}
-            className="bg-red-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl "
+            className="bg-black rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl "
           >
             <img
               src={movie.image}

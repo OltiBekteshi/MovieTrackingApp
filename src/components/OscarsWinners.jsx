@@ -3,23 +3,27 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/effect-fade";
-import { EffectFade, Pagination } from "swiper/modules";
+import { Autoplay, EffectFade, Pagination } from "swiper/modules";
 import { slides } from "../utils/dummyData";
 
 const OscarsWinners = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <section className="w-full bg-red-900 py-10">
-      <h3 className="text-white pl-4 font-bold text-5xl pb-6 flex justify-center">
-        Top 10 Movies with the most Oscar wins
+    <section className="w-full bg-linear-to-r from-blue-500  to-green-900 shadow-md py-10">
+      <h3 className="text-white pl-4 font-bold text-5xl pb-6 flex justify-center ">
+        10 filmat me më shumë çmime Oscar
       </h3>
-      <div className="max-w-6xl mx-auto px-4">
+      <div className="max-w-6xl mx-auto px-4 ">
         <Swiper
           spaceBetween={50}
+          autoplay={{
+            delay: 3200,
+            disableOnInteraction: false,
+          }}
           effect="fade"
           pagination={{ clickable: true }}
-          modules={[EffectFade, Pagination]}
+          modules={[EffectFade, Pagination, Autoplay]}
           autoHeight={true}
           onSlideChange={(swiper) => setActiveIndex(swiper.activeIndex)}
         >

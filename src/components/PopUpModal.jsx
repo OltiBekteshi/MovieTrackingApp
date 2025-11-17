@@ -66,10 +66,10 @@ const MovieModal = ({
             <h2 className="text-2xl font-bold mb-4">{selectedMovie.title}</h2>
             <p className="mb-4">{selectedMovie.overview}</p>
             <p className="text-sm text-gray-600 mb-2">
-              Release: {selectedMovie.release_date}
+              Data publikimit: {selectedMovie.release_date}
             </p>
             <p className="text-sm text-gray-600 mb-2">
-              Duration:{" "}
+              Kohezgjatja:{" "}
               {runtime
                 ? `${Math.floor(runtime / 60)}h ${runtime % 60}m`
                 : "N/A"}
@@ -83,14 +83,14 @@ const MovieModal = ({
                 onClick={() => handleAddToWatchlist(selectedMovie)}
                 className="bg-gray-600 p-3 text-white font-bold rounded-xl hover:shadow-xl hover:cursor-pointer flex-1"
               >
-                Add to Watchlist
+                Shto ne listn e filmave te shikuar
               </button>
 
               <button
                 onClick={() => handleAddToWatchLater(selectedMovie)}
                 className="bg-gray-600 p-3 text-white font-bold rounded-xl hover:shadow-xl hover:cursor-pointer flex-1"
               >
-                Add to Watch later
+                Shiko me vone
               </button>
             </div>
 
@@ -99,7 +99,7 @@ const MovieModal = ({
                 onClick={() => handleWatchTrailer(selectedMovie.id)}
                 className="bg-red-600 p-3 w-full mt-3 text-white font-bold rounded-xl hover:shadow-xl hover:cursor-pointer flex-1"
               >
-                Watch Trailer
+                Shiko trailerin
               </button>
             </div>
           </>

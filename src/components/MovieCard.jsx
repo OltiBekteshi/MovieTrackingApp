@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Toaster, toast } from "sonner";
 import PopUpModal from "./PopUpModal";
-import { FaTransgenderAlt } from "react-icons/fa";
+import { addToWatchlist, addToWatchLater } from "./../utils/movieService";
 
-const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater }) => {
+const MovieCard = ({
+  watchlist,
+  setWatchlist,
+  watchlater,
+  setWatchlater,
+  userId,
+}) => {
   const [movies, setMovies] = useState([]);
   const [movieDetails, setMovieDetails] = useState({});
   const [page, setPage] = useState(1);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [trailerKey, setTrailerKey] = useState(null);
   const apiKey = import.meta.env.VITE_TMDB_API_KEY;
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -49,28 +52,38 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater }) => {
     else toast("No trailer available for this movie");
   };
 
-  const handleAddToWatchlist = (movie) => {
-    if (!watchlist.find((m) => m.id === movie.id)) {
-      setWatchlist([...watchlist, movie]);
-      toast.success(`${movie.title} added to your watchlist!`);
+  const handleAddToWatchlist = async (movie) => {
+    if (!watchlist.find((m) => m.movie_id === movie.id)) {
+      try {
+        await addToWatchlist(userId, movie);
+        setWatchlist([...watchlist, { ...movie, movie_id: movie.id }]);
+        toast.success(`${movie.title} added to your watchlist!`);
+      } catch (err) {
+        toast.error("Failed to add movie to watchlist");
+        console.error(err);
+      }
     } else {
       toast(`${movie.title} is already in your watchlist.`);
     }
-    navigate("/watchlist");
   };
 
-  const handleAddToWatchLater = (movie) => {
-    if (!watchlater.find((m) => m.id === movie.id)) {
-      setWatchlater([...watchlater, movie]);
-      toast.success(`${movie.title} added to Watch Later!`);
+  const handleAddToWatchLater = async (movie) => {
+    if (!watchlater.find((m) => m.movie_id === movie.id)) {
+      try {
+        await addToWatchLater(userId, movie);
+        setWatchlater([...watchlater, { ...movie, movie_id: movie.id }]);
+        toast.success(`${movie.title} added to Watch Later!`);
+      } catch (err) {
+        toast.error("Failed to add movie to Watch Later");
+        console.error(err);
+      }
     } else {
       toast(`${movie.title} is already in your Watch Later list.`);
     }
-    navigate("/watch-later");
   };
 
   return (
-    <div className="bg-black min-h-screen p-6">
+    <div className="bg-linear-to-r from-blue-500  to-green-900 shadow-md  min-h-screen p-6">
       <h1 className="text-3xl font-bold mb-6 text-center text-white mt-20">
         Movies
       </h1>
@@ -80,7 +93,7 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater }) => {
           <div
             key={movie.id}
             onClick={() => setSelectedMovie(movie)}
-            className="bg-red-900 text-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition duration-300 cursor-pointer"
+            className="bg-black text-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition duration-300 cursor-pointer"
           >
             <img
               src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -93,7 +106,7 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater }) => {
               <p className="text-sm text-white">{movie.release_date}</p>
 
               <p className="text-sm text-white mt-1 font-bold">
-                Duration:{" "}
+                Kohezgjatja:{" "}
                 {movieDetails[movie.id]
                   ? `${Math.floor(movieDetails[movie.id] / 60)}h ${
                       movieDetails[movie.id] % 60
@@ -106,7 +119,7 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater }) => {
               </p>
               <div>
                 <button className="bg-gray-800 p-3 text-white font-bold mt-2 rounded-xl hover:shadow-xl hover:cursor-pointer w-full">
-                  See details
+                  Shiko detajet
                 </button>
               </div>
             </div>
@@ -120,14 +133,14 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater }) => {
           disabled={page === 1}
           onClick={() => setPage((prev) => prev - 1)}
         >
-          Prev
+          Para
         </button>
         <span className="text-white px-2 py-2">{page}</span>
         <button
           className="bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-800 hover:cursor-pointer"
           onClick={() => setPage((prev) => prev + 1)}
         >
-          Next
+          Pas
         </button>
       </div>
 

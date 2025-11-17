@@ -7,8 +7,8 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 bg-white shadow-md">
-      <div className="max-w-7xl mx-auto flex items-center justify-between p-4 text-black">
+    <nav className="fixed top-0 left-0 w-full z-50 bg-linear-to-r from-blue-500  to-green-900 shadow-md ">
+      <div className="max-w-7xl mx-auto flex items-center justify-between p-4 text-white">
         <Link
           to="/"
           className="text-xl font-bold hover:opacity-80 flex items-center"
@@ -18,40 +18,40 @@ const Navbar = () => {
         </Link>
 
         <div className="hidden md:flex items-center gap-5">
-          <Link to="/" className="px-3 py-2 rounded-2xl hover:bg-gray-200">
-            Home
+          <Link to="/" className="px-3 py-2 rounded-2xl hover:opacity-[0.7]">
+            Ballina
           </Link>
           <Link
             to="/movies"
-            className="px-3 py-2 rounded-2xl hover:bg-gray-200"
+            className="px-3 py-2 rounded-2xl hover:opacity-[0.7]"
           >
-            Movies
+            Filmat
           </Link>
           <Link
             to="/watchlist"
-            className="px-3 py-2 rounded-2xl hover:bg-gray-200"
+            className="px-3 py-2 rounded-2xl hover:opacity-[0.7]"
           >
-            Watchlist
+            Lista e filmave te shikuar
           </Link>
           <Link
             to="/watch-later"
-            className="px-3 py-2 rounded-2xl hover:bg-gray-200"
+            className="px-3 py-2 rounded-2xl hover:opacity-[0.7]"
           >
-            Watch later
+            Shiko me vone
           </Link>
 
           <SignedOut>
             <Link
               to="/sign-in"
-              className="bg-black text-white px-4 py-2 rounded-2xl hover:bg-gray-800"
+              className="border text-white px-4 py-2 rounded-2xl hover:opacity-[0.7]"
             >
-              Log in
+              Kyqu
             </Link>
             <Link
               to="/sign-up"
-              className="border border-black px-4 py-2 rounded-2xl hover:bg-gray-100"
+              className="border px-4 py-2 rounded-2xl hover:opacity-[0.7]"
             >
-              Sign up
+              Krijo llogari
             </Link>
           </SignedOut>
 
@@ -77,28 +77,28 @@ const Navbar = () => {
             className="block px-4 py-3 hover:bg-gray-200"
             onClick={() => setIsOpen(false)}
           >
-            Home
+            Ballina
           </Link>
           <Link
             to="/movies"
             className="block px-4 py-3 hover:bg-gray-200"
             onClick={() => setIsOpen(false)}
           >
-            Movies
+            Filmat
           </Link>
           <Link
             to="/watchlist"
             className="block px-4 py-3 hover:bg-gray-200"
             onClick={() => setIsOpen(false)}
           >
-            Watchlist
+            Lista e filmave te shikuara
           </Link>
           <Link
             to="/watch-later"
             className="block px-4 py-3 hover:bg-gray-200"
             onClick={() => setIsOpen(false)}
           >
-            Watch later
+            Shiko me vone
           </Link>
 
           <SignedOut>

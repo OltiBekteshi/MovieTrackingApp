@@ -4,25 +4,15 @@ import "swiper/css";
 import "swiper/css/navigation";
 import { Pagination } from "swiper/modules";
 import slides from "../../slides.json";
-import { toast } from "sonner";
 
-const Swipper = ({ watchlist, setWatchlist }) => {
+const Swipper = () => {
   const swiperRef = useRef(null);
 
-  const handleAddToWatchlist = (movie) => {
-    if (!watchlist.find((m) => m.title === movie.title)) {
-      setWatchlist([...watchlist, movie]);
-      toast.success(`${movie.title} added to your watchlist!`);
-    } else {
-      toast(`${movie.title} is already in your watchlist.`);
-    }
-  };
-
   return (
-    <section className="w-full max-w-full lg:max-w-6xl mx-auto pt-28 md:pt-24 bg-black ">
+    <section className="w-full max-w-full lg:max-w-6xl mx-auto pt-28 md:pt-24 bg-black pb-5 ">
       <h3>
         <p className="font-oswald text-white flex justify-center font-bold text-4xl p-3">
-          Top trending Movies
+          Filmat me ne trend
         </p>
       </h3>
       <Swiper
@@ -64,23 +54,18 @@ const Swipper = ({ watchlist, setWatchlist }) => {
                     >
                       Watch Trailer
                     </button>
-
-                    <button
-                      onClick={() => handleAddToWatchlist(movie)}
-                      className="bg-gray-700 px-4 py-2 rounded-lg hover:bg-gray-800 transition w-fit sm:w-auto hover:cursor-pointer mr-10"
-                    >
-                      Add to Watchlist
-                    </button>
                   </div>
                 </div>
 
                 <div>
-                  <h2 className="text-xl sm:text-2xl font-bold mb-4">Cast:</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold mb-4">
+                    Aktruan:
+                  </h2>
                   <div className="text-sm text-gray-300 leading-relaxed">
                     {movie.cast.map((actor, i) => (
                       <span key={i} className="block mb-1">
-                        <span className="font-semibold">{actor.name}</span> as{" "}
-                        {actor.role}
+                        <span className="font-semibold">{actor.name}</span>{" "}
+                        luajti {actor.role}
                       </span>
                     ))}
                   </div>
@@ -94,13 +79,13 @@ const Swipper = ({ watchlist, setWatchlist }) => {
             className="customPrev bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-800 hover:cursor-pointer"
             onClick={() => swiperRef.current?.slidePrev()}
           >
-            Back
+            Para
           </button>
           <button
             className="customNext bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-800 hover:cursor-pointer"
             onClick={() => swiperRef.current?.slideNext()}
           >
-            Next
+            Pas
           </button>
         </div>
       </Swiper>
