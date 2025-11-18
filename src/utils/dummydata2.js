@@ -1,53 +1,53 @@
 export const slides = [
-    {
-      img: "/LOR.jpg",
-      title: "The Lord of the Rings (2001), 11 wins",
-      text: "A meek Hobbit from the Shire and eight companions set out on a journey to destroy the powerful One Ring and save Middle-earth from the Dark Lord Sauron.",
-    },
-    {
-      img: "/titanic.jfif",
-      title: "Titanic (1997), 11 wins",
-      text: "A seventeen-year-old aristocrat falls in love with a kind but poor artist aboard the luxurious, ill-fated R.M.S. Titanic.",
-    },
-    {
-      img: "/Benhur.jfif",
-      title: "Benhur (1959), 11 wins",
-      text: "A Jewish prince is betrayed and sent into slavery by a Roman friend in 1st-century Jerusalem, but it's not long before he regains his freedom and comes back for revenge.",
-    },
-    {
-      img: "/EnglishPatient.jfif",
-      title: "The English Patient (1996), 9 wins ",
-      text: "At the close of World War II, a young nurse tends to a badly burned plane crash victim. His past is shown in flashbacks, revealing an involvement in a fateful love affair.",
-    },
+  {
+    img: "/LOR.jpg",
+    title: "The Lord of the Rings (2001), 11 wins",
+    text: "Një Hobit i butë nga Shire dhe tetë shokë nisen në një udhëtim për të shkatërruar Unazën e fuqishme të Vetme dhe për të shpëtuar Tokën e Mesme nga Lordi i Errët Sauron.",
+  },
+  {
+    img: "/titanic.jfif",
+    title: "Titanic (1997), 11 wins",
+    text: "Një aristokrat shtatëmbëdhjetëvjeçar bie në dashuri me një artist të sjellshëm, por të varfër, në bordin e anijes luksoze dhe të pafat R.M.S. Titanic.",
+  },
+  {
+    img: "/Benhur.jfif",
+    title: "Benhur (1959), 11 wins",
+    text: "Një princ hebre tradhtohet dhe dërgohet në skllavëri nga një mik romak në Jerusalemin e shekullit të parë, por nuk kalon shumë kohë para se ai të rifitojë lirinë dhe të kthehet për hakmarrje.",
+  },
+  {
+    img: "/EnglishPatient.jfif",
+    title: "The English Patient (1996), 9 wins ",
+    text: "Në fund të Luftës së Dytë Botërore, një infermiere e re kujdeset për një viktimë të djegur rëndë nga një rrëzim avioni. E kaluara e tij tregohet në rikthime në të kaluarën, duke zbuluar një përfshirje në një histori dashurie fatale.",
+  },
 
-    {
-      img: "/TheLastEmperor.jfif",
-      title: "The Last Emperor (1987), 9 wins",
-      text: "Bernardo Bertolucci's Oscar-winning dramatization of China's eleventh and final monarch of the Qing dynasty: Emperor Puyi.",
-    },
-    {
-      img: "/Gigi.jfif",
-      title: "Gigi (1958), 9 wins ",
-      text: "Weary of the conventions of Parisian society, a rich playboy and a youthful courtesan-in-training enjoy a platonic friendship which may not stay platonic for long.",
-    },
-    {
-      img: "/Slumdog.jfif",
-      title: "Slumdog Millionare (2008), 8 wins",
-      text: "When a teenager from the slums of Mumbai is interrogated about his suspicious performance on a quiz show, he revisits various events from his past to explain how he knew all the answers.",
-    },
-    {
-      img: "/Amadeus.jfif",
-      title: "Amadeus (1984), 8 wins",
-      text: "The life and work of Wolfgang Amadeus Mozart seen through the eyes of his contemporary and rival, Antonio Salieri.",
-    },
-    {
-      img: "/Gandhi.jfif",
-      title: "Gandhi (1982), 8 wins",
-      text: "The life of the lawyer who became the famed leader of the Indian revolts against the British rule through his philosophy of nonviolent protest.",
-    },
-    {
-      img: "/waterfront.jfif",
-      title: "On the Waterfront (1954), 8 wins",
-      text: "An ex-prize fighter turned New Jersey longshoreman struggles to stand up to his corrupt union bosses, including his older brother, as he starts to connect with the grieving sister of one of the syndicate's victims.",
-    },
-  ];
+  {
+    img: "/TheLastEmperor.jfif",
+    title: "The Last Emperor (1987), 9 wins",
+    text: "Dramatizimi fitues i çmimit Oscar nga Bernardo Bertolucci i monarkut të njëmbëdhjetë dhe të fundit të Kinës të dinastisë Qing: Perandorit Puyi.",
+  },
+  {
+    img: "/Gigi.jfif",
+    title: "Gigi (1958), 9 wins ",
+    text: "Të lodhur nga konvencionet e shoqërisë pariziene, një playboy i pasur dhe një kurtizane e re në stërvitje gëzojnë një miqësi platonike e cila mund të mos qëndrojë platonike për shumë kohë.",
+  },
+  {
+    img: "/Slumdog.jfif",
+    title: "Slumdog Millionare (2008), 8 wins",
+    text: "Kur një adoleshent nga lagjet e varfra të Mumbait merret në pyetje për performancën e tij të dyshimtë në një kuiz, ai rikthehet në mendje në ngjarje të ndryshme nga e kaluara e tij për të shpjeguar se si i dinte të gjitha përgjigjet.",
+  },
+  {
+    img: "/Amadeus.jfif",
+    title: "Amadeus (1984), 8 wins",
+    text: "Jeta dhe vepra e Wolfgang Amadeus Mozartit e parë përmes syve të bashkëkohësit dhe rivalit të tij, Antonio Salieri.",
+  },
+  {
+    img: "/Gandhi.jfif",
+    title: "Gandhi (1982), 8 wins",
+    text: "Jeta e avokatit që u bë udhëheqësi i famshëm i revoltave indiane kundër sundimit britanik nëpërmjet filozofisë së tij të protestës paqësore.",
+  },
+  {
+    img: "/waterfront.jfif",
+    title: "On the Waterfront (1954), 8 wins",
+    text: "Një ish-boksier çmimesh i kthyer në punonjës të portit në Nju Xhersi përpiqet t'u bëjë ballë shefave të tij të korruptuar të sindikatës, përfshirë vëllain e tij më të madh, ndërsa fillon të lidhet me motrën e pikëlluar të njërës prej viktimave të sindikatës.",
+  },
+];

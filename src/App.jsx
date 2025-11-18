@@ -21,7 +21,6 @@ function App() {
   const [watchlist, setWatchlist] = useState([]);
   const [watchlater, setWatchlater] = useState([]);
 
-  // Fetch watchlist & watchlater from Supabase
   useEffect(() => {
     if (!userId) return;
 

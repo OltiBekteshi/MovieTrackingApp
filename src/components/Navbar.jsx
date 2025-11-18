@@ -31,13 +31,13 @@ const Navbar = () => {
             to="/watchlist"
             className="px-3 py-2 rounded-2xl hover:opacity-[0.7]"
           >
-            Lista e filmave te shikuar
+            Lista e filmave të shikuar
           </Link>
           <Link
             to="/watch-later"
             className="px-3 py-2 rounded-2xl hover:opacity-[0.7]"
           >
-            Shiko me vone
+            Shiko më vonë
           </Link>
 
           <SignedOut>
@@ -91,14 +91,14 @@ const Navbar = () => {
             className="block px-4 py-3 hover:bg-gray-200"
             onClick={() => setIsOpen(false)}
           >
-            Lista e filmave te shikuara
+            Lista e filmave të shikuara
           </Link>
           <Link
             to="/watch-later"
             className="block px-4 py-3 hover:bg-gray-200"
             onClick={() => setIsOpen(false)}
           >
-            Shiko me vone
+            Shiko më vonë
           </Link>
 
           <SignedOut>
@@ -107,14 +107,14 @@ const Navbar = () => {
               className="block px-4 py-3 bg-black text-white rounded-lg m-2 text-center hover:bg-gray-800"
               onClick={() => setIsOpen(false)}
             >
-              Log in
+              Kyqu
             </Link>
             <Link
               to="/sign-up"
               className="block px-4 py-3 border border-black rounded-lg m-2 text-center hover:bg-gray-100"
               onClick={() => setIsOpen(false)}
             >
-              Sign up
+              Krijo llogarinë
             </Link>
           </SignedOut>
 

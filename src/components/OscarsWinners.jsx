@@ -4,7 +4,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/effect-fade";
 import { Autoplay, EffectFade, Pagination } from "swiper/modules";
-import { slides } from "../utils/dummyData";
+import { slides } from "../utils/dummydata2";
 
 const OscarsWinners = () => {
   const [activeIndex, setActiveIndex] = useState(0);

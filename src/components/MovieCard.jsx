@@ -15,6 +15,9 @@ const MovieCard = ({
   const [page, setPage] = useState(1);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [trailerKey, setTrailerKey] = useState(null);
+
+  const [searchTerm, setSearchTerm] = useState("");
+
   const apiKey = import.meta.env.VITE_TMDB_API_KEY;
 
   useEffect(() => {
@@ -40,6 +43,10 @@ const MovieCard = ({
     fetchMovies();
   }, [apiKey, page]);
 
+  const filteredMovies = movies.filter((movie) =>
+    movie.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const handleWatchTrailer = async (movieId) => {
     const res = await fetch(
       `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${apiKey}&language=en-US`
@@ -57,13 +64,13 @@ const MovieCard = ({
       try {
         await addToWatchlist(userId, movie);
         setWatchlist([...watchlist, { ...movie, movie_id: movie.id }]);
-        toast.success(`${movie.title} added to your watchlist!`);
+        toast.success(`${movie.title} u shtua në listën e filmave të shikuar!`);
       } catch (err) {
-        toast.error("Failed to add movie to watchlist");
+        toast.error("Shtimi i filmit dështoi");
         console.error(err);
       }
     } else {
-      toast(`${movie.title} is already in your watchlist.`);
+      toast(`${movie.title} gjindet në listën e filmave të shikuar`);
     }
   };
 
@@ -72,24 +79,36 @@ const MovieCard = ({
       try {
         await addToWatchLater(userId, movie);
         setWatchlater([...watchlater, { ...movie, movie_id: movie.id }]);
-        toast.success(`${movie.title} added to Watch Later!`);
+        toast.success(`${movie.title} u shtua në Shiko më vonë!`);
       } catch (err) {
-        toast.error("Failed to add movie to Watch Later");
+        toast.error("Shtimi i filmit dështoi");
         console.error(err);
       }
     } else {
-      toast(`${movie.title} is already in your Watch Later list.`);
+      toast(`${movie.title} gjindet në listën e Shiko më vonë`);
     }
   };
 
   return (
-    <div className="bg-linear-to-r from-blue-500  to-green-900 shadow-md  min-h-screen p-6">
+    <div className="bg-linear-to-r from-blue-500 to-green-900 shadow-md min-h-screen p-6">
       <h1 className="text-3xl font-bold mb-6 text-center text-white mt-20">
-        Movies
+        Filmat
       </h1>
+
+      <div className="flex justify-center mb-6">
+        <input
+          type="text"
+          placeholder="Kerko filmin..."
+          className="w-full max-w-md px-4 py-2 rounded-lg border border-gray-300 text-white"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
       <Toaster position="top-right" />
+
       <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-        {movies.map((movie) => (
+        {filteredMovies.map((movie) => (
           <div
             key={movie.id}
             onClick={() => setSelectedMovie(movie)}
@@ -117,11 +136,10 @@ const MovieCard = ({
               <p className="text-yellow-500 font-bold mt-1">
                 ⭐ {movie.vote_average.toFixed(1)}
               </p>
-              <div>
-                <button className="bg-gray-800 p-3 text-white font-bold mt-2 rounded-xl hover:shadow-xl hover:cursor-pointer w-full">
-                  Shiko detajet
-                </button>
-              </div>
+
+              <button className="bg-gray-800 p-3 text-white font-bold mt-2 rounded-xl hover:shadow-xl w-full hover:cursor-pointer">
+                Shiko detajet
+              </button>
             </div>
           </div>
         ))}
@@ -129,18 +147,18 @@ const MovieCard = ({
 
       <div className="flex justify-center mt-6 gap-4">
         <button
-          className="bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-800 hover:cursor-pointer"
+          className="bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-800"
           disabled={page === 1}
           onClick={() => setPage((prev) => prev - 1)}
         >
-          Para
+          Pas
         </button>
         <span className="text-white px-2 py-2">{page}</span>
         <button
-          className="bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-800 hover:cursor-pointer"
+          className="bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-800"
           onClick={() => setPage((prev) => prev + 1)}
         >
-          Pas
+          Para
         </button>
       </div>
 

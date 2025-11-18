@@ -12,7 +12,7 @@ const Swipper = () => {
     <section className="w-full max-w-full lg:max-w-6xl mx-auto pt-28 md:pt-24 bg-black pb-5 ">
       <h3>
         <p className="font-oswald text-white flex justify-center font-bold text-4xl p-3">
-          Filmat me ne trend
+          Filmat më në trend
         </p>
       </h3>
       <Swiper
@@ -52,7 +52,7 @@ const Swipper = () => {
                       onClick={() => window.open(movie.trailer, "_blank")}
                       className="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition w-fit sm:w-auto hover:cursor-pointer mr-0"
                     >
-                      Watch Trailer
+                      Shiko trailerin
                     </button>
                   </div>
                 </div>
@@ -65,7 +65,8 @@ const Swipper = () => {
                     {movie.cast.map((actor, i) => (
                       <span key={i} className="block mb-1">
                         <span className="font-semibold">{actor.name}</span>{" "}
-                        luajti {actor.role}
+                        luajti
+                        <span className="font-semibold"> {actor.role}</span>
                       </span>
                     ))}
                   </div>
@@ -79,13 +80,13 @@ const Swipper = () => {
             className="customPrev bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-800 hover:cursor-pointer"
             onClick={() => swiperRef.current?.slidePrev()}
           >
-            Para
+            Pas
           </button>
           <button
             className="customNext bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-800 hover:cursor-pointer"
             onClick={() => swiperRef.current?.slideNext()}
           >
-            Pas
+            Para
           </button>
         </div>
       </Swiper>

@@ -1,6 +1,5 @@
 import { supabase } from "./supabaseClient";
 
-// WATCHLIST
 export async function getWatchlist(userId) {
   const { data, error } = await supabase
     .from("watchlist")
@@ -50,7 +49,6 @@ export async function addComment(userId, movieId, comment) {
   return data;
 }
 
-// WATCHLATER
 export async function getWatchLater(userId) {
   const { data, error } = await supabase
     .from("watchlater")
@@ -87,3 +85,24 @@ export async function removeFromWatchLater(userId, movieId) {
   if (error) throw error;
   return data;
 }
+
+export const saveComment = async (userId, movieId, comment) => {
+  const { data, error } = await supabase
+    .from("comments")
+    .insert([{ user_id: userId, movie_id: movieId, comment }]);
+
+  if (error) throw error;
+  return data;
+};
+
+export const getComments = async (userId, movieId) => {
+  const { data, error } = await supabase
+    .from("comments")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("movie_id", movieId)
+    .order("created_at", { ascending: true });
+
+  if (error) throw error;
+  return data;
+};

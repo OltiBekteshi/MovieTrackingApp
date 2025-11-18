@@ -1,7 +1,7 @@
 [
   {
     "title": "Inception",
-    "description": "Inception (2010): A skilled thief who steals secrets through dream invasion is given a chance at redemption by performing the impossible: planting an idea in someone’s mind. A mind-bending thriller exploring dreams within dreams.",
+    "description": "Një hajdut i aftë që vjedh sekrete përmes pushtimit të ëndrrave i jepet një shans për shpengim duke kryer të pamundurën: duke mbjellë një ide në mendjen e dikujt. Një thriller tronditës që eksploron ëndrrat brenda ëndrrave.",
     "trailer": "https://www.youtube.com/watch?v=Qwe6qXFTdgc",
     "image": "/images.jfif",
     "cast": [
@@ -13,7 +13,7 @@
   },
   {
     "title": "The Dark Knight",
-    "description": "The Dark Knight (2008): When a menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman, James Gordon and Harvey Dent must work together to put an end to the madness.",
+    "description": "Kur një kërcënim i njohur si Jokeri shkakton kaos dhe rrëmujë mbi banorët e Gothamit, Batman, James Gordon dhe Harvey Dent duhet të punojnë së bashku për t'i dhënë fund kësaj çmendurie.",
     "trailer": "https://www.youtube.com/watch?v=vbjYVETxZqM",
     "image": "/darkknight.jfif",
     "cast": [
@@ -25,7 +25,7 @@
   },
   {
     "title": "Zodiac",
-    "description": "Zodiac (2007): Between 1968 and 1983, a San Francisco cartoonist becomes an amateur detective obsessed with tracking down the Zodiac Killer, an unidentified individual who terrorizes Northern California with a killing spree.",
+    "description": "Midis viteve 1968 dhe 1983, një karikaturist nga San Francisko bëhet një detektiv amator i fiksuar pas gjurmimit të Vrasësit Zodiac, një individ i paidentifikuar që terrorizon Kaliforninë Veriore me një mori vrasjesh.",
     "trailer": "https://www.youtube.com/watch?v=yNncHPl1UXg",
     "image": "/zodiac.jfif",
     "cast": [
@@ -37,7 +37,7 @@
   },
   {
     "title": "The Invisible Guest",
-    "description": "The Invisible Guest (2016): A young businessman wakes up in a hotel room locked from the inside with the dead body of his lover next to him. He hires a prestigious lawyer, and over one night they work together to clarify what happened in a frenetic race against time.",
+    "description": "Një biznesmen i ri zgjohet në një dhomë hoteli të mbyllur nga brenda me trupin e pajetë të të dashurës së tij pranë tij. Ai punëson një avokat prestigjioz dhe gjatë një nate ata punojnë së bashku për të sqaruar se çfarë ka ndodhur në një garë frenetike kundër kohës.",
     "trailer": "https://www.youtube.com/watch?v=epCg2RbyF80",
     "image": "/invisible.jfif",
     "cast": [
@@ -49,7 +49,7 @@
   },
   {
     "title": "Interstellar",
-    "description": "Interstellar (2014): In a dystopian future where Earth is dying, a group of explorers travels through a wormhole to find a new home for humanity. A visually stunning tale of love, sacrifice, and the vastness of space.",
+    "description": "Në një të ardhme distopiane ku Toka po vdes, një grup eksploruesish udhëtojnë nëpër një vrimë krimbi për të gjetur një shtëpi të re për njerëzimin. Një rrëfim mahnitës vizualisht për dashurinë, sakrificën dhe pafundësinë e hapësirës.",
     "trailer": "https://www.youtube.com/watch?v=2LqzF5WauAw",
     "image": "/interstellar.jfif",
     "cast": [
@@ -61,7 +61,7 @@
   },
   {
     "title": "Se7en",
-    "description": "Se7en (1995): Two detectives hunt a serial killer who uses the seven deadly sins as his modus operandi. A dark, gripping thriller that delves into the depths of human depravity.",
+    "description": "Dy detektivë ndjekin një vrasës serial i cili përdor shtatë mëkatet vdekjeprurëse si mënyrën e tij të veprimit. Një thriller i errët dhe rrëqethës që zhytet në thellësitë e shthurjes njerëzore.",
     "trailer": "https://www.youtube.com/watch?v=KPOuJGkpblk",
     "image": "/seven.jfif",
     "cast": [

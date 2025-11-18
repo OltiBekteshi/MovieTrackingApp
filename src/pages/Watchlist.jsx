@@ -1,34 +1,57 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { removeFromWatchlist } from "../utils/movieService";
+import {
+  removeFromWatchlist,
+  saveComment,
+  getComments,
+} from "../utils/movieService";
 
 const Watchlist = ({ watchlist, setWatchlist, userId }) => {
   const navigate = useNavigate();
+
   const [comments, setComments] = useState({});
   const [showInput, setShowInput] = useState({});
   const [newComment, setNewComment] = useState({});
 
+  useEffect(() => {
+    if (!userId || !watchlist) return;
+
+    const loadComments = async () => {
+      const allComments = {};
+
+      for (const movie of watchlist) {
+        const result = await getComments(userId, movie.movie_id);
+
+        allComments[movie.movie_id] = result.map((c) => c.comment);
+      }
+
+      setComments(allComments);
+    };
+
+    loadComments();
+  }, [userId, watchlist]);
+
   const handleRemove = async (movieId) => {
     if (!userId) {
-      toast.error("Kyqu per te fshire filmin");
+      toast.error("Duhet të jeni të kycur për të fshirë filmin");
       return;
     }
 
     try {
       await removeFromWatchlist(userId, movieId);
+
       const updated = watchlist.filter((m) => m.movie_id !== movieId);
       setWatchlist(updated);
-      toast.success("Filmi u fshi me sukses");
 
-      setComments((prev) => {
-        const updatedComments = { ...prev };
-        delete updatedComments[movieId];
-        return updatedComments;
-      });
+      const updatedComments = { ...comments };
+      delete updatedComments[movieId];
+      setComments(updatedComments);
+
+      toast.success("Filmi u fshi me sukses");
     } catch (err) {
       console.error(err);
-      toast.error("Fshirja e filmit deshtoi");
+      toast.error("Fshirja e filmit dështoi");
     }
   };
 
@@ -36,27 +59,35 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
     setShowInput((prev) => ({ ...prev, [movieId]: !prev[movieId] }));
   };
 
-  const handleSaveComment = (movieId) => {
+  const handleSaveComment = async (movieId) => {
     if (!newComment[movieId] || newComment[movieId].trim() === "") {
-      toast.error("Hapesira per koment nuk duhet te jete boshe");
+      toast.error("Komenti nuk mund të jetë bosh");
       return;
     }
 
-    setComments((prev) => ({
-      ...prev,
-      [movieId]: [...(prev[movieId] || []), newComment[movieId]],
-    }));
+    try {
+      await saveComment(userId, movieId, newComment[movieId]);
 
-    setNewComment((prev) => ({ ...prev, [movieId]: "" }));
-    setShowInput((prev) => ({ ...prev, [movieId]: false }));
-    toast.success("Komenti i shtua");
+      setComments((prev) => ({
+        ...prev,
+        [movieId]: [...(prev[movieId] || []), newComment[movieId]],
+      }));
+
+      setNewComment((prev) => ({ ...prev, [movieId]: "" }));
+      setShowInput((prev) => ({ ...prev, [movieId]: false }));
+
+      toast.success("Komenti u ruajt me sukses!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Ruajtja e komentit dështoi");
+    }
   };
 
   if (!watchlist || watchlist.length === 0) {
     return (
       <div className="bg-black min-h-screen text-white flex flex-col items-center justify-center">
         <h1 className="text-3xl font-bold mb-4">
-          Lista e filmave te shikuar eshte e thate
+          Lista e filmave të shikuar është bosh
         </h1>
         <button
           className="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 cursor-pointer"
@@ -69,9 +100,9 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
   }
 
   return (
-    <div className="bg-linear-to-r from-blue-500  to-green-900 shadow-md  min-h-screen p-6">
+    <div className="bg-linear-to-r from-blue-500 to-green-900 shadow-md min-h-screen p-6">
       <h1 className="text-3xl font-bold mb-6 text-white text-center mt-20">
-        Lista e filmave te shikuara
+        Lista e filmave të shikuara
       </h1>
 
       <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
@@ -120,11 +151,11 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
                         [movie.movie_id]: e.target.value,
                       }))
                     }
-                    placeholder="Write a comment..."
+                    placeholder="Shkruaj një koment..."
                     className="w-full p-2 rounded bg-gray-800 text-white text-sm"
                   />
                   <button
-                    className="bg-green-700 p-2 rounded-lg mt-2 hover:bg-green-800 text-sm"
+                    className="bg-green-700 p-2 rounded-lg mt-2 hover:bg-green-800 text-sm hover:cursor-pointer"
                     onClick={() => handleSaveComment(movie.movie_id)}
                   >
                     Ruaj komentin
@@ -136,7 +167,7 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
                 className="bg-blue-700 p-2 text-white rounded-lg hover:bg-blue-800 mt-4 hover:cursor-pointer"
                 onClick={() => handleAddComment(movie.movie_id)}
               >
-                {showInput[movie.movie_id] ? "Anulo" : "Shto komentin"}
+                {showInput[movie.movie_id] ? "Anulo" : "Shto koment"}
               </button>
 
               <button
