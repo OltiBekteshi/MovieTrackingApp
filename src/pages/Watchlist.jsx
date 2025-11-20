@@ -5,6 +5,7 @@ import {
   removeFromWatchlist,
   saveComment,
   getComments,
+  deleteComment,
 } from "../utils/movieService";
 
 const Watchlist = ({ watchlist, setWatchlist, userId }) => {
@@ -30,7 +31,8 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
 
       for (const movie of watchlist) {
         const result = await getComments(userId, movie.movie_id);
-        allComments[movie.movie_id] = result.map((c) => c.comment);
+        // store full comment objects for each movie
+        allComments[movie.movie_id] = result;
       }
 
       setComments(allComments);
@@ -73,11 +75,14 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
     }
 
     try {
-      await saveComment(userId, movieId, newComment[movieId]);
+      const saved = await saveComment(userId, movieId, newComment[movieId]);
+      // Supabase returns an array of inserted rows when using .select()
+      const savedComment = saved[0];
 
+      // ✅ instantly show new comment without refresh
       setComments((prev) => ({
         ...prev,
-        [movieId]: [...(prev[movieId] || []), newComment[movieId]],
+        [movieId]: [...(prev[movieId] || []), savedComment],
       }));
 
       setNewComment((prev) => ({ ...prev, [movieId]: "" }));
@@ -87,6 +92,23 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
     } catch (err) {
       console.error(err);
       toast.error("Ruajtja e komentit dështoi");
+    }
+  };
+
+  // ✅ delete a single comment
+  const handleDeleteComment = async (movieId, commentId) => {
+    try {
+      await deleteComment(userId, commentId);
+
+      setComments((prev) => ({
+        ...prev,
+        [movieId]: (prev[movieId] || []).filter((c) => c.id !== commentId),
+      }));
+
+      toast.success("Komenti u fshi me sukses!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Fshirja e komentit dështoi");
     }
   };
 
@@ -146,16 +168,25 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
                 {movie.description || movie.overview}
               </p>
 
+              {/* COMMENTS LIST WITH DELETE BUTTON */}
               {comments[movie.movie_id] &&
                 comments[movie.movie_id].length > 0 && (
                   <div className="mt-3 space-y-2">
-                    {comments[movie.movie_id].map((c, idx) => (
-                      <p
-                        key={idx}
-                        className="bg-gray-800 p-2 rounded text-sm text-gray-200"
+                    {comments[movie.movie_id].map((c) => (
+                      <div
+                        key={c.id}
+                        className="bg-gray-800 p-2 rounded text-sm text-gray-200 flex justify-between items-center gap-2"
                       >
-                        {c}
-                      </p>
+                        <span>{c.comment}</span>
+                        <button
+                          className="text-xs bg-red-600 px-2 py-1 rounded hover:bg-red-700 hover:cursor-pointer"
+                          onClick={() =>
+                            handleDeleteComment(movie.movie_id, c.id)
+                          }
+                        >
+                          Fshij
+                        </button>
+                      </div>
                     ))}
                   </div>
                 )}

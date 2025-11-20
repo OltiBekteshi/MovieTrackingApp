@@ -43,7 +43,8 @@ export async function removeFromWatchlist(userId, movieId) {
 export const saveComment = async (userId, movieId, comment) => {
   const { data, error } = await supabase
     .from("comments")
-    .insert([{ user_id: userId, movie_id: movieId, comment }]);
+    .insert([{ user_id: userId, movie_id: movieId, comment }])
+    .select(); // ✅ ensures `data` is not null
   if (error) throw error;
   return data;
 };
@@ -55,6 +56,17 @@ export const getComments = async (userId, movieId) => {
     .eq("user_id", userId)
     .eq("movie_id", movieId)
     .order("created_at", { ascending: true });
+  if (error) throw error;
+  return data;
+};
+
+// delete a single comment
+export const deleteComment = async (userId, commentId) => {
+  const { data, error } = await supabase
+    .from("comments")
+    .delete()
+    .eq("id", commentId)
+    .eq("user_id", userId);
   if (error) throw error;
   return data;
 };
