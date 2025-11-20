@@ -4,7 +4,6 @@ import { ClerkProvider } from "@clerk/clerk-react";
 import App from "./App.jsx";
 import "./index.css";
 import alTranslations from "./al.json";
-// import { frFR } from "@clerk/localizations";
 
 const clerkKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 

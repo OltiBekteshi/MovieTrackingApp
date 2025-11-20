@@ -15,7 +15,6 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
   const [showInput, setShowInput] = useState({});
   const [newComment, setNewComment] = useState({});
 
-  // ⭐ RECALCULATE TOTAL TIME WHEN WATCHLIST CHANGES
   const totalMinutes = watchlist.reduce(
     (sum, movie) => sum + (movie.runtime || 0),
     0
@@ -31,7 +30,7 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
 
       for (const movie of watchlist) {
         const result = await getComments(userId, movie.movie_id);
-        // store full comment objects for each movie
+
         allComments[movie.movie_id] = result;
       }
 
@@ -76,10 +75,9 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
 
     try {
       const saved = await saveComment(userId, movieId, newComment[movieId]);
-      // Supabase returns an array of inserted rows when using .select()
+
       const savedComment = saved[0];
 
-      // ✅ instantly show new comment without refresh
       setComments((prev) => ({
         ...prev,
         [movieId]: [...(prev[movieId] || []), savedComment],
@@ -95,7 +93,6 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
     }
   };
 
-  // ✅ delete a single comment
   const handleDeleteComment = async (movieId, commentId) => {
     try {
       await deleteComment(userId, commentId);
@@ -134,7 +131,6 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
         Lista e filmave të shikuara
       </h1>
 
-      {/* ⭐ TOTAL WATCHED TIME */}
       <div className="text-white text-xl font-bold text-center mb-6">
         Totali i orëve të shikuara: {totalHours}h {totalRemainingMinutes}m
       </div>
@@ -168,7 +164,6 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
                 {movie.description || movie.overview}
               </p>
 
-              {/* COMMENTS LIST WITH DELETE BUTTON */}
               {comments[movie.movie_id] &&
                 comments[movie.movie_id].length > 0 && (
                   <div className="mt-3 space-y-2">

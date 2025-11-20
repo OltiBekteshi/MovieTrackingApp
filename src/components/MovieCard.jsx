@@ -59,7 +59,6 @@ const MovieCard = ({
     else toast("No trailer available for this movie");
   };
 
-  // ✅ Add movie to watchlist WITH runtime
   const handleAddToWatchlist = async (movie) => {
     if (!watchlist.find((m) => m.movie_id === movie.id)) {
       try {
