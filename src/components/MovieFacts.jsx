@@ -4,6 +4,7 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import facts from "../../facts.json";
 
 const MovieFacts = () => {
   return (
@@ -19,40 +20,7 @@ const MovieFacts = () => {
       </h1>
 
       <div className="w-full max-w-6xl space-y-4">
-        {[
-          {
-            title: "Titanic",
-            text: "Titaniku kishte një iceberg të vërtetë… pak a shumë - Skena me iceberg-un në Titanic nuk ishte vetëm CGI; James Cameron ndërtoi një kopje të vërtetë 15-tonëshe për aktorët të ndërvepronin me të.",
-          },
-          {
-            title: "Harry Potter and the Chamber of Secrets",
-            text: "Zëri i Dobby në Harry Potter ishte një problem - Aktori që e jepte zërin e Dobby-t në fillim kishte vetëm disa linja për të lexuar, por regjistrimet e tij ishin shumë të shpejta dhe me tonalitet të lartë, kështu që duhej muaj për ta bërë të kuptueshëm.",
-          },
-          {
-            title: "The Lord of the Rings: The Fellowship of the Ring",
-            text: "Peter Jackson përdori truke perspektive për të bërë që Hobbitët të dukeshin më të vegjël pa CGI — një iluzion kinematik klasik!",
-          },
-          {
-            title: "The Lion King",
-            text: "The Lion King është në thelb një adaptim i Hamlet nga Shakespeare - madje edhe Scar është Claudius i botës së kafshëve.",
-          },
-          {
-            title: "Gladiator",
-            text: "Një makinë moderne shfaqet në sfond të një skene në Gladiator - një nga 'gabimet' më të famshme që fansat e duan.",
-          },
-          {
-            title: "Mission Impossible",
-            text: "Tom Cruise ka bërë aktrime aq të rrezikshme sa ka thyer kocka dhe dislokuar shpatulla gjatë xhirimeve. Superhero i vërtetë.",
-          },
-          {
-            title: "Star Wars: Episode IV - A New Hope",
-            text: "David Prowse luajti fizikisht Darth Vader, por zëri ishte i James Earl Jones - Prowse nuk e dëgjoi zërin e tij deri në premierë!",
-          },
-          {
-            title: "Psycho",
-            text: "Skena e famshme e dushit në Psycho u xhirua për 7 ditë me 70 kënde kamerash — gjaku ishte shurup çokollate.",
-          },
-        ].map((fact, index) => (
+        {facts.map((fact, index) => (
           <Accordion
             key={index}
             sx={{

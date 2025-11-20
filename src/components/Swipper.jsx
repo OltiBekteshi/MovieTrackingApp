@@ -21,7 +21,6 @@ const Swipper = () => {
           nextEl: ".customNext",
           prevEl: ".customPrev",
         }}
-        pagination={{ dynamicBullets: true }}
         modules={[Pagination]}
         spaceBetween={20}
         slidesPerView={1}

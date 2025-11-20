@@ -56,7 +56,19 @@ const Navbar = () => {
           </SignedOut>
 
           <SignedIn>
-            <UserButton afterSignOutUrl="/" />
+            <UserButton
+              afterSignOutUrl="/"
+              localization={{
+                signIn: {
+                  start: {
+                    title: "Hyrje",
+                    subtitle: "Përdorni llogarinë tuaj për të vazhduar",
+                    actionText: "Hyr",
+                    footerText: "Nuk keni llogari? Regjistrohuni!",
+                  },
+                },
+              }}
+            />
           </SignedIn>
         </div>
 

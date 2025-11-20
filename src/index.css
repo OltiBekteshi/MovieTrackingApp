@@ -29,3 +29,29 @@ body {
 .cl-internal-l2l775 {
   display: none;
 }
+
+.cl-userButtonPopoverActionButton__manageAccount {
+  font-size: 0;
+}
+
+.cl-userButtonPopoverActionButton__manageAccount span::after {
+  content: "Menaxho llogarinë";
+  font-size: 14px;
+  margin-left: 6px;
+  text-wrap: nowrap;
+}
+
+.cl-userButtonPopoverActionButton__signOut {
+  font-size: 0;
+}
+
+.cl-userButtonPopoverActionButton__signOut span::before {
+  content: "Qkyqu";
+  font-size: 14px;
+  margin-left: 6px;
+  text-wrap: nowrap;
+}
+
+.cl-userButtonPopoverActionButton__signOut span svg {
+  display: none;
+}

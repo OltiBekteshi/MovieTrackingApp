@@ -1,0 +1,88 @@
+{
+  "signIn": {
+    "start": {
+      "title": "Hyr në llogari",
+      "subtitle": "Përdor email-in ose fjalëkalimin tënd",
+      "actionText": "Nuk ke një llogari?",
+      "actionLink": "Regjistrohu"
+    },
+    "email": {
+      "label": "Email",
+      "placeholder": "Shkruaj email-in tënd"
+    },
+    "password": {
+      "label": "Fjalëkalimi",
+      "placeholder": "Shkruaj fjalëkalimin"
+    },
+    "forgotPassword": "Ke harruar fjalëkalimin?",
+    "continueButton": "Vazhdo"
+  },
+  "signUp": {
+    "start": {
+      "title": "Krijo një llogari",
+      "subtitle": "Filloni duke vendosur detajet tuaja",
+      "actionText": "Ke një llogari?",
+      "actionLink": "Hyr"
+    },
+    "email": {
+      "label": "Email",
+      "placeholder": "Shkruaj email-in tënd"
+    },
+    "password": {
+      "label": "Fjalëkalimi",
+      "placeholder": "Zgjidh një fjalëkalim"
+    },
+    "continueButton": "Regjistrohu"
+  },
+  "forgotPassword": {
+    "start": {
+      "title": "Rivendos fjalëkalimin",
+      "subtitle": "Shkruaj email-in tënd për të marrë një link për rivendosje",
+      "actionText": "Kthehu tek hyrja",
+      "actionLink": "Hyr"
+    },
+    "email": {
+      "label": "Email",
+      "placeholder": "Shkruaj email-in tënd"
+    },
+    "continueButton": "Dërgo link"
+  },
+  "resetPassword": {
+    "start": {
+      "title": "Vendos fjalëkalimin e ri",
+      "subtitle": "Zgjidh një fjalëkalim të ri",
+      "continueButton": "Rivendos fjalëkalimin"
+    },
+    "password": {
+      "label": "Fjalëkalimi i ri",
+      "placeholder": "Shkruaj fjalëkalimin e ri"
+    }
+  },
+  "verification": {
+    "email": {
+      "title": "Verifikoni email-in",
+      "subtitle": "Ju kemi dërguar një email me kodin e verifikimit",
+      "resend": "Ritrego kodin",
+      "success": "Email-i u verifikua me sukses!"
+    },
+    "phone": {
+      "title": "Verifikoni numrin e telefonit",
+      "subtitle": "Ju kemi dërguar një SMS me kodin e verifikimit",
+      "resend": "Ritrego kodin",
+      "success": "Numri u verifikua me sukses!"
+    }
+  },
+  "buttons": {
+    "signIn": "Hyr",
+    "signUp": "Regjistrohu",
+    "continue": "Vazhdo",
+    "submit": "Dërgo",
+    "back": "Kthehu"
+  },
+  "errors": {
+    "required": "Kjo fushë është e detyrueshme",
+    "invalidEmail": "Email i pavlefshëm",
+    "invalidPassword": "Fjalëkalim i pavlefshëm",
+    "passwordMismatch": "Fjalëkalimet nuk përputhen"
+  }
+}
