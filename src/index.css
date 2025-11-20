@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import url("https://fonts.googleapis.com/css2?family=Amethysta&family=Keania+One&family=Oswald:wght@200..700&family=Young+Serif&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap");
 
 html,
 body {
@@ -7,7 +7,9 @@ body {
   padding: 0;
   box-sizing: border-box;
   background-color: black;
-  font-family: oswald;
+  font-family: "Poppins", sans-serif;
+  font-style: normal;
+  font-weight: 400;
 }
 
 * {
@@ -15,7 +17,7 @@ body {
 }
 
 @theme {
-  --font-oswald: Oswald, "sans-serif";
+  --font-poppins: poppins, "sans-serif";
 }
 
 .cl-internal-1dauvpw {

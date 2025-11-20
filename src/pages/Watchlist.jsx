@@ -14,6 +14,14 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
   const [showInput, setShowInput] = useState({});
   const [newComment, setNewComment] = useState({});
 
+  // ⭐ RECALCULATE TOTAL TIME WHEN WATCHLIST CHANGES
+  const totalMinutes = watchlist.reduce(
+    (sum, movie) => sum + (movie.runtime || 0),
+    0
+  );
+  const totalHours = Math.floor(totalMinutes / 60);
+  const totalRemainingMinutes = totalMinutes % 60;
+
   useEffect(() => {
     if (!userId || !watchlist) return;
 
@@ -22,7 +30,6 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
 
       for (const movie of watchlist) {
         const result = await getComments(userId, movie.movie_id);
-
         allComments[movie.movie_id] = result.map((c) => c.comment);
       }
 
@@ -105,6 +112,11 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
         Lista e filmave të shikuara
       </h1>
 
+      {/* ⭐ TOTAL WATCHED TIME */}
+      <div className="text-white text-xl font-bold text-center mb-6">
+        Totali i orëve të shikuara: {totalHours}h {totalRemainingMinutes}m
+      </div>
+
       <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {watchlist.map((movie) => (
           <div
@@ -122,6 +134,13 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
 
             <div className="p-4 flex flex-col grow">
               <h3 className="font-semibold text-lg mb-2">{movie.title}</h3>
+
+              <p className="text-sm text-gray-300 mb-2">
+                ⏱ Kohezgjatja:{" "}
+                {movie.runtime
+                  ? `${Math.floor(movie.runtime / 60)}h ${movie.runtime % 60}m`
+                  : "N/A"}
+              </p>
 
               <p className="grow text-sm text-white line-clamp-3 sm:line-clamp-none">
                 {movie.description || movie.overview}

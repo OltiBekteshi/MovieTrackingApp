@@ -15,7 +15,6 @@ const MovieCard = ({
   const [page, setPage] = useState(1);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [trailerKey, setTrailerKey] = useState(null);
-
   const [searchTerm, setSearchTerm] = useState("");
 
   const apiKey = import.meta.env.VITE_TMDB_API_KEY;
@@ -35,11 +34,12 @@ const MovieCard = ({
             `https://api.themoviedb.org/3/movie/${movie.id}?api_key=${apiKey}&language=en-US`
           );
           const movieData = await res.json();
-          details[movie.id] = movieData.runtime;
+          details[movie.id] = movieData.runtime || 0;
         })
       );
       setMovieDetails(details);
     };
+
     fetchMovies();
   }, [apiKey, page]);
 
@@ -59,11 +59,15 @@ const MovieCard = ({
     else toast("No trailer available for this movie");
   };
 
+  // ✅ Add movie to watchlist WITH runtime
   const handleAddToWatchlist = async (movie) => {
     if (!watchlist.find((m) => m.movie_id === movie.id)) {
       try {
-        await addToWatchlist(userId, movie);
-        setWatchlist([...watchlist, { ...movie, movie_id: movie.id }]);
+        await addToWatchlist(userId, movie, movieDetails[movie.id]);
+        setWatchlist([
+          ...watchlist,
+          { ...movie, movie_id: movie.id, runtime: movieDetails[movie.id] },
+        ]);
         toast.success(`${movie.title} u shtua në listën e filmave të shikuar!`);
       } catch (err) {
         toast.error("Shtimi i filmit dështoi");
@@ -77,8 +81,11 @@ const MovieCard = ({
   const handleAddToWatchLater = async (movie) => {
     if (!watchlater.find((m) => m.movie_id === movie.id)) {
       try {
-        await addToWatchLater(userId, movie);
-        setWatchlater([...watchlater, { ...movie, movie_id: movie.id }]);
+        await addToWatchLater(userId, movie, movieDetails[movie.id]);
+        setWatchlater([
+          ...watchlater,
+          { ...movie, movie_id: movie.id, runtime: movieDetails[movie.id] },
+        ]);
         toast.success(`${movie.title} u shtua në Shiko më vonë!`);
       } catch (err) {
         toast.error("Shtimi i filmit dështoi");

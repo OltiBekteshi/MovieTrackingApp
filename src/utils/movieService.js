@@ -1,5 +1,6 @@
 import { supabase } from "./supabaseClient";
 
+// Watchlist Functions
 export async function getWatchlist(userId) {
   const { data, error } = await supabase
     .from("watchlist")
@@ -10,7 +11,8 @@ export async function getWatchlist(userId) {
   return data;
 }
 
-export async function addToWatchlist(userId, movie) {
+// Add movie to watchlist with runtime
+export async function addToWatchlist(userId, movie, runtime) {
   const { data, error } = await supabase.from("watchlist").upsert([
     {
       user_id: userId,
@@ -20,7 +22,7 @@ export async function addToWatchlist(userId, movie) {
       poster_path: movie.poster_path,
       release_date: movie.release_date,
       vote_average: movie.vote_average,
-      runtime: movie.runtime,
+      runtime: runtime || 0, // store runtime
     },
   ]);
   if (error) throw error;
@@ -37,18 +39,27 @@ export async function removeFromWatchlist(userId, movieId) {
   return data;
 }
 
-export async function addComment(userId, movieId, comment) {
+// Comments
+export const saveComment = async (userId, movieId, comment) => {
   const { data, error } = await supabase
-    .from("watchlist")
-    .update({
-      comments: supabase.array_append("comments", comment),
-    })
-    .eq("user_id", userId)
-    .eq("movie_id", movieId);
+    .from("comments")
+    .insert([{ user_id: userId, movie_id: movieId, comment }]);
   if (error) throw error;
   return data;
-}
+};
 
+export const getComments = async (userId, movieId) => {
+  const { data, error } = await supabase
+    .from("comments")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("movie_id", movieId)
+    .order("created_at", { ascending: true });
+  if (error) throw error;
+  return data;
+};
+
+// Watch Later Functions
 export async function getWatchLater(userId) {
   const { data, error } = await supabase
     .from("watchlater")
@@ -59,7 +70,7 @@ export async function getWatchLater(userId) {
   return data;
 }
 
-export async function addToWatchLater(userId, movie) {
+export async function addToWatchLater(userId, movie, runtime) {
   const { data, error } = await supabase.from("watchlater").upsert([
     {
       user_id: userId,
@@ -69,7 +80,7 @@ export async function addToWatchLater(userId, movie) {
       poster_path: movie.poster_path,
       release_date: movie.release_date,
       vote_average: movie.vote_average,
-      runtime: movie.runtime,
+      runtime: runtime || 0,
     },
   ]);
   if (error) throw error;
@@ -85,24 +96,3 @@ export async function removeFromWatchLater(userId, movieId) {
   if (error) throw error;
   return data;
 }
-
-export const saveComment = async (userId, movieId, comment) => {
-  const { data, error } = await supabase
-    .from("comments")
-    .insert([{ user_id: userId, movie_id: movieId, comment }]);
-
-  if (error) throw error;
-  return data;
-};
-
-export const getComments = async (userId, movieId) => {
-  const { data, error } = await supabase
-    .from("comments")
-    .select("*")
-    .eq("user_id", userId)
-    .eq("movie_id", movieId)
-    .order("created_at", { ascending: true });
-
-  if (error) throw error;
-  return data;
-};
