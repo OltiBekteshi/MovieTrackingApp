@@ -13,6 +13,7 @@ const MovieCard = ({
   const [movies, setMovies] = useState([]);
   const [movieDetails, setMovieDetails] = useState({});
   const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [trailerKey, setTrailerKey] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -21,42 +22,72 @@ const MovieCard = ({
 
   useEffect(() => {
     const fetchMovies = async () => {
-      const res = await fetch(
-        `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=en-US&page=${page}`
-      );
-      const data = await res.json();
-      setMovies(data.results);
+      try {
+        const isSearching = searchTerm.trim().length > 0;
 
-      const details = {};
-      await Promise.all(
-        data.results.map(async (movie) => {
-          const res = await fetch(
-            `https://api.themoviedb.org/3/movie/${movie.id}?api_key=${apiKey}&language=en-US`
-          );
-          const movieData = await res.json();
-          details[movie.id] = movieData.runtime || 0;
-        })
-      );
-      setMovieDetails(details);
+        const url = isSearching
+          ? `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&language=en-US&query=${encodeURIComponent(
+              searchTerm
+            )}&page=${page}&include_adult=false`
+          : `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=en-US&page=${page}`;
+
+        const res = await fetch(url);
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch movies");
+        }
+
+        const data = await res.json();
+
+        const results = data.results || [];
+
+        const resultsWithPosters = results.filter((movie) => movie.poster_path);
+
+        setMovies(resultsWithPosters);
+        setTotalPages(data.total_pages || 1);
+
+        const details = {};
+        await Promise.all(
+          resultsWithPosters.map(async (movie) => {
+            try {
+              const res = await fetch(
+                `https://api.themoviedb.org/3/movie/${movie.id}?api_key=${apiKey}&language=en-US`
+              );
+              const movieData = await res.json();
+              details[movie.id] = movieData.runtime || 0;
+            } catch (err) {
+              console.error("Error fetching movie details:", err);
+              details[movie.id] = 0;
+            }
+          })
+        );
+
+        setMovieDetails(details);
+      } catch (error) {
+        console.error(error);
+        toast.error("Nuk mund t'i marr filmat");
+        setMovies([]);
+      }
     };
 
     fetchMovies();
-  }, [apiKey, page]);
-
-  const filteredMovies = movies.filter((movie) =>
-    movie.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  }, [apiKey, page, searchTerm]);
 
   const handleWatchTrailer = async (movieId) => {
-    const res = await fetch(
-      `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${apiKey}&language=en-US`
-    );
-    const data = await res.json();
-    const trailer = data.results.find(
-      (vid) => vid.site === "YouTube" && vid.type === "Trailer"
-    );
-    if (trailer) setTrailerKey(trailer.key);
-    else toast("No trailer available for this movie");
+    try {
+      const res = await fetch(
+        `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${apiKey}&language=en-US`
+      );
+      const data = await res.json();
+      const trailer = data.results?.find(
+        (vid) => vid.site === "YouTube" && vid.type === "Trailer"
+      );
+      if (trailer) setTrailerKey(trailer.key);
+      else toast("No trailer available for this movie");
+    } catch (err) {
+      console.error(err);
+      toast.error("Nuk mund ta gjej trailerin");
+    }
   };
 
   const handleAddToWatchlist = async (movie) => {
@@ -95,6 +126,24 @@ const MovieCard = ({
     }
   };
 
+  const handleNextPage = () => {
+    setPage((prev) => {
+      if (prev >= totalPages) {
+        return 1;
+      }
+      return prev + 1;
+    });
+  };
+
+  const handlePrevPage = () => {
+    setPage((prev) => (prev > 1 ? prev - 1 : prev));
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setPage(1);
+  };
+
   return (
     <div className="bg-linear-to-r from-blue-500 to-green-900 shadow-md min-h-screen p-6">
       <h1 className="text-3xl font-bold mb-6 text-center text-white mt-20">
@@ -105,16 +154,16 @@ const MovieCard = ({
         <input
           type="text"
           placeholder="Kerko filmin..."
-          className="w-full max-w-md px-4 py-2 rounded-lg border border-gray-300 text-white"
+          className="w-full max-w-md px-4 py-2 rounded-lg border border-gray-300 text-white bg-black/40"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={handleSearchChange}
         />
       </div>
 
       <Toaster position="top-right" />
 
       <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-        {filteredMovies.map((movie) => (
+        {movies.map((movie) => (
           <div
             key={movie.id}
             onClick={() => setSelectedMovie(movie)}
@@ -151,18 +200,20 @@ const MovieCard = ({
         ))}
       </div>
 
-      <div className="flex justify-center mt-6 gap-4">
+      <div className="flex justify-center mt-6 gap-4 items-center">
         <button
-          className="bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-800"
+          className="bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-800 hover:cursor-pointer disabled:opacity-50"
           disabled={page === 1}
-          onClick={() => setPage((prev) => prev - 1)}
+          onClick={handlePrevPage}
         >
           Pas
         </button>
-        <span className="text-white px-2 py-2">{page}</span>
+
+        <span className="text-white px-2 py-2">Faqja {page} </span>
+
         <button
-          className="bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-800"
-          onClick={() => setPage((prev) => prev + 1)}
+          className="bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-800 hover:cursor-pointer"
+          onClick={handleNextPage}
         >
           Para
         </button>
