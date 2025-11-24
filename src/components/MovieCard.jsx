@@ -59,7 +59,6 @@ const MovieCard = ({
         const results = data.results || [];
         const resultsWithPosters = results.filter((movie) => movie.poster_path);
 
-        // Fetch details
         const details = {};
         await Promise.all(
           resultsWithPosters.map(async (movie) => {

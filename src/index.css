@@ -240,12 +240,18 @@ label.cl-formFieldLabel.cl-formFieldLabel__emailAddress-field::after {
   pointer-events: none;
 }
 
-.cl-formButtonPrimary.cl-button {
+.cl-formButtonPrimary.cl-button,
+.cl-formButtonPrimary.cl-button:hover,
+.cl-formButtonPrimary.cl-button:focus,
+.cl-formButtonPrimary.cl-button:active {
   color: transparent !important;
   position: relative;
 }
 
-.cl-formButtonPrimary.cl-button::after {
+.cl-formButtonPrimary.cl-button::after,
+.cl-formButtonPrimary.cl-button:hover::after,
+.cl-formButtonPrimary.cl-button:focus::after,
+.cl-formButtonPrimary.cl-button:active::after {
   content: "Ruaj";
   color: #fff;
   position: relative;
@@ -692,7 +698,7 @@ label.cl-formFieldLabel.cl-formFieldLabel__password-field {
 
 label.cl-formFieldLabel.cl-formFieldLabel__password-field::after {
   content: "Fjalëkalimi";
-  color: #000; 
+  color: #000;
   position: absolute;
   top: 0;
   left: 0;
@@ -708,7 +714,7 @@ a.cl-formFieldAction.cl-formFieldAction__password[data-localization-key="formFie
 
 a.cl-formFieldAction.cl-formFieldAction__password[data-localization-key="formFieldAction__forgotPassword"]::after {
   content: "Ke harruar fjalëkalimin?";
-  color: #1d4ed8; 
+  color: #1d4ed8;
   position: absolute;
   top: 0;
   left: 0;
@@ -732,3 +738,38 @@ a.cl-footerActionLink[data-localization-key="signIn.password.actionLink"]::after
   pointer-events: none;
   text-wrap: nowrap;
 }
+
+
+.cl-formButtonPrimary.cl-button,
+.cl-formButtonPrimary.cl-button * {
+  transition: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+}
+
+
+.cl-formButtonPrimary.cl-button {
+  color: transparent !important;
+  position: relative;
+}
+
+
+.cl-formButtonPrimary.cl-button::after {
+  content: "Ruaj";
+  color: #fff;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+
+.cl-formButtonPrimary.cl-button:hover::after,
+.cl-formButtonPrimary.cl-button:focus::after,
+.cl-formButtonPrimary.cl-button:active::after {
+  color: #fff !important;
+  opacity: 1 !important;
+}
+
