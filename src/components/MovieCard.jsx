@@ -17,52 +17,74 @@ const MovieCard = ({
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [trailerKey, setTrailerKey] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [overviewCache, setOverviewCache] = useState({}); 
 
   const apiKey = import.meta.env.VITE_TMDB_API_KEY;
 
+  const translateText = async (text, targetLang = "sq") => {
+    if (!text) return "";
+    if (overviewCache[text]) return overviewCache[text]; 
+    try {
+      const res = await fetch(
+        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(
+          text
+        )}`
+      );
+      const data = await res.json();
+      const translated = data[0].map((item) => item[0]).join("");
+      setOverviewCache((prev) => ({ ...prev, [text]: translated }));
+      return translated;
+    } catch (err) {
+      console.error("Translation error:", err);
+      return text; 
+    }
+  };
+
+  
   useEffect(() => {
     const fetchMovies = async () => {
       try {
         const isSearching = searchTerm.trim().length > 0;
 
         const url = isSearching
-          ? `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&language=en-US&query=${encodeURIComponent(
+          ? `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&language=en-EN&query=${encodeURIComponent(
               searchTerm
             )}&page=${page}&include_adult=false`
-          : `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=en-US&page=${page}`;
+          : `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=en-EN&page=${page}`;
 
         const res = await fetch(url);
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch movies");
-        }
+        if (!res.ok) throw new Error("Failed to fetch movies");
 
         const data = await res.json();
-
         const results = data.results || [];
-
         const resultsWithPosters = results.filter((movie) => movie.poster_path);
 
-        setMovies(resultsWithPosters);
-        setTotalPages(data.total_pages || 1);
-
+        // Fetch details
         const details = {};
         await Promise.all(
           resultsWithPosters.map(async (movie) => {
             try {
               const res = await fetch(
-                `https://api.themoviedb.org/3/movie/${movie.id}?api_key=${apiKey}&language=en-US`
+                `https://api.themoviedb.org/3/movie/${movie.id}?api_key=${apiKey}&language=en-EN`
               );
               const movieData = await res.json();
               details[movie.id] = movieData.runtime || 0;
-            } catch (err) {
-              console.error("Error fetching movie details:", err);
+            } catch {
               details[movie.id] = 0;
             }
           })
         );
-
         setMovieDetails(details);
+
+        const translatedMovies = await Promise.all(
+          resultsWithPosters.map(async (movie) => {
+            const translatedOverview = await translateText(movie.overview, "sq");
+            return { ...movie, overview: translatedOverview };
+          })
+        );
+
+        setMovies(translatedMovies);
+        setTotalPages(data.total_pages || 1);
       } catch (error) {
         console.error(error);
         toast.error("Nuk mund t'i marr filmat");
@@ -73,10 +95,11 @@ const MovieCard = ({
     fetchMovies();
   }, [apiKey, page, searchTerm]);
 
+  
   const handleWatchTrailer = async (movieId) => {
     try {
       const res = await fetch(
-        `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${apiKey}&language=en-US`
+        `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${apiKey}&language=en-EN`
       );
       const data = await res.json();
       const trailer = data.results?.find(
@@ -99,9 +122,8 @@ const MovieCard = ({
           { ...movie, movie_id: movie.id, runtime: movieDetails[movie.id] },
         ]);
         toast.success(`${movie.title} u shtua në listën e filmave të shikuar!`);
-      } catch (err) {
-        toast.error("Shtimi i filmit dështoi");
-        console.error(err);
+      } catch  {
+        toast.error("Kyqu per te shtuar filmin");
       }
     } else {
       toast(`${movie.title} gjindet në listën e filmave të shikuar`);
@@ -117,9 +139,8 @@ const MovieCard = ({
           { ...movie, movie_id: movie.id, runtime: movieDetails[movie.id] },
         ]);
         toast.success(`${movie.title} u shtua në Shiko më vonë!`);
-      } catch (err) {
-        toast.error("Shtimi i filmit dështoi");
-        console.error(err);
+      } catch {
+        toast.error("Kyqu per te shtuar filmin");
       }
     } else {
       toast(`${movie.title} gjindet në listën e Shiko më vonë`);
@@ -127,12 +148,7 @@ const MovieCard = ({
   };
 
   const handleNextPage = () => {
-    setPage((prev) => {
-      if (prev >= totalPages) {
-        return 1;
-      }
-      return prev + 1;
-    });
+    setPage((prev) => (prev >= totalPages ? 1 : prev + 1));
   };
 
   const handlePrevPage = () => {
@@ -144,6 +160,7 @@ const MovieCard = ({
     setPage(1);
   };
 
+  
   return (
     <div className="bg-linear-to-r from-blue-500 to-green-900 shadow-md min-h-screen p-6">
       <h1 className="text-3xl font-bold mb-6 text-center text-white mt-20">
@@ -176,7 +193,7 @@ const MovieCard = ({
             />
             <div className="p-4">
               <h3 className="font-semibold text-lg truncate">{movie.title}</h3>
-              <p className="truncate">{movie.overview}</p>
+              <p className="truncate">{movie.overview}</p> 
               <p className="text-sm text-white">{movie.release_date}</p>
 
               <p className="text-sm text-white mt-1 font-bold">

@@ -25,7 +25,7 @@ const WatchLater = ({ watchlater, setWatchlater, userId }) => {
 
   if (!watchlater || watchlater.length === 0) {
     return (
-      <div className="bg-black min-h-screen text-white flex flex-col items-center justify-center ">
+      <div className="bg-linear-to-r from-blue-500  to-green-900 shadow-md min-h-screen text-white flex flex-col items-center justify-center ">
         <h1 className="text-3xl font-bold mb-4 ">
           Lista e filmave per ti shikuar me vone eshte e thate
         </h1>

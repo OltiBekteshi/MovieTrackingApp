@@ -57,3 +57,678 @@ body {
 .cl-userButtonPopoverActionButton__signOut span svg {
   display: none;
 }
+
+.cl-headerSubtitle {
+  display: none;
+}
+
+.cl-formFieldHintText {
+  display: none;
+}
+
+.cl-headerTitle {
+  font-size: 0;
+}
+
+.cl-profileSectionPrimaryButton.cl-button__password {
+  color: transparent !important;
+  position: relative;
+}
+
+.cl-profileSectionPrimaryButton.cl-button__password::after {
+  content: "Ndrysho fjalekalimin";
+  color: #000;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  text-align: center;
+  pointer-events: none;
+}
+
+.cl-profileSectionPrimaryButton.cl-button__profile {
+  color: transparent !important;
+  position: relative;
+}
+
+.cl-profileSectionPrimaryButton.cl-button__profile::after {
+  content: "Përditëso";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  pointer-events: none;
+}
+
+.cl-profileSectionPrimaryButton.cl-button__username {
+  color: transparent !important;
+  position: relative;
+}
+
+.cl-profileSectionPrimaryButton.cl-button__username::after {
+  content: "Përditëso";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  pointer-events: none;
+}
+
+.cl-profileSectionTitleText.cl-profileSectionTitleText__username {
+  color: transparent !important;
+  position: relative;
+}
+
+.cl-profileSectionTitleText.cl-profileSectionTitleText__username::after {
+  content: "Përdoruesi";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+.cl-profileSectionTitleText.cl-profileSectionTitleText__emailAddresses {
+  color: transparent !important;
+  position: relative;
+}
+
+.cl-profileSectionTitleText.cl-profileSectionTitleText__emailAddresses::after {
+  content: "Email adresa";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+.cl-profileSectionTitleText.cl-profileSectionTitleText__connectedAccounts {
+  color: transparent !important;
+  position: relative;
+}
+
+.cl-profileSectionTitleText.cl-profileSectionTitleText__connectedAccounts::after {
+  content: "Llogari të lidhura";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+.cl-profileSectionTitleText.cl-profileSectionTitleText__profile {
+  color: transparent !important;
+  position: relative;
+}
+
+.cl-profileSectionTitleText.cl-profileSectionTitleText__profile::after {
+  content: "Profili";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+span.cl-internal-pz0ugf[data-localization-key="userProfile.start.emailAddressesSection.primaryButton"] {
+  color: transparent !important;
+  position: relative;
+}
+
+span.cl-internal-pz0ugf[data-localization-key="userProfile.start.emailAddressesSection.primaryButton"]::after {
+  content: "Shto adresë emaili";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+span.cl-internal-pz0ugf[data-localization-key="userProfile.start.connectedAccountsSection.primaryButton"] {
+  color: transparent !important;
+  position: relative;
+}
+
+span.cl-internal-pz0ugf[data-localization-key="userProfile.start.connectedAccountsSection.primaryButton"]::after {
+  content: "Lidhu me llogari";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+label.cl-formFieldLabel.cl-formFieldLabel__emailAddress-field {
+  color: transparent !important;
+  position: relative;
+}
+
+label.cl-formFieldLabel.cl-formFieldLabel__emailAddress-field::after {
+  content: "Adresa e emailit";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  text-wrap: nowrap;
+}
+
+.cl-formButtonReset.cl-button {
+  color: transparent !important;
+  position: relative;
+}
+
+.cl-formButtonReset.cl-button::after {
+  content: "Anulo";
+  color: #000;
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  pointer-events: none;
+}
+
+.cl-formButtonPrimary.cl-button {
+  color: transparent !important;
+  position: relative;
+}
+
+.cl-formButtonPrimary.cl-button::after {
+  content: "Ruaj";
+  color: #fff;
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  pointer-events: none;
+}
+
+label.cl-formFieldLabel.cl-formFieldLabel__username-field {
+  color: transparent !important;
+  position: relative;
+}
+
+label.cl-formFieldLabel.cl-formFieldLabel__username-field::after {
+  content: "Emri i përdoruesit";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  text-wrap: nowrap;
+}
+
+.cl-profileSectionTitleText.cl-profileSectionTitleText__danger {
+  color: transparent !important;
+  position: relative;
+}
+
+.cl-profileSectionTitleText.cl-profileSectionTitleText__danger::after {
+  content: "Fshi llogarinë";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+.cl-profileSectionPrimaryButton.cl-button__danger {
+  color: transparent !important;
+  position: relative;
+}
+
+.cl-profileSectionPrimaryButton.cl-button__danger::after {
+  content: "Fshi llogarinë";
+  color: #d32f2f;
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  pointer-events: none;
+}
+
+.cl-profileSection__activeDevices {
+  display: none;
+}
+
+span.cl-navbarButtonText.cl-navbarButtonText__security {
+  color: transparent !important;
+  position: relative;
+}
+
+span.cl-navbarButtonText.cl-navbarButtonText__security::after {
+  content: "Siguria";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  pointer-events: none;
+}
+
+span.cl-navbarButtonText.cl-navbarButtonText__account {
+  color: transparent !important;
+  position: relative;
+}
+
+span.cl-navbarButtonText.cl-navbarButtonText__account::after {
+  content: "Profili";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  pointer-events: none;
+}
+
+label.cl-formFieldLabel.cl-formFieldLabel__newPassword-field {
+  color: transparent !important;
+  position: relative;
+}
+
+label.cl-formFieldLabel.cl-formFieldLabel__newPassword-field::after {
+  content: "Fjalëkalim i ri";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+label.cl-formFieldLabel.cl-formFieldLabel__confirmPassword-field {
+  color: transparent !important;
+  position: relative;
+}
+
+label.cl-formFieldLabel.cl-formFieldLabel__confirmPassword-field::after {
+  content: "Konfirmo fjalëkalimin";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  text-wrap: nowrap;
+}
+
+.cl-formFieldRadioLabelTitle[data-localization-key="formFieldLabel__signOutOfOtherSessions"] {
+  color: transparent !important;
+  position: relative;
+}
+
+.cl-formFieldRadioLabelTitle[data-localization-key="formFieldLabel__signOutOfOtherSessions"]::after {
+  content: "Dil nga të gjitha pajisjet e tjera";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+.cl-formFieldRadioLabelDescription {
+  display: none;
+}
+
+h1.cl-internal-18jv961[data-localization-key="userProfile.navbar.title"] {
+  color: transparent !important;
+  position: relative;
+}
+
+h1.cl-internal-18jv961[data-localization-key="userProfile.navbar.title"]::after {
+  content: "Llogaria";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+p.cl-internal-2z548n[data-localization-key="userProfile.navbar.description"] {
+  color: transparent !important;
+  position: relative;
+}
+
+p.cl-internal-2z548n[data-localization-key="userProfile.navbar.description"]::after {
+  content: "Menaxho informacionin e llogarisë";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+#google_translate_element,
+.goog-te-banner-frame,
+.goog-te-menu-frame,
+.skiptranslate {
+  display: none !important;
+}
+
+body {
+  top: 0 !important;
+}
+
+button.cl-menuItem[data-localization-key="userProfile.start.emailAddressesSection.detailsAction__primary"] {
+  color: transparent !important;
+  position: relative;
+}
+
+button.cl-menuItem[data-localization-key="userProfile.start.emailAddressesSection.detailsAction__primary"]::after {
+  content: "Përfundo verifikimin";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  pointer-events: none;
+}
+
+button.cl-menuItem[data-localization-key="userProfile.start.emailAddressesSection.destructiveAction"] {
+  color: transparent !important;
+  position: relative;
+}
+
+button.cl-menuItem[data-localization-key="userProfile.start.emailAddressesSection.destructiveAction"]::after {
+  content: "Fshij email";
+  color: #e53e3e;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  pointer-events: none;
+}
+
+.cl-badge {
+  display: none;
+}
+
+p.cl-internal-2z548n[data-localization-key="userProfile.deletePage.messageLine1"] {
+  color: transparent !important;
+  position: relative;
+}
+
+p.cl-internal-2z548n[data-localization-key="userProfile.deletePage.messageLine1"]::after {
+  content: "Jeni të sigurt që doni të fshini llogarinë tuaj? Disa të dhëna të lidhura mund të ruhen. Për të kërkuar fshirje të plotë të të dhënave, ju lutemi kontaktoni suportin.";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+p.cl-internal-14vleju[data-localization-key="userProfile.deletePage.messageLine2"] {
+  color: transparent !important;
+  position: relative;
+}
+
+p.cl-internal-14vleju[data-localization-key="userProfile.deletePage.messageLine2"]::after {
+  content: "Kjo veprim është i përhershëm dhe i pakthyeshëm.";
+  color: red;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+label.cl-formFieldLabel[data-localization-key="userProfile.deletePage.actionDescription"] {
+  color: transparent !important;
+  position: relative;
+}
+
+label.cl-formFieldLabel[data-localization-key="userProfile.deletePage.actionDescription"]::after {
+  content: 'Shkruani "Delete account" më poshtë për të vazhduar.';
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  text-wrap: nowrap;
+}
+
+input.cl-formFieldInput__deleteConfirmation::placeholder {
+  color: transparent;
+  position: relative;
+}
+
+input.cl-formFieldInput__deleteConfirmation::after {
+  content: "Fshij llogarinë";
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0 0.5rem;
+  color: #a0a0a0;
+  pointer-events: none;
+  font-style: italic;
+}
+
+p.cl-profileSectionTitleText__password[data-localization-key="userProfile.start.passwordSection.title"] {
+  color: transparent !important;
+  position: relative;
+}
+
+p.cl-profileSectionTitleText__password[data-localization-key="userProfile.start.passwordSection.title"]::after {
+  content: "Fjalëkalimi";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+label.cl-formFieldLabel__firstName-field[data-localization-key="formFieldLabel__firstName"] {
+  color: transparent !important;
+  position: relative;
+}
+
+label.cl-formFieldLabel__firstName-field[data-localization-key="formFieldLabel__firstName"]::after {
+  content: "Emri";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+label.cl-formFieldLabel__lastName-field[data-localization-key="formFieldLabel__lastName"] {
+  color: transparent !important;
+  position: relative;
+}
+
+label.cl-formFieldLabel__lastName-field[data-localization-key="formFieldLabel__lastName"]::after {
+  content: "Mbiemri";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+button.cl-avatarImageActionsUpload[data-localization-key="userProfile.profilePage.imageFormSubtitle"] {
+  color: transparent !important;
+  position: relative;
+}
+
+button.cl-avatarImageActionsUpload[data-localization-key="userProfile.profilePage.imageFormSubtitle"]::after {
+  content: "Ngarko";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  pointer-events: none;
+}
+
+p.cl-internal-159eg0a[data-localization-key="userProfile.profilePage.fileDropAreaHint"] {
+  color: transparent !important;
+  position: relative;
+}
+
+p.cl-internal-159eg0a[data-localization-key="userProfile.profilePage.fileDropAreaHint"]::after {
+  content: "Madhësia e rekomanduar 1:1, deri në 10MB.";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  text-wrap: nowrap;
+}
+
+label.cl-formFieldLabel__identifier-field[data-localization-key="formFieldLabel__username"] {
+  color: transparent !important;
+  position: relative;
+}
+
+label.cl-formFieldLabel__identifier-field[data-localization-key="formFieldLabel__username"]::after {
+  content: "Emri i përdoruesit";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  text-wrap: nowrap;
+}
+
+span.cl-lastAuthenticationStrategyBadge[data-localization-key="lastAuthenticationStrategy"] {
+  display: none;
+}
+
+span.cl-footerActionText[data-localization-key="signIn.start.actionText"] {
+  color: transparent !important;
+  position: relative;
+}
+
+span.cl-footerActionText[data-localization-key="signIn.start.actionText"]::after {
+  content: "Nuk keni një llogari?";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+a.cl-footerActionLink[data-localization-key="signIn.start.actionLink"] {
+  color: transparent !important;
+  position: relative;
+}
+
+a.cl-footerActionLink[data-localization-key="signIn.start.actionLink"]::after {
+  content: "Regjistrohu";
+  color: #1d4ed8;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+span.cl-footerActionText[data-localization-key="signUp.start.actionText"] {
+  color: transparent !important;
+  position: relative;
+}
+
+span.cl-footerActionText[data-localization-key="signUp.start.actionText"]::after {
+  content: "Tashmë keni një llogari?";
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+a.cl-footerActionLink[data-localization-key="signUp.start.actionLink"] {
+  color: transparent !important;
+  position: relative;
+}
+
+a.cl-footerActionLink[data-localization-key="signUp.start.actionLink"]::after {
+  content: "Hyr";
+  color: #1d4ed8;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+label.cl-formFieldLabel.cl-formFieldLabel__password-field {
+  color: transparent !important;
+  position: relative;
+}
+
+label.cl-formFieldLabel.cl-formFieldLabel__password-field::after {
+  content: "Fjalëkalimi";
+  color: #000; 
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  text-wrap: nowrap;
+}
+
+a.cl-formFieldAction.cl-formFieldAction__password[data-localization-key="formFieldAction__forgotPassword"] {
+  color: transparent !important;
+  position: relative;
+}
+
+a.cl-formFieldAction.cl-formFieldAction__password[data-localization-key="formFieldAction__forgotPassword"]::after {
+  content: "Ke harruar fjalëkalimin?";
+  color: #1d4ed8; 
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  text-wrap: nowrap;
+}
+
+a.cl-footerActionLink[data-localization-key="signIn.password.actionLink"] {
+  color: transparent !important;
+  position: relative;
+}
+
+a.cl-footerActionLink[data-localization-key="signIn.password.actionLink"]::after {
+  content: "Përdor një metodë tjetër";
+  color: #1d4ed8;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  text-wrap: nowrap;
+}

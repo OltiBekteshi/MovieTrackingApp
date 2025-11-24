@@ -19,7 +19,6 @@ export const slides = [
     title: "The English Patient (1996), 9 çmime ",
     text: "Në fund të Luftës së Dytë Botërore, një infermiere e re kujdeset për një viktimë të djegur rëndë nga një rrëzim avioni. E kaluara e tij tregohet në rikthime në të kaluarën, duke zbuluar një përfshirje në një histori dashurie fatale.",
   },
-
   {
     img: "/TheLastEmperor.jfif",
     title: "The Last Emperor (1987), 9 çmime",

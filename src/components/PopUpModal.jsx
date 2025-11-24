@@ -83,7 +83,7 @@ const MovieModal = ({
                 onClick={() => handleAddToWatchlist(selectedMovie)}
                 className="bg-gray-600 p-3 text-white font-bold rounded-xl hover:shadow-xl hover:cursor-pointer flex-1"
               >
-                Shto ne listn e filmave te shikuar
+                Shto ne listen e filmave te shikuar
               </button>
 
               <button
