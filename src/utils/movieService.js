@@ -103,3 +103,58 @@ export async function removeFromWatchLater(userId, movieId) {
   if (error) throw error;
   return data;
 }
+
+export const getPublicComments = async (movieId) => {
+  const { data, error } = await supabase
+    .from("film_discussion")
+    .select("*")
+    .eq("movie_id", movieId)
+    .order("created_at", { ascending: true });
+  if (error) throw error;
+  return data;
+};
+
+export const addPublicComment = async (userId, username, movieId, comment) => {
+  const { data, error } = await supabase
+    .from("film_discussion")
+    .insert([{ user_id: userId, username, movie_id: movieId, comment }])
+    .select();
+  if (error) throw error;
+  return data;
+};
+
+export const deletePublicComment = async (commentId, userId) => {
+  const { data, error } = await supabase
+    .from("film_discussion")
+    .delete()
+    .eq("id", commentId)
+    .eq("user_id", userId);
+  if (error) throw error;
+  return data;
+};
+
+export const subscribeToPublicComments = (movieId, callback) => {
+  return supabase
+    .channel(`film-discussion-${movieId}`)
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "film_discussion",
+        filter: `movie_id=eq.${movieId}`,
+      },
+      callback
+    )
+    .on(
+      "postgres_changes",
+      {
+        event: "DELETE",
+        schema: "public",
+        table: "film_discussion",
+        filter: `movie_id=eq.${movieId}`,
+      },
+      callback
+    )
+    .subscribe();
+};
