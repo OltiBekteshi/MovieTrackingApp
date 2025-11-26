@@ -103,7 +103,7 @@ const MovieCard = ({
     };
 
     fetchMovies();
-  }, [page, searchTerm, selectedGenre]);
+  }, );
 
   const handleWatchTrailer = async (movieId) => {
     try {
