@@ -264,7 +264,7 @@ const MovieCard = ({
 
       <div className="flex justify-center mt-6 gap-4">
         <button
-          className="bg-gray-800 text-white px-6 py-2 rounded-lg disabled:opacity-50"
+          className="bg-gray-800 text-white px-6 py-2 rounded-lg disabled:opacity-50 hover:cursor-pointer hover:bg-gray-900"
           disabled={page === 1}
           onClick={() => setPage(page - 1)}
         >
@@ -274,7 +274,7 @@ const MovieCard = ({
         <span className="text-white text-lg">Faqja {page}</span>
 
         <button
-          className="bg-gray-800 text-white px-6 py-2 rounded-lg"
+          className="bg-gray-800 text-white px-6 py-2 rounded-lg hover:cursor-pointer hover:bg-gray-900"
           onClick={() => setPage(page + 1)}
         >
           Para
