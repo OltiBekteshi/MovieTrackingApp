@@ -12,19 +12,19 @@ const Footer = () => {
         <div className="flex gap-4">
           <a
             href="#"
-            className=" transition-colors duration-200 text-white font-bold"
+            className=" transition-colors duration-200 text-white font-bold hover:opacity-[0.7]"
           >
             Politika e privatësisë
           </a>
           <a
             href="#"
-            className=" transition-colors duration-200 text-white font-bold"
+            className=" transition-colors duration-200 text-white font-bold hover:opacity-[0.7]"
           >
             Kushtet
           </a>
           <a
             href="#"
-            className=" transition-colors duration-200 text-white font-bold"
+            className=" transition-colors duration-200 text-white font-bold hover:opacity-[0.7]"
           >
             Kontakti
           </a>
