@@ -221,9 +221,9 @@ const MovieModal = ({
                 />
                 <button
                   onClick={handleSendPublicComment}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 hover:cursor-pointer"
+                  className=" text-black px-3 hover:cursor-pointer"
                 >
-                  Dërgo
+                  ➤
                 </button>
               </div>
             </div>
