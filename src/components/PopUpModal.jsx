@@ -139,7 +139,7 @@ const MovieModal = ({
                 {getGenresForMovie().map((g) => (
                   <span
                     key={g.id}
-                    className="text-xs bg-black text-white px-2 py-1 rounded-md"
+                    className="text-xs text-black px-2 py-1 rounded-md"
                   >
                     {g.name}
                   </span>
@@ -183,10 +183,17 @@ const MovieModal = ({
               Shiko trailerin
             </button>
 
-            <div className="mt-6">
-              <h3 className="text-xl font-bold mb-3">Komentet e përdoruesve</h3>
+             <button
+              
+              className="bg-green-600 p-3 w-full mt-3 text-white font-bold rounded-xl hover:bg-green-700 hover:cursor-pointer"
+            >
+              Rekomando filmin te nje shok/shoqe
+            </button>
 
-              <div className="border-t border-black p-3 max-h-48 overflow-y-auto">
+            <div className="mt-6">
+              <h3 className="text-xl font-bold mb-3">Komentet e shikuesve</h3>
+
+              <div className="border-t border-black pt-3 pb-3 max-h-48 overflow-y-auto">
 
                 {publicComments.length === 0 ? (
                   <p className="text-gray-400 text-sm">Nuk ka komente ende.</p>
@@ -194,15 +201,15 @@ const MovieModal = ({
                   publicComments.map((c) => (
                     <div
                       key={c.id}
-                      className="relative mb-3 p-2 bg-white rounded-lg shadow"
+                      className="relative mb-3 p-2 bg-white rounded-lg shadow w-full"
                     >
                       <p className="text-xs text-gray-500 mb-1">{c.username}</p>
-                      <p className="text-sm text-black">{c.comment}</p>
+                      <p className="text-sm text-black ">{c.comment}</p>
 
                       {user?.id === c.user_id && (
                         <button
                           onClick={() => deletePublicComment(c.id, user.id)}
-                          className="text-red-500 text-xs absolute top-4 right-2 hover:cursor-pointer "
+                          className="text-red-500 text-xs absolute top-5 right-2 hover:cursor-pointer "
                         >
                             ❌
                         </button>

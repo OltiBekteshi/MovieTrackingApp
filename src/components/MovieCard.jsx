@@ -156,7 +156,7 @@ const MovieCard = ({
   };
 
   return (
-    <div className="bg-gradient-to-r from-blue-500 to-green-900 min-h-screen p-6">
+    <div className="bg-linear-to-r from-blue-500 to-green-900 min-h-screen p-6">
 
       
      <div className="w-full flex justify-start mb-6 mt-20">
