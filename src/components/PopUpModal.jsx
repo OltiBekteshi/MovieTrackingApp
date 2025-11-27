@@ -186,9 +186,10 @@ const MovieModal = ({
             <div className="mt-6">
               <h3 className="text-xl font-bold mb-3">Komentet e përdoruesve</h3>
 
-              <div className="bg-gray-700 p-3 rounded-lg max-h-48 overflow-y-auto">
+              <div className="border-t border-black p-3 max-h-48 overflow-y-auto">
+
                 {publicComments.length === 0 ? (
-                  <p className="text-gray-300 text-sm">Nuk ka komente ende.</p>
+                  <p className="text-gray-400 text-sm">Nuk ka komente ende.</p>
                 ) : (
                   publicComments.map((c) => (
                     <div
@@ -196,14 +197,14 @@ const MovieModal = ({
                       className="relative mb-3 p-2 bg-white rounded-lg shadow"
                     >
                       <p className="text-xs text-gray-500 mb-1">{c.username}</p>
-                      <p className="text-sm text-gray-800">{c.comment}</p>
+                      <p className="text-sm text-black">{c.comment}</p>
 
                       {user?.id === c.user_id && (
                         <button
                           onClick={() => deletePublicComment(c.id, user.id)}
-                          className="text-red-500 text-xs absolute top-2 right-2 hover:cursor-pointer hover:cursor-pointer"
+                          className="text-red-500 text-xs absolute top-4 right-2 hover:cursor-pointer "
                         >
-                          Fshi
+                            ❌
                         </button>
                       )}
                     </div>
