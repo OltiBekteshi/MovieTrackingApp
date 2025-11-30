@@ -11,6 +11,7 @@ import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
 import Page from "./pages/Page";
 import { useUser } from "@clerk/clerk-react";
+import { supabase } from "./utils/supabaseClient";     // ⭐ SHTUAR
 import { getWatchlist, getWatchLater } from "./utils/movieService";
 
 function App() {
@@ -20,6 +21,27 @@ function App() {
   const [watchlist, setWatchlist] = useState([]);
   const [watchlater, setWatchlater] = useState([]);
 
+  // ⭐ SHTO REGJISTRIMIN E USER NE SUPABASE
+  useEffect(() => {
+    if (!user) return;
+
+    const saveUserToSupabase = async () => {
+      try {
+        await supabase.from("users").upsert({
+          id: user.id,
+          email: user.primaryEmailAddress?.emailAddress,
+          username: user.username,
+          image_url: user.imageUrl,
+        });
+      } catch (error) {
+        console.error("Gabim gjate ruajtjes se user:", error);
+      }
+    };
+
+    saveUserToSupabase();
+  }, [user]);
+
+  // ⭐ FETCH WATCHLIST & WATCHLATER
   useEffect(() => {
     if (!userId) return;
 

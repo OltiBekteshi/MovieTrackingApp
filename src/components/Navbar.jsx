@@ -1,13 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { FiMenu, FiX } from "react-icons/fi";
-import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
+import { FiMenu, FiX, FiBell } from "react-icons/fi";
+import { SignedIn, SignedOut, UserButton, useUser } from "@clerk/clerk-react";
+import { supabase } from "../utils/supabaseClient";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showNotif, setShowNotif] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const { user } = useUser();
+
+  useEffect(() => {
+    if (!user) return;
+
+    const loadNotifications = async () => {
+      const { data } = await supabase
+        .from("recommendations")
+        .select("*")
+        .eq("receiver_id", user.id)
+        .order("created_at", { ascending: false });
+
+      setNotifications(data || []);
+    };
+
+    loadNotifications();
+  }, [user]);
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 bg-linear-to-r from-blue-500  to-green-900 shadow-md ">
+    <nav className="fixed top-0 left-0 w-full z-50 bg-linear-to-r from-blue-500 to-green-900 shadow-md">
       <div className="max-w-7xl mx-auto flex items-center justify-between p-4 text-white">
         <Link
           to="/"
@@ -21,16 +41,10 @@ const Navbar = () => {
           <Link to="/" className="px-3 py-2 rounded-2xl hover:opacity-[0.7]">
             Ballina
           </Link>
-          <Link
-            to="/movies"
-            className="px-3 py-2 rounded-2xl hover:opacity-[0.7]"
-          >
+          <Link to="/movies" className="px-3 py-2 rounded-2xl hover:opacity-[0.7]">
             Filmat
           </Link>
-          <Link
-            to="/watchlist"
-            className="px-3 py-2 rounded-2xl hover:opacity-[0.7]"
-          >
+          <Link to="/watchlist" className="px-3 py-2 rounded-2xl hover:opacity-[0.7]">
             Lista e filmave të shikuar
           </Link>
           <Link
@@ -39,6 +53,38 @@ const Navbar = () => {
           >
             Shiko më vonë
           </Link>
+
+          {/* NOTIFICATIONS */}
+          {user && (
+            <div className="relative">
+              <FiBell
+                size={24}
+                className="cursor-pointer"
+                onClick={() => setShowNotif(!showNotif)}
+              />
+
+              {showNotif && (
+                <div className="absolute right-0 mt-3 bg-white text-black w-72 rounded-xl shadow-xl p-3">
+                  <h3 className="font-bold mb-2">Rekomandimet</h3>
+
+                  {notifications.length === 0 ? (
+                    <p className="text-sm text-gray-500">
+                      Nuk keni rekomandime.
+                    </p>
+                  ) : (
+                    notifications.map((n) => (
+                      <div
+                        key={n.id}
+                        className="bg-gray-200 p-2 rounded-lg mb-2 text-sm"
+                      >
+                        {n.message}
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           <SignedOut>
             <Link
@@ -56,87 +102,17 @@ const Navbar = () => {
           </SignedOut>
 
           <SignedIn>
-            <UserButton
-              afterSignOutUrl="/"
-              localization={{
-                signIn: {
-                  start: {
-                    title: "Hyrje",
-                    subtitle: "Përdorni llogarinë tuaj për të vazhduar",
-                    actionText: "Hyr",
-                    footerText: "Nuk keni llogari? Regjistrohuni!",
-                  },
-                },
-              }}
-            />
+            <UserButton afterSignOutUrl="/" />
           </SignedIn>
         </div>
 
+        {/* MOBILE MENU BUTTON */}
         <div className="md:hidden">
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="text-2xl focus:outline-none"
-          >
+          <button onClick={() => setIsOpen(!isOpen)} className="text-2xl">
             {isOpen ? <FiX /> : <FiMenu />}
           </button>
         </div>
       </div>
-
-      {isOpen && (
-        <div className="md:hidden bg-white shadow-md">
-          <Link
-            to="/"
-            className="block px-4 py-3 hover:bg-gray-200"
-            onClick={() => setIsOpen(false)}
-          >
-            Ballina
-          </Link>
-          <Link
-            to="/movies"
-            className="block px-4 py-3 hover:bg-gray-200"
-            onClick={() => setIsOpen(false)}
-          >
-            Filmat
-          </Link>
-          <Link
-            to="/watchlist"
-            className="block px-4 py-3 hover:bg-gray-200"
-            onClick={() => setIsOpen(false)}
-          >
-            Lista e filmave të shikuara
-          </Link>
-          <Link
-            to="/watch-later"
-            className="block px-4 py-3 hover:bg-gray-200"
-            onClick={() => setIsOpen(false)}
-          >
-            Shiko më vonë
-          </Link>
-
-          <SignedOut>
-            <Link
-              to="/sign-in"
-              className="block px-4 py-3 bg-black text-white rounded-lg m-2 text-center hover:bg-gray-800"
-              onClick={() => setIsOpen(false)}
-            >
-              Kyqu
-            </Link>
-            <Link
-              to="/sign-up"
-              className="block px-4 py-3 border border-black rounded-lg m-2 text-center hover:bg-gray-100"
-              onClick={() => setIsOpen(false)}
-            >
-              Krijo llogarinë
-            </Link>
-          </SignedOut>
-
-          <SignedIn>
-            <div className="flex justify-center py-3">
-              <UserButton afterSignOutUrl="/" />
-            </div>
-          </SignedIn>
-        </div>
-      )}
     </nav>
   );
 };

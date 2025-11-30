@@ -32,6 +32,32 @@ const MovieModal = ({
   const [publicComments, setPublicComments] = useState([]);
   const [commentInput, setCommentInput] = useState("");
 
+  // NEW STATE FOR RECOMMENDATION SYSTEM
+  const [showUsersModal, setShowUsersModal] = useState(false);
+  const [allUsers, setAllUsers] = useState([]);
+
+  // FETCH USERS FROM SUPABASE
+  const loadUsers = async () => {
+    const { data, error } = await supabase.from("users").select("*");
+
+    if (!error) {
+      setAllUsers(data.filter((u) => u.clerk_user_id !== user.id));
+    }
+  };
+
+  // SEND RECOMMENDATION
+  const sendRecommendation = async (receiverId) => {
+    await supabase.from("recommendations").insert({
+      sender_id: user.id,
+      receiver_id: receiverId,
+      movie_id: selectedMovie.id,
+      message: `${user.fullName || user.username || "Një përdorues"} ju rekomandoi filmin "${selectedMovie.title}".`,
+    });
+
+    setShowUsersModal(false);
+    alert("Rekomandimi u dërgua me sukses!");
+  };
+
   const getGenresForMovie = () => {
     if (!selectedMovie || !selectedMovie.genre_ids) return [];
     return genres.filter((g) => selectedMovie.genre_ids.includes(g.id));
@@ -175,16 +201,17 @@ const MovieModal = ({
                 Shiko me vone
               </button>
             </div>
-
-            <button
+<button
               onClick={() => handleWatchTrailer(selectedMovie.id)}
               className="bg-red-600 p-3 w-full mt-3 text-white font-bold rounded-xl hover:bg-red-700 hover:cursor-pointer"
             >
               Shiko trailerin
             </button>
-
-             <button
-              
+            <button
+              onClick={() => {
+                loadUsers();
+                setShowUsersModal(true);
+              }}
               className="bg-green-600 p-3 w-full mt-3 text-white font-bold rounded-xl hover:bg-green-700 hover:cursor-pointer"
             >
               Rekomando filmin te nje shok/shoqe
@@ -194,7 +221,6 @@ const MovieModal = ({
               <h3 className="text-xl font-bold mb-3">Komentet e shikuesve</h3>
 
               <div className="border-t border-black pt-3 pb-3 max-h-48 overflow-y-auto">
-
                 {publicComments.length === 0 ? (
                   <p className="text-gray-400 text-sm">Nuk ka komente ende.</p>
                 ) : (
@@ -204,14 +230,14 @@ const MovieModal = ({
                       className="relative mb-3 p-2 bg-white rounded-lg shadow w-full"
                     >
                       <p className="text-xs text-gray-500 mb-1">{c.username}</p>
-                      <p className="text-sm text-black ">{c.comment}</p>
+                      <p className="text-sm text-black">{c.comment}</p>
 
                       {user?.id === c.user_id && (
                         <button
                           onClick={() => deletePublicComment(c.id, user.id)}
-                          className="text-red-500 text-xs absolute top-5 right-2 hover:cursor-pointer "
+                          className="text-red-500 text-xs absolute top-5 right-2 hover:cursor-pointer"
                         >
-                            ❌
+                          ❌
                         </button>
                       )}
                     </div>
@@ -248,6 +274,43 @@ const MovieModal = ({
           </div>
         )}
       </div>
+
+      {/* USERS MODAL */}
+      {showUsersModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[60]">
+          <div className="bg-white w-96 p-5 rounded-xl shadow-lg">
+            <h2 className="text-xl font-bold mb-4">Zgjidh një përdorues</h2>
+
+            {allUsers.length === 0 && (
+              <p className="text-gray-500 text-center mb-4">Nuk u gjet asnjë përdorues.</p>
+            )}
+
+            <div className="max-h-60 overflow-y-auto">
+              {allUsers.map((u) => (
+                <div
+                  key={u.id}
+                  onClick={() => sendRecommendation(u.clerk_user_id)}
+                  className="flex items-center gap-3 p-2 hover:bg-gray-200 rounded cursor-pointer"
+                >
+                  <img
+                    src={u.image_url}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                  <p>{u.full_name}</p>
+                  {u.full_name}
+                </div>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setShowUsersModal(false)}
+              className="mt-4 w-full py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-800"
+            >
+              Mbyll
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
