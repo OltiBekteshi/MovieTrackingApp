@@ -1,16 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Toaster, toast } from "sonner";
 import PopUpModal from "./PopUpModal";
 import { addToWatchlist, addToWatchLater } from "./../utils/movieService";
 import { useLocation } from "react-router-dom";
 
-const MovieCard = ({
-  watchlist,
-  setWatchlist,
-  watchlater,
-  setWatchlater,
-  userId,
-}) => {
+const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater, userId }) => {
   const [movies, setMovies] = useState([]);
   const [movieDetails, setMovieDetails] = useState({});
   const [page, setPage] = useState(1);
@@ -19,9 +13,12 @@ const MovieCard = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("");
   const [overviewCache, setOverviewCache] = useState({});
+  const [open, setOpen] = useState(false);
 
   const location = useLocation();
   const apiKey = import.meta.env.VITE_TMDB_API_KEY;
+
+  const dropdownRef = useRef(null); // <-- REF për dropdown
 
   const genres = [
     { id: 28, name: "Aksion" },
@@ -32,15 +29,25 @@ const MovieCard = ({
     { id: 9648, name: "Mister" },
   ];
 
+  // CLICK OUTSIDE -> Mbyll dropdown
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (open && dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [open]);
+
   const translateText = async (text, targetLang = "sq") => {
     if (!text) return "";
     if (overviewCache[text]) return overviewCache[text];
 
     try {
       const res = await fetch(
-        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(
-          text
-        )}`
+        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`
       );
       const data = await res.json();
       const translated = data[0].map((item) => item[0]).join("");
@@ -52,6 +59,7 @@ const MovieCard = ({
     }
   };
 
+  // AUT0 OPEN MOVIE FROM URL PARAM
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const movieIdToOpen = params.get("open");
@@ -68,9 +76,9 @@ const MovieCard = ({
     };
 
     loadMovie();
-  }, );
+  }, []);
 
-
+  // FETCH MOVIES
   useEffect(() => {
     const fetchMovies = async () => {
       try {
@@ -91,6 +99,7 @@ const MovieCard = ({
 
         const results = (data.results || []).filter((m) => m.poster_path);
 
+        // FETCH RUNTIME DETAILS
         const details = {};
         await Promise.all(
           results.map(async (movie) => {
@@ -108,6 +117,7 @@ const MovieCard = ({
 
         setMovieDetails(details);
 
+        // TRANSLATE EACH MOVIE OVERVIEW
         const translatedMovies = await Promise.all(
           results.map(async (movie) => {
             const translated = await translateText(movie.overview, "sq");
@@ -120,9 +130,7 @@ const MovieCard = ({
     };
 
     fetchMovies();
-  }, );
-
-
+  }, [page, searchTerm, selectedGenre]);
 
   const handleWatchTrailer = async (movieId) => {
     try {
@@ -177,49 +185,89 @@ const MovieCard = ({
   return (
     <div className="bg-linear-to-r from-blue-500 to-green-900 min-h-screen p-6">
 
-
+      {/* DROPDOWN GENRES */}
       <div className="w-full flex justify-start mb-6 mt-20">
-        <div className="relative w-56">
-          <select
+        <div className="relative w-60 select-none" ref={dropdownRef}>
+          
+          {/* Trigger */}
+          <div
+            onClick={() => setOpen(!open)}
             className="
-              w-full appearance-none
               bg-white/10 text-white
-              px-5 py-3 pr-12
-              rounded-xl shadow-lg
-              backdrop-blur-lg border border-white/20
-              cursor-pointer
+              px-5 py-3
+              rounded-2xl shadow-xl
+              backdrop-blur-lg border border-white/30
+              cursor-pointer font-semibold
+              flex items-center justify-between
               transition-all duration-300
-              hover:bg-white/20 hover:shadow-xl
-              focus:outline-none focus:ring-2 focus:ring-white/30
-            "
-            defaultValue=""
-            onChange={(e) => {
-              setSelectedGenre(e.target.value);
-              setPage(1);
-            }}
-          >
-            <option className="bg-black text-white font-bold " value="">
-              Të gjithë filmat
-            </option>
-
-            {genres.map((g) => (
-              <option key={g.id} value={g.id} className="bg-white text-black">
-                {g.name}
-              </option>
-            ))}
-          </select>
-
-          <span
-            className="
-              absolute right-4 top-1/2 -translate-y-1/2
-              pointer-events-none text-white opacity-70
+              hover:bg-white/20 hover:shadow-2xl
             "
           >
-            ▼
-          </span>
+            <span>
+              {genres.find(g => g.id === Number(selectedGenre))?.name || "Të gjithë filmat"}
+            </span>
+
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className={`h-5 w-5 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+
+          {/* Dropdown List */}
+          {open && (
+            <div
+              className="
+                absolute top-full left-0 right-0 mt-2
+                bg-black/60 backdrop-blur-xl
+                border border-white/20
+                rounded-2xl shadow-2xl
+                overflow-hidden z-50
+              "
+            >
+              <div
+                onClick={() => {
+                  setSelectedGenre("");
+                  setPage(1);
+                  setOpen(false);
+                }}
+                className="
+                  px-5 py-3 cursor-pointer
+                  hover:bg-white/20 text-white font-semibold
+                  transition-all duration-200
+                "
+              >
+                Të gjithë filmat
+              </div>
+
+              {genres.map((g) => (
+                <div
+                  key={g.id}
+                  onClick={() => {
+                    setSelectedGenre(g.id);
+                    setPage(1);
+                    setOpen(false);
+                  }}
+                  className="
+                    px-5 py-3 cursor-pointer
+                    hover:bg-white/20 text-white font-semibold
+                    transition-all duration-200
+                  "
+                >
+                  {g.name}
+                </div>
+              ))}
+            </div>
+          )}
+
         </div>
       </div>
 
+      {/* SEARCH */}
       <h1 className="text-3xl font-bold text-center text-white mb-6">Filmat</h1>
 
       <div className="flex justify-center mb-6">
@@ -237,6 +285,7 @@ const MovieCard = ({
 
       <Toaster position="top-right" />
 
+      {/* MOVIE GRID */}
       <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {movies.map((movie) => (
           <div
@@ -255,15 +304,13 @@ const MovieCard = ({
               <p className="text-white text-sm mt-1 font-bold">
                 Kohezgjatja:{" "}
                 {movieDetails[movie.id]
-                  ? `${Math.floor(movieDetails[movie.id] / 60)}h ${
-                      movieDetails[movie.id] % 60
-                    }m`
+                  ? `${Math.floor(movieDetails[movie.id] / 60)}h ${movieDetails[movie.id] % 60}m`
                   : "N/A"}
               </p>
               <p className="text-yellow-400 font-bold mt-1">
                 ⭐ {movie.vote_average.toFixed(1)}
               </p>
-              <button className="bg-gray-800 p-2 w-full mt-3 rounded-lg hover:cursor-pointer">
+              <button className="bg-gray-800 p-2 w-full mt-3 rounded-lg hover:bg-gray-900">
                 Shiko Detajet
               </button>
             </div>
@@ -271,9 +318,10 @@ const MovieCard = ({
         ))}
       </div>
 
+      {/* PAGINATION */}
       <div className="flex justify-center mt-6 gap-4">
         <button
-          className="bg-gray-800 text-white px-6 py-2 rounded-lg disabled:opacity-50 hover:cursor-pointer hover:bg-gray-900"
+          className="bg-gray-800 text-white px-6 py-2 rounded-lg disabled:opacity-50 hover:bg-gray-900"
           disabled={page === 1}
           onClick={() => setPage(page - 1)}
         >
@@ -283,7 +331,7 @@ const MovieCard = ({
         <span className="text-white text-lg">Faqja {page}</span>
 
         <button
-          className="bg-gray-800 text-white px-6 py-2 rounded-lg hover:cursor-pointer hover:bg-gray-900"
+          className="bg-gray-800 text-white px-6 py-2 rounded-lg hover:bg-gray-900"
           onClick={() => setPage(page + 1)}
         >
           Para
