@@ -32,27 +32,38 @@ const MovieModal = ({
   const [publicComments, setPublicComments] = useState([]);
   const [commentInput, setCommentInput] = useState("");
 
-  // NEW STATE FOR RECOMMENDATION SYSTEM
+  // NEW for recommendation
   const [showUsersModal, setShowUsersModal] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
 
-  // FETCH USERS FROM SUPABASE
+  // Load users
   const loadUsers = async () => {
     const { data, error } = await supabase.from("users").select("*");
-
     if (!error) {
       setAllUsers(data.filter((u) => u.clerk_user_id !== user.id));
     }
   };
 
-  // SEND RECOMMENDATION
+  // NEW: send notification
+  const sendNotification = async (receiverId) => {
+    await supabase.from("notifications").insert({
+      receiver_id: receiverId,
+      title: "Rekomandim i ri filmi",
+      message: `${user.fullName} ju rekomandoi filmin "${selectedMovie.title}".`,
+      movie_id: selectedMovie.id,
+    });
+  };
+
+  // Send recommendation + notification
   const sendRecommendation = async (receiverId) => {
     await supabase.from("recommendations").insert({
       sender_id: user.id,
       receiver_id: receiverId,
       movie_id: selectedMovie.id,
-      message: `${user.fullName || user.username || "Një përdorues"} ju rekomandoi filmin "${selectedMovie.title}".`,
+      message: `${user.fullName} ju rekomandoi filmin "${selectedMovie.title}".`,
     });
+
+    await sendNotification(receiverId);
 
     setShowUsersModal(false);
     alert("Rekomandimi u dërgua me sukses!");
@@ -178,10 +189,12 @@ const MovieModal = ({
             <p className="text-sm text-gray-600 mb-2">
               Data publikimit: {selectedMovie.release_date}
             </p>
+
             <p className="text-sm text-gray-600 mb-2">
               Kohezgjatja:{" "}
               {runtime ? `${Math.floor(runtime / 60)}h ${runtime % 60}m` : "N/A"}
             </p>
+
             <p className="text-yellow-500 font-bold mb-4">
               ⭐ {selectedMovie.vote_average.toFixed(1)}
             </p>
@@ -189,32 +202,34 @@ const MovieModal = ({
             <div className="flex flex-wrap gap-3">
               <button
                 onClick={() => handleAddToWatchlist(selectedMovie)}
-                className="bg-gray-600 p-3 text-white font-bold rounded-xl flex-1 hover:bg-gray-800 hover:cursor-pointer"
+                className="bg-gray-600 p-3 text-white font-bold rounded-xl flex-1 hover:bg-gray-800"
               >
-                Shto ne listen e filmave te shikuar
+                Shto në listë
               </button>
 
               <button
                 onClick={() => handleAddToWatchLater(selectedMovie)}
-                className="bg-gray-600 p-3 text-white font-bold rounded-xl flex-1 hover:bg-gray-800 hover:cursor-pointer"
+                className="bg-gray-600 p-3 text-white font-bold rounded-xl flex-1 hover:bg-gray-800"
               >
-                Shiko me vone
+                Shiko më vonë
               </button>
             </div>
-<button
+
+            <button
               onClick={() => handleWatchTrailer(selectedMovie.id)}
-              className="bg-red-600 p-3 w-full mt-3 text-white font-bold rounded-xl hover:bg-red-700 hover:cursor-pointer"
+              className="bg-red-600 p-3 w-full mt-3 text-white font-bold rounded-xl hover:bg-red-700"
             >
               Shiko trailerin
             </button>
+
             <button
               onClick={() => {
                 loadUsers();
                 setShowUsersModal(true);
               }}
-              className="bg-green-600 p-3 w-full mt-3 text-white font-bold rounded-xl hover:bg-green-700 hover:cursor-pointer"
+              className="bg-green-600 p-3 w-full mt-3 text-white font-bold rounded-xl hover:bg-green-700"
             >
-              Rekomando filmin te nje shok/shoqe
+              Rekomando një shok/shoqe
             </button>
 
             <div className="mt-6">
@@ -235,7 +250,7 @@ const MovieModal = ({
                       {user?.id === c.user_id && (
                         <button
                           onClick={() => deletePublicComment(c.id, user.id)}
-                          className="text-red-500 text-xs absolute top-5 right-2 hover:cursor-pointer"
+                          className="text-red-500 text-xs absolute top-5 right-2"
                         >
                           ❌
                         </button>
@@ -254,7 +269,7 @@ const MovieModal = ({
                 />
                 <button
                   onClick={handleSendPublicComment}
-                  className=" text-black px-3 hover:cursor-pointer"
+                  className="text-black px-3"
                 >
                   ➤
                 </button>
@@ -275,14 +290,15 @@ const MovieModal = ({
         )}
       </div>
 
-      {/* USERS MODAL */}
       {showUsersModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[60]">
           <div className="bg-white w-96 p-5 rounded-xl shadow-lg">
             <h2 className="text-xl font-bold mb-4">Zgjidh një përdorues</h2>
 
             {allUsers.length === 0 && (
-              <p className="text-gray-500 text-center mb-4">Nuk u gjet asnjë përdorues.</p>
+              <p className="text-gray-500 text-center mb-4">
+                Nuk u gjet asnjë përdorues.
+              </p>
             )}
 
             <div className="max-h-60 overflow-y-auto">
@@ -297,7 +313,6 @@ const MovieModal = ({
                     className="w-10 h-10 rounded-full object-cover"
                   />
                   <p>{u.full_name}</p>
-                  {u.full_name}
                 </div>
               ))}
             </div>

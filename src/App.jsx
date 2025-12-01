@@ -27,12 +27,15 @@ function App() {
 
     const saveUserToSupabase = async () => {
       try {
-        await supabase.from("users").upsert({
-          id: user.id,
-          email: user.primaryEmailAddress?.emailAddress,
-          username: user.username,
-          image_url: user.imageUrl,
-        });
+       await supabase.from("users").upsert({
+  id: user.id,                 // PRIMARY KEY = Clerk ID
+  full_name: user.fullName,
+  email: user.primaryEmailAddress?.emailAddress,
+  image_url: user.imageUrl,
+  clerk_user_id: user.id       // ekstra ruajmë edhe këtu
+});
+
+
       } catch (error) {
         console.error("Gabim gjate ruajtjes se user:", error);
       }
