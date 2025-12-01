@@ -21,7 +21,6 @@ export default function Notifications() {
 
     loadNotifications();
 
-    // Supabase realtime notifications
     const channel = supabase
       .channel("realtime-recommendations")
       .on(

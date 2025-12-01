@@ -18,7 +18,7 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater, userId 
   const location = useLocation();
   const apiKey = import.meta.env.VITE_TMDB_API_KEY;
 
-  const dropdownRef = useRef(null); // <-- REF për dropdown
+  const dropdownRef = useRef(null); 
 
   const genres = [
     { id: 28, name: "Aksion" },
@@ -29,7 +29,7 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater, userId 
     { id: 9648, name: "Mister" },
   ];
 
-  // CLICK OUTSIDE -> Mbyll dropdown
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (open && dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -59,7 +59,7 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater, userId 
     }
   };
 
-  // AUT0 OPEN MOVIE FROM URL PARAM
+
   useEffect(() => {
   const params = new URLSearchParams(location.search);
   const movieIdToOpen = params.get("open");
@@ -79,7 +79,7 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater, userId 
 }, [location.search]);
 
 
-  // FETCH MOVIES
+
   useEffect(() => {
     const fetchMovies = async () => {
       try {
@@ -100,7 +100,6 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater, userId 
 
         const results = (data.results || []).filter((m) => m.poster_path);
 
-        // FETCH RUNTIME DETAILS
         const details = {};
         await Promise.all(
           results.map(async (movie) => {
@@ -118,7 +117,6 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater, userId 
 
         setMovieDetails(details);
 
-        // TRANSLATE EACH MOVIE OVERVIEW
         const translatedMovies = await Promise.all(
           results.map(async (movie) => {
             const translated = await translateText(movie.overview, "sq");
@@ -186,11 +184,9 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater, userId 
   return (
     <div className="bg-linear-to-r from-blue-500 to-green-900 min-h-screen p-6">
 
-      {/* DROPDOWN GENRES */}
       <div className="w-full flex justify-start mb-6 mt-20">
         <div className="relative w-60 select-none" ref={dropdownRef}>
           
-          {/* Trigger */}
           <div
             onClick={() => setOpen(!open)}
             className="
@@ -219,7 +215,6 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater, userId 
             </svg>
           </div>
 
-          {/* Dropdown List */}
           {open && (
             <div
               className="
@@ -268,7 +263,6 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater, userId 
         </div>
       </div>
 
-      {/* SEARCH */}
       <h1 className="text-3xl font-bold text-center text-white mb-6">Filmat</h1>
 
       <div className="flex justify-center mb-6">
@@ -286,7 +280,6 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater, userId 
 
       <Toaster position="top-right" />
 
-      {/* MOVIE GRID */}
       <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {movies.map((movie) => (
           <div
@@ -319,7 +312,6 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater, userId 
         ))}
       </div>
 
-      {/* PAGINATION */}
       <div className="flex justify-center mt-6 gap-4">
         <button
           className="bg-gray-800 text-white px-6 py-2 rounded-lg disabled:opacity-50 hover:bg-gray-900"

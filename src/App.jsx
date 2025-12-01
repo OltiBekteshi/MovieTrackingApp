@@ -79,7 +79,6 @@ function App() {
             }
           />
 
-          {/* NEW ROUTE TO OPEN MOVIE FROM NOTIFICATION */}
           <Route
             path="/recommended/:movieId"
             element={
