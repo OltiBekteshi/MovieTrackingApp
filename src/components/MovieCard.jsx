@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Toaster, toast } from "sonner";
 import PopUpModal from "./PopUpModal";
 import { addToWatchlist, addToWatchLater } from "./../utils/movieService";
+import { useLocation } from "react-router-dom";
 
 const MovieCard = ({
   watchlist,
@@ -13,13 +14,13 @@ const MovieCard = ({
   const [movies, setMovies] = useState([]);
   const [movieDetails, setMovieDetails] = useState({});
   const [page, setPage] = useState(1);
-  const [ setTotalPages] = useState(1);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [trailerKey, setTrailerKey] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("");
   const [overviewCache, setOverviewCache] = useState({});
 
+  const location = useLocation();
   const apiKey = import.meta.env.VITE_TMDB_API_KEY;
 
   const genres = [
@@ -51,6 +52,27 @@ const MovieCard = ({
     }
   };
 
+  // === AUTO OPEN MOVIE FROM NOTIFICATION ===
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const movieIdToOpen = params.get("open");
+
+    if (!movieIdToOpen) return;
+
+    const loadMovie = async () => {
+      const res = await fetch(
+        `https://api.themoviedb.org/3/movie/${movieIdToOpen}?api_key=${apiKey}&language=en-EN`
+      );
+      const data = await res.json();
+      data.overview = await translateText(data.overview, "sq");
+      setSelectedMovie(data);
+    };
+
+    loadMovie();
+  }, [location.search]);
+
+
+  // === FETCH MOVIES NORMAL ===
   useEffect(() => {
     const fetchMovies = async () => {
       try {
@@ -96,14 +118,13 @@ const MovieCard = ({
         );
 
         setMovies(translatedMovies);
-        setTotalPages(data.total_pages || 1);
-      } catch {
-        ("");
-      }
+      } catch {""}
     };
 
     fetchMovies();
-  }, );
+  }, [searchTerm, selectedGenre, page]);
+
+
 
   const handleWatchTrailer = async (movieId) => {
     try {
@@ -158,54 +179,50 @@ const MovieCard = ({
   return (
     <div className="bg-linear-to-r from-blue-500 to-green-900 min-h-screen p-6">
 
-      
-     <div className="w-full flex justify-start mb-6 mt-20">
-  <div className="relative w-56">
+      {/* FILTRI I ZHANREVE (pa ndryshim) */}
+      <div className="w-full flex justify-start mb-6 mt-20">
+        <div className="relative w-56">
+          <select
+            className="
+              w-full appearance-none
+              bg-white/10 text-white
+              px-5 py-3 pr-12
+              rounded-xl shadow-lg
+              backdrop-blur-lg border border-white/20
+              cursor-pointer
+              transition-all duration-300
+              hover:bg-white/20 hover:shadow-xl
+              focus:outline-none focus:ring-2 focus:ring-white/30
+            "
+            defaultValue=""
+            onChange={(e) => {
+              setSelectedGenre(e.target.value);
+              setPage(1);
+            }}
+          >
+            <option className="bg-black text-white font-bold " value="">
+              Të gjithë filmat
+            </option>
 
-    <select
-      className="
-        w-full appearance-none
-        bg-white/10 text-white
-        px-5 py-3 pr-12
-        rounded-xl shadow-lg
-        backdrop-blur-lg border border-white/20
-        cursor-pointer
-        transition-all duration-300
-        hover:bg-white/20 hover:shadow-xl
-        focus:outline-none focus:ring-2 focus:ring-white/30
-      "
-      defaultValue=""
-      onChange={(e) => {
-        setSelectedGenre(e.target.value);
-        setPage(1);
-      }}
-    >
-      <option className="bg-black text-white font-bold " value="">
-        Të gjithë filmat
-      </option>
+            {genres.map((g) => (
+              <option key={g.id} value={g.id} className="bg-white text-black">
+                {g.name}
+              </option>
+            ))}
+          </select>
 
-      {genres.map((g) => (
-        <option key={g.id} value={g.id} className="bg-white text-black">
-          {g.name}
-        </option>
-      ))}
-    </select>
+          <span
+            className="
+              absolute right-4 top-1/2 -translate-y-1/2
+              pointer-events-none text-white opacity-70
+            "
+          >
+            ▼
+          </span>
+        </div>
+      </div>
 
-    <span
-      className="
-        absolute right-4 top-1/2 -translate-y-1/2
-        pointer-events-none text-white opacity-70
-      "
-    >
-      ▼
-    </span>
-  </div>
-</div>
-
-
-      <h1 className="text-3xl font-bold text-center text-white mb-6">
-        Filmat
-      </h1>
+      <h1 className="text-3xl font-bold text-center text-white mb-6">Filmat</h1>
 
       <div className="flex justify-center mb-6">
         <input
@@ -232,15 +249,11 @@ const MovieCard = ({
             <img
               src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
               className="w-full h-72 object-cover"
-              alt={movie.title}
             />
             <div className="p-4">
               <h3 className="font-semibold text-lg truncate">{movie.title}</h3>
-
               <p className="truncate">{movie.overview}</p>
-
               <p className="text-sm mt-1">{movie.release_date}</p>
-
               <p className="text-white text-sm mt-1 font-bold">
                 Kohezgjatja:{" "}
                 {movieDetails[movie.id]
@@ -249,11 +262,9 @@ const MovieCard = ({
                     }m`
                   : "N/A"}
               </p>
-
               <p className="text-yellow-400 font-bold mt-1">
                 ⭐ {movie.vote_average.toFixed(1)}
               </p>
-
               <button className="bg-gray-800 p-2 w-full mt-3 rounded-lg hover:cursor-pointer">
                 Shiko Detajet
               </button>

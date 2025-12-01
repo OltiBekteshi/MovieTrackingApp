@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FiMenu, FiX, FiBell } from "react-icons/fi";
 import { SignedIn, SignedOut, UserButton, useUser } from "@clerk/clerk-react";
 import { supabase } from "../utils/supabaseClient";
@@ -9,7 +9,7 @@ const Navbar = () => {
   const [showNotif, setShowNotif] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const { user } = useUser();
-
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!user) return;
@@ -27,11 +27,8 @@ const Navbar = () => {
     load();
   }, [user]);
 
-
   useEffect(() => {
     if (!user) return;
-
-    console.log("Clerk User ID:", user.id);
 
     const channel = supabase
       .channel("notifications-realtime")
@@ -41,19 +38,23 @@ const Navbar = () => {
           schema: "public",
           table: "notifications",
           event: "INSERT",
-          filter: `receiver_id=eq."${user.id}"`, 
+          filter: `receiver_id=eq."${user.id}"`,
         },
         (payload) => {
-          console.log("Realtime Notification Received:", payload.new);
           setNotifications((prev) => [payload.new, ...prev]);
         }
       )
       .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => supabase.removeChannel(channel);
   }, [user]);
+
+
+  const openRecommended = (movieId) => {
+    setShowNotif(false);
+    navigate(`/movies?open=${movieId}`);
+  };
+
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-linear-to-r from-blue-500 to-green-900 shadow-md">
@@ -65,23 +66,15 @@ const Navbar = () => {
 
         <div className="hidden md:flex items-center gap-5">
 
-          <Link to="/" className="px-3 py-2 rounded-2xl hover:opacity-[0.7]">
-            Ballina
-          </Link>
-          <Link to="/movies" className="px-3 py-2 rounded-2xl hover:opacity-[0.7]">
-            Filmat
-          </Link>
-          <Link to="/watchlist" className="px-3 py-2 rounded-2xl hover:opacity-[0.7]">
-            Të shikuar
-          </Link>
-          <Link to="/watch-later" className="px-3 py-2 rounded-2xl hover:opacity-[0.7]">
-            Shiko më vonë
-          </Link>
+          <Link to="/" className="px-3 py-2 rounded-2xl hover:opacity-[0.7]">Ballina</Link>
+          <Link to="/movies" className="px-3 py-2 rounded-2xl hover:opacity-[0.7]">Filmat</Link>
+          <Link to="/watchlist" className="px-3 py-2 rounded-2xl hover:opacity-[0.7]">Të shikuar</Link>
+          <Link to="/watch-later" className="px-3 py-2 rounded-2xl hover:opacity-[0.7]">Shiko më vonë</Link>
 
           {user && (
             <div className="relative">
               <FiBell
-                size={24}
+                size={28}
                 className="cursor-pointer"
                 onClick={() => setShowNotif(!showNotif)}
               />
@@ -92,20 +85,18 @@ const Navbar = () => {
                 </span>
               )}
 
-
               {showNotif && (
                 <div className="absolute right-0 mt-3 bg-white text-black w-72 rounded-xl shadow-xl p-3 z-50">
                   <h3 className="font-bold mb-2">Rekomandimet</h3>
 
                   {notifications.length === 0 ? (
-                    <p className="text-sm text-gray-500">
-                      Nuk keni rekomandime.
-                    </p>
+                    <p className="text-sm text-gray-500">Nuk keni rekomandime.</p>
                   ) : (
                     notifications.map((n) => (
                       <div
                         key={n.id}
-                        className="bg-green-600 p-2 rounded-lg mb-2 text-sm font-bold text-white"
+                        onClick={() => openRecommended(n.movie_id)}
+                        className="bg-green-600 p-2 rounded-lg mb-2 text-sm font-bold text-white cursor-pointer hover:bg-green-700"
                       >
                         {n.message}
                       </div>
@@ -117,12 +108,8 @@ const Navbar = () => {
           )}
 
           <SignedOut>
-            <Link to="/sign-in" className="border px-4 py-2 rounded-2xl">
-              Kyqu
-            </Link>
-            <Link to="/sign-up" className="border px-4 py-2 rounded-2xl">
-              Krijo llogari
-            </Link>
+            <Link to="/sign-in" className="border px-4 py-2 rounded-2xl">Kyqu</Link>
+            <Link to="/sign-up" className="border px-4 py-2 rounded-2xl">Krijo llogari</Link>
           </SignedOut>
 
           <SignedIn>

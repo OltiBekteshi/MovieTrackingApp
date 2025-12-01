@@ -11,7 +11,7 @@ import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
 import Page from "./pages/Page";
 import { useUser } from "@clerk/clerk-react";
-import { supabase } from "./utils/supabaseClient";     // ⭐ SHTUAR
+import { supabase } from "./utils/supabaseClient";
 import { getWatchlist, getWatchLater } from "./utils/movieService";
 
 function App() {
@@ -21,21 +21,18 @@ function App() {
   const [watchlist, setWatchlist] = useState([]);
   const [watchlater, setWatchlater] = useState([]);
 
-  // ⭐ SHTO REGJISTRIMIN E USER NE SUPABASE
   useEffect(() => {
     if (!user) return;
 
     const saveUserToSupabase = async () => {
       try {
-       await supabase.from("users").upsert({
-  id: user.id,                 // PRIMARY KEY = Clerk ID
-  full_name: user.fullName,
-  email: user.primaryEmailAddress?.emailAddress,
-  image_url: user.imageUrl,
-  clerk_user_id: user.id       // ekstra ruajmë edhe këtu
-});
-
-
+        await supabase.from("users").upsert({
+          id: user.id,
+          full_name: user.fullName,
+          email: user.primaryEmailAddress?.emailAddress,
+          image_url: user.imageUrl,
+          clerk_user_id: user.id
+        });
       } catch (error) {
         console.error("Gabim gjate ruajtjes se user:", error);
       }
@@ -44,7 +41,6 @@ function App() {
     saveUserToSupabase();
   }, [user]);
 
-  // ⭐ FETCH WATCHLIST & WATCHLATER
   useEffect(() => {
     if (!userId) return;
 
@@ -68,10 +64,8 @@ function App() {
       <BrowserRouter>
         <Navbar />
         <Routes>
-          <Route
-            path="/"
-            element={<Home watchlist={watchlist} setWatchlist={setWatchlist} />}
-          />
+          <Route path="/" element={<Home watchlist={watchlist} setWatchlist={setWatchlist} />} />
+
           <Route
             path="/movies"
             element={
@@ -84,6 +78,22 @@ function App() {
               />
             }
           />
+
+          {/* NEW ROUTE TO OPEN MOVIE FROM NOTIFICATION */}
+          <Route
+            path="/recommended/:movieId"
+            element={
+              <MovieCard
+                watchlist={watchlist}
+                setWatchlist={setWatchlist}
+                watchlater={watchlater}
+                setWatchlater={setWatchlater}
+                userId={userId}
+                openFromNotification={true}
+              />
+            }
+          />
+
           <Route
             path="/watchlist"
             element={
@@ -94,6 +104,7 @@ function App() {
               />
             }
           />
+
           <Route
             path="/watch-later"
             element={
@@ -104,6 +115,7 @@ function App() {
               />
             }
           />
+
           <Route path="/todos" element={<Page />} />
           <Route path="/sign-in/*" element={<SignInPage />} />
           <Route path="/sign-up" element={<SignUpPage />} />
