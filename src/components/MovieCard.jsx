@@ -61,22 +61,23 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater, userId 
 
   // AUT0 OPEN MOVIE FROM URL PARAM
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const movieIdToOpen = params.get("open");
+  const params = new URLSearchParams(location.search);
+  const movieIdToOpen = params.get("open");
 
-    if (!movieIdToOpen) return;
+  if (!movieIdToOpen) return;
 
-    const loadMovie = async () => {
-      const res = await fetch(
-        `https://api.themoviedb.org/3/movie/${movieIdToOpen}?api_key=${apiKey}&language=en-EN`
-      );
-      const data = await res.json();
-      data.overview = await translateText(data.overview, "sq");
-      setSelectedMovie(data);
-    };
+  const loadMovie = async () => {
+    const res = await fetch(
+      `https://api.themoviedb.org/3/movie/${movieIdToOpen}?api_key=${apiKey}&language=en-EN`
+    );
+    const data = await res.json();
+    data.overview = await translateText(data.overview, "sq");
+    setSelectedMovie(data);
+  };
 
-    loadMovie();
-  }, []);
+  loadMovie();
+}, [location.search]);
+
 
   // FETCH MOVIES
   useEffect(() => {
