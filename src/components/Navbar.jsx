@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiMenu, FiX, FiBell } from "react-icons/fi";
 import { SignedIn, SignedOut, UserButton, useUser } from "@clerk/clerk-react";
@@ -10,6 +10,8 @@ const Navbar = () => {
   const [notifications, setNotifications] = useState([]);
   const { user } = useUser();
   const navigate = useNavigate();
+
+  const notifRef = useRef(null);
 
   useEffect(() => {
     if (!user) return;
@@ -49,12 +51,22 @@ const Navbar = () => {
     return () => supabase.removeChannel(channel);
   }, [user]);
 
-
   const openRecommended = (movieId) => {
     setShowNotif(false);
     navigate(`/movies?open=${movieId}`);
   };
 
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setShowNotif(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-linear-to-r from-blue-500 to-green-900 shadow-md">
@@ -72,11 +84,11 @@ const Navbar = () => {
           <Link to="/watch-later" className="px-3 py-2 rounded-2xl hover:opacity-[0.7]">Shiko më vonë</Link>
 
           {user && (
-            <div className="relative">
+            <div className="relative" ref={notifRef}>
               <FiBell
                 size={28}
                 className="cursor-pointer"
-                onClick={() => setShowNotif(!showNotif)}
+                onClick={() => setShowNotif((prev) => !prev)}
               />
 
               {notifications.length > 0 && (

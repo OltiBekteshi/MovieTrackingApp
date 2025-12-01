@@ -52,7 +52,6 @@ const MovieCard = ({
     }
   };
 
-  // === AUTO OPEN MOVIE FROM NOTIFICATION ===
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const movieIdToOpen = params.get("open");
@@ -69,10 +68,9 @@ const MovieCard = ({
     };
 
     loadMovie();
-  }, [location.search]);
+  }, );
 
 
-  // === FETCH MOVIES NORMAL ===
   useEffect(() => {
     const fetchMovies = async () => {
       try {
@@ -122,7 +120,7 @@ const MovieCard = ({
     };
 
     fetchMovies();
-  }, [searchTerm, selectedGenre, page]);
+  }, );
 
 
 
@@ -179,7 +177,7 @@ const MovieCard = ({
   return (
     <div className="bg-linear-to-r from-blue-500 to-green-900 min-h-screen p-6">
 
-      {/* FILTRI I ZHANREVE (pa ndryshim) */}
+
       <div className="w-full flex justify-start mb-6 mt-20">
         <div className="relative w-56">
           <select

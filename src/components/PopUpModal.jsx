@@ -287,7 +287,7 @@ const MovieModal = ({
       </div>
 
       {showUsersModal && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[60]">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-60">
           <div className="bg-white w-96 p-5 rounded-xl shadow-lg">
             <h2 className="text-xl font-bold mb-4">Zgjidh një përdorues</h2>
 
