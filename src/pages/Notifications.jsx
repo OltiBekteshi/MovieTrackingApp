@@ -6,7 +6,7 @@ const Notifications = () => {
   const { user } = useUser();
   const [notifications, setNotifications] = useState([]);
 
-  // Load notifications
+  
   useEffect(() => {
     if (!user) return;
 
@@ -23,7 +23,7 @@ const Notifications = () => {
     loadNotifs();
   }, [user]);
 
-  // REALTIME listener
+  
   useEffect(() => {
     if (!user) return;
 
@@ -59,8 +59,8 @@ const Notifications = () => {
           key={n.id}
           className="p-4 bg-white border-l-4 border-green-600 rounded-lg shadow mb-3"
         >
-          <h3 className="font-semibold">{n.title}</h3>
-          <p className="text-gray-700">{n.message}</p>
+          <h3 className="font-bold">{n.title}</h3>
+          <p className="text-gray-700 font-bold">{n.message}</p>
         </div>
       ))}
     </div>

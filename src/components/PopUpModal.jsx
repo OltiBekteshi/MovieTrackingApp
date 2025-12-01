@@ -32,11 +32,9 @@ const MovieModal = ({
   const [publicComments, setPublicComments] = useState([]);
   const [commentInput, setCommentInput] = useState("");
 
-  // NEW for recommendation
   const [showUsersModal, setShowUsersModal] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
 
-  // Load users
   const loadUsers = async () => {
     const { data, error } = await supabase.from("users").select("*");
     if (!error) {
@@ -44,7 +42,6 @@ const MovieModal = ({
     }
   };
 
-  // NEW: send notification
   const sendNotification = async (receiverId) => {
     await supabase.from("notifications").insert({
       receiver_id: receiverId,
@@ -54,7 +51,6 @@ const MovieModal = ({
     });
   };
 
-  // Send recommendation + notification
   const sendRecommendation = async (receiverId) => {
     await supabase.from("recommendations").insert({
       sender_id: user.id,
@@ -202,14 +198,14 @@ const MovieModal = ({
             <div className="flex flex-wrap gap-3">
               <button
                 onClick={() => handleAddToWatchlist(selectedMovie)}
-                className="bg-gray-600 p-3 text-white font-bold rounded-xl flex-1 hover:bg-gray-800"
+                className="bg-gray-600 p-3 text-white font-bold rounded-xl flex-1 hover:bg-gray-800 hover:cursor-pointer"
               >
                 Shto në listë
               </button>
 
               <button
                 onClick={() => handleAddToWatchLater(selectedMovie)}
-                className="bg-gray-600 p-3 text-white font-bold rounded-xl flex-1 hover:bg-gray-800"
+                className="bg-gray-600 p-3 text-white font-bold rounded-xl flex-1 hover:bg-gray-800 hover:cursor-pointer"
               >
                 Shiko më vonë
               </button>
@@ -217,7 +213,7 @@ const MovieModal = ({
 
             <button
               onClick={() => handleWatchTrailer(selectedMovie.id)}
-              className="bg-red-600 p-3 w-full mt-3 text-white font-bold rounded-xl hover:bg-red-700"
+              className="bg-red-600 p-3 w-full mt-3 text-white font-bold rounded-xl hover:bg-red-700 hover:cursor-pointer"
             >
               Shiko trailerin
             </button>
@@ -227,9 +223,9 @@ const MovieModal = ({
                 loadUsers();
                 setShowUsersModal(true);
               }}
-              className="bg-green-600 p-3 w-full mt-3 text-white font-bold rounded-xl hover:bg-green-700"
+              className="bg-green-600 p-3 w-full mt-3 text-white font-bold rounded-xl hover:bg-green-700 hover:cursor-pointer"
             >
-              Rekomando një shok/shoqe
+              Rekomando filmin te një shok/shoqe
             </button>
 
             <div className="mt-6">
@@ -250,7 +246,7 @@ const MovieModal = ({
                       {user?.id === c.user_id && (
                         <button
                           onClick={() => deletePublicComment(c.id, user.id)}
-                          className="text-red-500 text-xs absolute top-5 right-2"
+                          className="text-red-500 text-xs absolute top-5 right-2 hover:cursor-pointer"
                         >
                           ❌
                         </button>
@@ -269,7 +265,7 @@ const MovieModal = ({
                 />
                 <button
                   onClick={handleSendPublicComment}
-                  className="text-black px-3"
+                  className="text-black px-3 hover:cursor-pointer"
                 >
                   ➤
                 </button>
@@ -312,14 +308,14 @@ const MovieModal = ({
                     src={u.image_url}
                     className="w-10 h-10 rounded-full object-cover"
                   />
-                  <p>{u.full_name}</p>
+                  <p className="font-bold">{u.full_name}</p>
                 </div>
               ))}
             </div>
 
             <button
               onClick={() => setShowUsersModal(false)}
-              className="mt-4 w-full py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-800"
+              className="mt-4 w-full py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-800 hover:cursor-pointer"
             >
               Mbyll
             </button>

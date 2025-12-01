@@ -10,7 +10,7 @@ const Navbar = () => {
   const [notifications, setNotifications] = useState([]);
   const { user } = useUser();
 
-  // Load notifications from DB (initial fetch)
+
   useEffect(() => {
     if (!user) return;
 
@@ -27,7 +27,7 @@ const Navbar = () => {
     load();
   }, [user]);
 
-  // Enable Realtime Notifications
+
   useEffect(() => {
     if (!user) return;
 
@@ -41,7 +41,7 @@ const Navbar = () => {
           schema: "public",
           table: "notifications",
           event: "INSERT",
-          filter: `receiver_id=eq."${user.id}"`, // IMPORTANT FIX
+          filter: `receiver_id=eq."${user.id}"`, 
         },
         (payload) => {
           console.log("Realtime Notification Received:", payload.new);
@@ -78,7 +78,6 @@ const Navbar = () => {
             Shiko më vonë
           </Link>
 
-          {/* NOTIFICATIONS */}
           {user && (
             <div className="relative">
               <FiBell
@@ -87,27 +86,26 @@ const Navbar = () => {
                 onClick={() => setShowNotif(!showNotif)}
               />
 
-              {/* Notification Badge */}
               {notifications.length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">
                   {notifications.length}
                 </span>
               )}
 
-              {/* Notification Dropdown */}
+
               {showNotif && (
                 <div className="absolute right-0 mt-3 bg-white text-black w-72 rounded-xl shadow-xl p-3 z-50">
-                  <h3 className="font-bold mb-2">Njoftimet</h3>
+                  <h3 className="font-bold mb-2">Rekomandimet</h3>
 
                   {notifications.length === 0 ? (
                     <p className="text-sm text-gray-500">
-                      Nuk keni njoftime.
+                      Nuk keni rekomandime.
                     </p>
                   ) : (
                     notifications.map((n) => (
                       <div
                         key={n.id}
-                        className="bg-gray-200 p-2 rounded-lg mb-2 text-sm"
+                        className="bg-green-600 p-2 rounded-lg mb-2 text-sm font-bold text-white"
                       >
                         {n.message}
                       </div>
