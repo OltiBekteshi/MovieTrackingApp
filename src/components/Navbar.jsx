@@ -8,9 +8,10 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [showAll, setShowAll] = useState(false);
+
   const { user } = useUser();
   const navigate = useNavigate();
-
   const notifRef = useRef(null);
 
   useEffect(() => {
@@ -51,9 +52,17 @@ const Navbar = () => {
     return () => supabase.removeChannel(channel);
   }, [user]);
 
-  const openRecommended = (movieId) => {
+  const deleteNotification = async (id) => {
+    await supabase.from("notifications").delete().eq("id", id);
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  };
+
+  const openRecommended = (notif) => {
     setShowNotif(false);
-    navigate(`/movies?open=${movieId}`);
+
+    deleteNotification(notif.id);
+
+    navigate(`/movies?open=${notif.movie_id}`);
   };
 
   useEffect(() => {
@@ -66,6 +75,10 @@ const Navbar = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const displayedNotifications = showAll
+    ? notifications
+    : notifications.slice(0, 5);
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-linear-to-r from-blue-500 to-green-900 shadow-md">
@@ -122,15 +135,35 @@ const Navbar = () => {
                       Nuk keni rekomandime.
                     </p>
                   ) : (
-                    notifications.map((n) => (
-                      <div
-                        key={n.id}
-                        onClick={() => openRecommended(n.movie_id)}
-                        className="bg-green-600 p-2 rounded-lg mb-2 text-sm font-bold text-white cursor-pointer hover:bg-green-700"
-                      >
-                        {n.message}
-                      </div>
-                    ))
+                    <>
+                      {displayedNotifications.map((n) => (
+                        <div
+                          key={n.id}
+                          onClick={() => openRecommended(n)}
+                          className="bg-gray-100 shadow-2xl p-2 rounded-lg mb-2 text-sm text-black cursor-pointer hover:bg-gray-200"
+                        >
+                          {n.message}
+                        </div>
+                      ))}
+
+                      {notifications.length > 5 && !showAll && (
+                        <button
+                          onClick={() => setShowAll(true)}
+                          className="text-blue-600 text-sm font-bold hover:underline cursor-pointer"
+                        >
+                          Shiko më shumë...
+                        </button>
+                      )}
+
+                      {showAll && (
+                        <button
+                          onClick={() => setShowAll(false)}
+                          className="text-blue-600 text-sm font-bold hover:underline mt-2 cursor-pointer"
+                        >
+                          Shiko më pak
+                        </button>
+                      )}
+                    </>
                   )}
                 </div>
               )}
@@ -158,99 +191,6 @@ const Navbar = () => {
           {isOpen ? <FiX /> : <FiMenu />}
         </button>
       </div>
-
-      {isOpen && (
-        <div className="md:hidden bg-linear-to-r from-blue-500 to-green-900 px-4 pb-4 text-white space-y-3">
-          {user && (
-            <div className="relative" ref={notifRef}>
-              <FiBell
-                size={26}
-                className="cursor-pointer"
-                onClick={() => setShowNotif((prev) => !prev)}
-              />
-
-              {notifications.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">
-                  {notifications.length}
-                </span>
-              )}
-
-              {showNotif && (
-                <div className="absolute left-0 mt-2 bg-white text-black w-72 rounded-xl shadow-xl p-3 z-50">
-                  <h3 className="font-bold mb-2">Rekomandimet</h3>
-
-                  {notifications.length === 0 ? (
-                    <p className="text-sm text-gray-500">
-                      Nuk keni rekomandime.
-                    </p>
-                  ) : (
-                    notifications.map((n) => (
-                      <div
-                        key={n.id}
-                        onClick={() => openRecommended(n.movie_id)}
-                        className="bg-green-600 p-2 rounded-lg mb-2 text-sm font-bold text-white cursor-pointer hover:bg-green-700"
-                      >
-                        {n.message}
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-
-          <Link to="/" className="block py-2" onClick={() => setIsOpen(false)}>
-            Ballina
-          </Link>
-
-          <Link
-            to="/movies"
-            className="block py-2"
-            onClick={() => setIsOpen(false)}
-          >
-            Filmat
-          </Link>
-
-          <Link
-            to="/watchlist"
-            className="block py-2"
-            onClick={() => setIsOpen(false)}
-          >
-            Të shikuar
-          </Link>
-
-          <Link
-            to="/watch-later"
-            className="block py-2"
-            onClick={() => setIsOpen(false)}
-          >
-            Shiko më vonë
-          </Link>
-
-          <SignedOut>
-            <Link
-              to="/sign-in"
-              className="block py-2"
-              onClick={() => setIsOpen(false)}
-            >
-              Kyqu
-            </Link>
-            <Link
-              to="/sign-up"
-              className="block py-2"
-              onClick={() => setIsOpen(false)}
-            >
-              Krijo llogari
-            </Link>
-          </SignedOut>
-
-          <SignedIn>
-            <div className="py-2">
-              <UserButton afterSignOutUrl="/" />
-            </div>
-          </SignedIn>
-        </div>
-      )}
     </nav>
   );
 };

@@ -3,6 +3,7 @@ import { Toaster, toast } from "sonner";
 import PopUpModal from "./PopUpModal";
 import { addToWatchlist, addToWatchLater } from "./../utils/movieService";
 import { useLocation } from "react-router-dom";
+import ClipLoader from "react-spinners/ClipLoader";
 
 const MovieCard = ({
   watchlist,
@@ -20,10 +21,10 @@ const MovieCard = ({
   const [selectedGenre, setSelectedGenre] = useState("");
   const [overviewCache, setOverviewCache] = useState({});
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const location = useLocation();
   const apiKey = import.meta.env.VITE_TMDB_API_KEY;
-
   const dropdownRef = useRef(null);
 
   const genres = [
@@ -91,6 +92,8 @@ const MovieCard = ({
   useEffect(() => {
     const fetchMovies = async () => {
       try {
+        setLoading(true);
+
         let url = "";
 
         if (searchTerm.trim()) {
@@ -133,8 +136,11 @@ const MovieCard = ({
         );
 
         setMovies(translatedMovies);
-      } catch {
-        ("");
+      } catch (err) {
+        console.error("Error fetching movies:", err);
+        toast.error("Gabim gjatë ngarkimit të filmave");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -295,39 +301,50 @@ const MovieCard = ({
 
       <Toaster position="top-right" />
 
-      <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-        {movies.map((movie) => (
-          <div
-            key={movie.id}
-            className="bg-black rounded-2xl text-white shadow-md hover:shadow-xl transition overflow-hidden cursor-pointer"
-            onClick={() => setSelectedMovie(movie)}
-          >
-            <img
-              src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-              className="w-full h-72 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="font-semibold text-lg truncate">{movie.title}</h3>
-              <p className="truncate">{movie.overview}</p>
-              <p className="text-sm mt-1">{movie.release_date}</p>
-              <p className="text-white text-sm mt-1 font-bold">
-                Kohezgjatja:{" "}
-                {movieDetails[movie.id]
-                  ? `${Math.floor(movieDetails[movie.id] / 60)}h ${
-                      movieDetails[movie.id] % 60
-                    }m`
-                  : "N/A"}
-              </p>
-              <p className="text-yellow-400 font-bold mt-1">
-                ⭐ {movie.vote_average.toFixed(1)}
-              </p>
-              <button className="bg-gray-800 p-2 w-full mt-3 rounded-lg hover:bg-gray-900 cursor-pointer">
-                Shiko Detajet
-              </button>
+      {loading ? (
+        <div className="flex justify-center items-center py-20">
+          <ClipLoader size={79} color="white" />
+        </div>
+      ) : (
+        <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          {movies.map((movie) => (
+            <div
+              key={movie.id}
+              className="bg-black rounded-2xl text-white shadow-md hover:shadow-xl transition overflow-hidden cursor-pointer hover:scale-103"
+              onClick={() => setSelectedMovie(movie)}
+            >
+              <img
+                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                className="w-full h-72 object-cover"
+              />
+              <div className="p-4">
+                <h3 className="font-semibold text-lg truncate">
+                  {movie.title}
+                </h3>
+                <p className="truncate">{movie.overview}</p>
+                <p className="text-sm mt-1">{movie.release_date}</p>
+                <p className="text-white text-sm mt-1 font-bold">
+                  Kohezgjatja:{" "}
+                  {movieDetails[movie.id]
+                    ? `${Math.floor(movieDetails[movie.id] / 60)}h ${
+                        movieDetails[movie.id] % 60
+                      }m`
+                    : "N/A"}
+                </p>
+                <p className="text-yellow-400 font-bold mt-1">
+                  ⭐ {movie.vote_average.toFixed(1)}
+                </p>
+                <button
+                  onClick={() => setSelectedMovie(movie)}
+                  className="bg-gray-800 p-2 w-full mt-3 rounded-lg hover:bg-gray-900 cursor-pointer"
+                >
+                  Shiko Detajet
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       <div className="flex justify-center mt-6 gap-4">
         <button

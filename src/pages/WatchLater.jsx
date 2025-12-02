@@ -8,7 +8,7 @@ const WatchLater = ({ watchlater, setWatchlater, userId }) => {
 
   const handleRemove = async (movieId) => {
     if (!userId) {
-      toast.error("Kyqu per te fshire filmin");
+      toast.error("Kyqu për të fshirë filmin");
       return;
     }
 
@@ -19,7 +19,7 @@ const WatchLater = ({ watchlater, setWatchlater, userId }) => {
       toast.success("Filmi u fshi me sukses");
     } catch (err) {
       console.error(err);
-      toast.error("Fshirja e filmit deshtoi");
+      toast.error("Fshirja e filmit dështoi");
     }
   };
 
@@ -27,7 +27,7 @@ const WatchLater = ({ watchlater, setWatchlater, userId }) => {
     return (
       <div className="bg-linear-to-r from-blue-500  to-green-900 shadow-md min-h-screen text-white flex flex-col items-center justify-center ">
         <h1 className="text-3xl font-bold mb-4 ">
-          Lista e filmave per ti shikuar me vone eshte e thate
+          Lista e filmave për t'i shikuar më vonë është e thatë
         </h1>
         <button
           className="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 cursor-pointer"
@@ -42,7 +42,7 @@ const WatchLater = ({ watchlater, setWatchlater, userId }) => {
   return (
     <div className="bg-linear-to-r from-blue-500  to-green-900 shadow-md  min-h-screen p-6">
       <h1 className="text-3xl font-bold mb-6 text-white text-center mt-20">
-        Shiko me vone
+        Shiko më vonë
       </h1>
 
       <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">

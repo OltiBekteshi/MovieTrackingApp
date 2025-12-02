@@ -40,7 +40,6 @@ const MovieFacts = () => {
                 sx={{
                   fontWeight: 600,
                   color: "#ffffff",
-                  textShadow: "0 0 8px rgba(250, 204, 21, 0.5)",
                 }}
               >
                 {fact.title}
