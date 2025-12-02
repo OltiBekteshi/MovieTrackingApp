@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useUser } from "@clerk/clerk-react";
+import { useNavigate } from "react-router-dom";
 import {
   getPublicComments,
   addPublicComment,
   deletePublicComment,
-  subscribeToPublicComments
+  subscribeToPublicComments,
 } from "../utils/movieService";
 import { supabase } from "../utils/supabaseClient";
 
@@ -34,6 +35,8 @@ const MovieModal = ({
 
   const [showUsersModal, setShowUsersModal] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
+
+  const navigate = useNavigate();
 
   const loadUsers = async () => {
     const { data, error } = await supabase.from("users").select("*");
@@ -74,6 +77,7 @@ const MovieModal = ({
     if (e.target.id === "modal-background") {
       setSelectedMovie(null);
       setTrailerKey(null);
+      navigate("/movies", { replace: true });
     }
   };
 
@@ -152,6 +156,7 @@ const MovieModal = ({
           onClick={() => {
             setSelectedMovie(null);
             setTrailerKey(null);
+            navigate("/movies", { replace: true });
           }}
           className="absolute top-3 right-3 text-gray-700 font-bold text-3xl hover:text-red-500"
         >
@@ -188,7 +193,9 @@ const MovieModal = ({
 
             <p className="text-sm text-gray-600 mb-2">
               Kohezgjatja:{" "}
-              {runtime ? `${Math.floor(runtime / 60)}h ${runtime % 60}m` : "N/A"}
+              {runtime
+                ? `${Math.floor(runtime / 60)}h ${runtime % 60}m`
+                : "N/A"}
             </p>
 
             <p className="text-yellow-500 font-bold mb-4">

@@ -4,7 +4,13 @@ import PopUpModal from "./PopUpModal";
 import { addToWatchlist, addToWatchLater } from "./../utils/movieService";
 import { useLocation } from "react-router-dom";
 
-const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater, userId }) => {
+const MovieCard = ({
+  watchlist,
+  setWatchlist,
+  watchlater,
+  setWatchlater,
+  userId,
+}) => {
   const [movies, setMovies] = useState([]);
   const [movieDetails, setMovieDetails] = useState({});
   const [page, setPage] = useState(1);
@@ -18,7 +24,7 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater, userId 
   const location = useLocation();
   const apiKey = import.meta.env.VITE_TMDB_API_KEY;
 
-  const dropdownRef = useRef(null); 
+  const dropdownRef = useRef(null);
 
   const genres = [
     { id: 28, name: "Aksion" },
@@ -29,10 +35,13 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater, userId 
     { id: 9648, name: "Mister" },
   ];
 
-
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (open && dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+      if (
+        open &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target)
+      ) {
         setOpen(false);
       }
     };
@@ -47,7 +56,9 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater, userId 
 
     try {
       const res = await fetch(
-        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`
+        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(
+          text
+        )}`
       );
       const data = await res.json();
       const translated = data[0].map((item) => item[0]).join("");
@@ -59,26 +70,23 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater, userId 
     }
   };
 
-
   useEffect(() => {
-  const params = new URLSearchParams(location.search);
-  const movieIdToOpen = params.get("open");
+    const params = new URLSearchParams(location.search);
+    const movieIdToOpen = params.get("open");
 
-  if (!movieIdToOpen) return;
+    if (!movieIdToOpen) return;
 
-  const loadMovie = async () => {
-    const res = await fetch(
-      `https://api.themoviedb.org/3/movie/${movieIdToOpen}?api_key=${apiKey}&language=en-EN`
-    );
-    const data = await res.json();
-    data.overview = await translateText(data.overview, "sq");
-    setSelectedMovie(data);
-  };
+    const loadMovie = async () => {
+      const res = await fetch(
+        `https://api.themoviedb.org/3/movie/${movieIdToOpen}?api_key=${apiKey}&language=en-EN`
+      );
+      const data = await res.json();
+      data.overview = await translateText(data.overview, "sq");
+      setSelectedMovie(data);
+    };
 
-  loadMovie();
-}, [location.search]);
-
-
+    loadMovie();
+  }, [location.search]);
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -125,7 +133,9 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater, userId 
         );
 
         setMovies(translatedMovies);
-      } catch {""}
+      } catch {
+        ("");
+      }
     };
 
     fetchMovies();
@@ -183,10 +193,8 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater, userId 
 
   return (
     <div className="bg-linear-to-r from-blue-500 to-green-900 min-h-screen p-6">
-
       <div className="w-full flex justify-start mb-6 mt-20">
         <div className="relative w-60 select-none" ref={dropdownRef}>
-          
           <div
             onClick={() => setOpen(!open)}
             className="
@@ -201,17 +209,25 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater, userId 
             "
           >
             <span>
-              {genres.find(g => g.id === Number(selectedGenre))?.name || "Të gjithë filmat"}
+              {genres.find((g) => g.id === Number(selectedGenre))?.name ||
+                "Të gjithë filmat"}
             </span>
 
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className={`h-5 w-5 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+              className={`h-5 w-5 transition-transform duration-300 ${
+                open ? "rotate-180" : ""
+              }`}
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </div>
 
@@ -259,7 +275,6 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater, userId 
               ))}
             </div>
           )}
-
         </div>
       </div>
 
@@ -298,13 +313,15 @@ const MovieCard = ({ watchlist, setWatchlist, watchlater, setWatchlater, userId 
               <p className="text-white text-sm mt-1 font-bold">
                 Kohezgjatja:{" "}
                 {movieDetails[movie.id]
-                  ? `${Math.floor(movieDetails[movie.id] / 60)}h ${movieDetails[movie.id] % 60}m`
+                  ? `${Math.floor(movieDetails[movie.id] / 60)}h ${
+                      movieDetails[movie.id] % 60
+                    }m`
                   : "N/A"}
               </p>
               <p className="text-yellow-400 font-bold mt-1">
                 ⭐ {movie.vote_average.toFixed(1)}
               </p>
-              <button className="bg-gray-800 p-2 w-full mt-3 rounded-lg hover:bg-gray-900">
+              <button className="bg-gray-800 p-2 w-full mt-3 rounded-lg hover:bg-gray-900 cursor-pointer">
                 Shiko Detajet
               </button>
             </div>
