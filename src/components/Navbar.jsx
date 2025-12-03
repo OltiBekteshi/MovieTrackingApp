@@ -59,9 +59,7 @@ const Navbar = () => {
 
   const openRecommended = (notif) => {
     setShowNotif(false);
-
     deleteNotification(notif.id);
-
     navigate(`/movies?open=${notif.movie_id}`);
   };
 
@@ -85,7 +83,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto flex items-center justify-between p-4 text-white">
         <Link
           to="/"
-          className="text-xl font-bold hover:opacity-80 flex items-center"
+          className="text-xl font-bold flex items-center hover:opacity-80"
         >
           <img src="/movie.png" alt="Logo" className="h-7 w-7 mr-1" />
           MovieTracker
@@ -140,7 +138,7 @@ const Navbar = () => {
                         <div
                           key={n.id}
                           onClick={() => openRecommended(n)}
-                          className="bg-gray-100 shadow-2xl p-2 rounded-lg mb-2 text-sm text-black cursor-pointer hover:bg-gray-200"
+                          className="bg-gray-100 shadow p-2 rounded-lg mb-2 text-sm cursor-pointer hover:bg-gray-200"
                         >
                           {n.message}
                         </div>
@@ -149,7 +147,7 @@ const Navbar = () => {
                       {notifications.length > 5 && !showAll && (
                         <button
                           onClick={() => setShowAll(true)}
-                          className="text-blue-600 text-sm font-bold hover:underline cursor-pointer"
+                          className="text-blue-600 text-sm font-bold hover:underline"
                         >
                           Shiko më shumë...
                         </button>
@@ -158,7 +156,7 @@ const Navbar = () => {
                       {showAll && (
                         <button
                           onClick={() => setShowAll(false)}
-                          className="text-blue-600 text-sm font-bold hover:underline mt-2 cursor-pointer"
+                          className="text-blue-600 text-sm font-bold hover:underline mt-2"
                         >
                           Shiko më pak
                         </button>
@@ -191,6 +189,110 @@ const Navbar = () => {
           {isOpen ? <FiX /> : <FiMenu />}
         </button>
       </div>
+
+      {isOpen && (
+        <div className="md:hidden bg-linear-to-r from-blue-500 to-green-900 text-white px-6 py-4 space-y-4">
+          <Link to="/" onClick={() => setIsOpen(false)} className="block">
+            Ballina
+          </Link>
+          <Link to="/movies" onClick={() => setIsOpen(false)} className="block">
+            Filmat
+          </Link>
+          <Link
+            to="/watchlist"
+            onClick={() => setIsOpen(false)}
+            className="block"
+          >
+            Të shikuar
+          </Link>
+          <Link
+            to="/watch-later"
+            onClick={() => setIsOpen(false)}
+            className="block"
+          >
+            Shiko më vonë
+          </Link>
+
+          {user && (
+            <div className="relative" ref={notifRef}>
+              <div
+                className="flex items-center gap-2 cursor-pointer"
+                onClick={() => setShowNotif((p) => !p)}
+              >
+                <FiBell size={24} />
+                <span>Notifikimet</span>
+              </div>
+
+              {notifications.length > 0 && (
+                <span className="absolute top-0 left-20 bg-red-600 h-2 w-2 rounded-full"></span>
+              )}
+
+              {showNotif && (
+                <div className="mt-3 bg-white text-black w-full rounded-xl shadow-xl p-3 z-50">
+                  <h3 className="font-bold mb-2">Rekomandimet</h3>
+
+                  {notifications.length === 0 ? (
+                    <p className="text-sm text-gray-500">
+                      Nuk keni rekomandime.
+                    </p>
+                  ) : (
+                    <>
+                      {displayedNotifications.map((n) => (
+                        <div
+                          key={n.id}
+                          onClick={() => openRecommended(n)}
+                          className="bg-gray-100 shadow p-2 rounded-lg mb-2 text-sm cursor-pointer hover:bg-gray-200"
+                        >
+                          {n.message}
+                        </div>
+                      ))}
+
+                      {notifications.length > 5 && !showAll && (
+                        <button
+                          onClick={() => setShowAll(true)}
+                          className="text-blue-600 text-sm font-bold hover:underline"
+                        >
+                          Shiko më shumë...
+                        </button>
+                      )}
+
+                      {showAll && (
+                        <button
+                          onClick={() => setShowAll(false)}
+                          className="text-blue-600 text-sm font-bold hover:underline mt-2"
+                        >
+                          Shiko më pak
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          <SignedOut>
+            <Link
+              to="/sign-in"
+              onClick={() => setIsOpen(false)}
+              className="block"
+            >
+              Kyqu
+            </Link>
+            <Link
+              to="/sign-up"
+              onClick={() => setIsOpen(false)}
+              className="block"
+            >
+              Krijo llogari
+            </Link>
+          </SignedOut>
+
+          <SignedIn>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
+        </div>
+      )}
     </nav>
   );
 };
