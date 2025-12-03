@@ -17,7 +17,7 @@ const TopRated = () => {
             <img
               src={movie.image}
               alt={movie.title}
-              className="w-full h-72 object-cover "
+              className="w-full h-100 object-fill "
             />
             <div className="p-4">
               <h3 className="text-white text-lg font-semibold">
