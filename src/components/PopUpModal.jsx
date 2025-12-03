@@ -163,6 +163,15 @@ const MovieModal = ({
           &times;
         </button>
 
+        {trailerKey && (
+          <button
+            onClick={() => setTrailerKey(null)}
+            className="absolute top-6 left-3 font-bold text-red-500 cursor-pointer"
+          >
+            ← Kthehu prapa
+          </button>
+        )}
+
         {!trailerKey ? (
           <>
             <img
@@ -280,7 +289,7 @@ const MovieModal = ({
             </div>
           </>
         ) : (
-          <div className="aspect-video">
+          <div className="aspect-video mt-10">
             <iframe
               width="100%"
               height="415"
