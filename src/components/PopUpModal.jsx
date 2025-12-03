@@ -8,6 +8,7 @@ import {
   subscribeToPublicComments,
 } from "../utils/movieService";
 import { supabase } from "../utils/supabaseClient";
+import { Toaster, toast } from "sonner";
 
 const genres = [
   { id: 28, name: "Aksion" },
@@ -65,7 +66,7 @@ const MovieModal = ({
     await sendNotification(receiverId);
 
     setShowUsersModal(false);
-    alert("Rekomandimi u dërgua me sukses!");
+    toast.success("Rekomandimi u dërgua me sukses!");
   };
 
   const getGenresForMovie = () => {
@@ -144,6 +145,8 @@ const MovieModal = ({
   };
 
   if (!selectedMovie) return null;
+
+  <Toaster position="top-right" />;
 
   return (
     <div
