@@ -79,13 +79,13 @@ const Swipper = () => {
             className="customPrev bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-800 hover:cursor-pointer"
             onClick={() => swiperRef.current?.slidePrev()}
           >
-            Pas
+            ←
           </button>
           <button
             className="customNext bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-800 hover:cursor-pointer"
             onClick={() => swiperRef.current?.slideNext()}
           >
-            Para
+            →
           </button>
         </div>
       </Swiper>
