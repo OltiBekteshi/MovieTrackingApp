@@ -39,6 +39,8 @@ const MovieModal = ({
 
   const navigate = useNavigate();
 
+  const [personalRating, setPersonalRating] = useState(0);
+
   const loadUsers = async () => {
     const { data, error } = await supabase.from("users").select("*");
     if (!error) {
@@ -146,7 +148,10 @@ const MovieModal = ({
 
   if (!selectedMovie) return null;
 
-  <Toaster position="top-right" />;
+  const handleRatingClick = (rating) => {
+    setPersonalRating(rating);
+    toast.success(`Ju vlerësuat filmin me ${rating} yje!`);
+  };
 
   return (
     <div
@@ -166,15 +171,6 @@ const MovieModal = ({
           &times;
         </button>
 
-        {trailerKey && (
-          <button
-            onClick={() => setTrailerKey(null)}
-            className="absolute top-6 left-3 font-bold text-red-500 cursor-pointer"
-          >
-            ← Kthehu prapa
-          </button>
-        )}
-
         {!trailerKey ? (
           <>
             <img
@@ -183,7 +179,12 @@ const MovieModal = ({
             />
 
             <div className="flex justify-between items-start mb-2">
-              <h2 className="text-2xl font-bold">{selectedMovie.title}</h2>
+              <h2 className="text-2xl font-bold flex">
+                {selectedMovie.title}{" "}
+                <p className="text-yellow-500 font-bold flex">
+                  ⭐ {selectedMovie.vote_average.toFixed(1)}
+                </p>
+              </h2>
 
               <div className="flex flex-wrap gap-2 justify-end">
                 {getGenresForMovie().map((g) => (
@@ -210,9 +211,31 @@ const MovieModal = ({
                 : "N/A"}
             </p>
 
-            <p className="text-yellow-500 font-bold mb-4">
-              ⭐ {selectedMovie.vote_average.toFixed(1)}
-            </p>
+            <div className="flex items-center justify-between mt-4 mb-4">
+              <div className="flex items-center gap-2">
+                <p className="font-bold">Vlerësimi personal:</p>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <span
+                    key={star}
+                    onClick={() => handleRatingClick(star)}
+                    className={`cursor-pointer text-2xl ${
+                      star <= personalRating
+                        ? "text-yellow-500"
+                        : "text-gray-400"
+                    }`}
+                  >
+                    ★
+                  </span>
+                ))}
+              </div>
+
+              <button
+                className="text-blue-600 underline text-sm hover:cursor-pointer"
+                onClick={() => toast.info("")}
+              >
+                Shiko 3 vlerësimet e fundit
+              </button>
+            </div>
 
             <div className="flex flex-wrap gap-3">
               <button
