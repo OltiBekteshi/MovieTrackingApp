@@ -171,6 +171,16 @@ const MovieModal = ({
           &times;
         </button>
 
+        {/* 🔥 ADDED BACK BUTTON FOR TRAILER VIEW */}
+        {trailerKey && (
+          <button
+            onClick={() => setTrailerKey(null)}
+            className="absolute top-6 left-3 font-bold text-red-500 cursor-pointer"
+          >
+            ← Kthehu prapa
+          </button>
+        )}
+
         {!trailerKey ? (
           <>
             <img
