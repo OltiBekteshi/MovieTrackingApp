@@ -46,7 +46,6 @@ const MovieCard = ({
         setOpen(false);
       }
     };
-
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
   }, [open]);
@@ -74,20 +73,25 @@ const MovieCard = ({
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const movieIdToOpen = params.get("open");
-
     if (!movieIdToOpen) return;
 
-    const loadMovie = async () => {
-      const res = await fetch(
-        `https://api.themoviedb.org/3/movie/${movieIdToOpen}?api_key=${apiKey}&language=en-EN`
-      );
-      const data = await res.json();
-      data.overview = await translateText(data.overview, "sq");
-      setSelectedMovie(data);
-    };
-
-    loadMovie();
+    openMovieDetails(movieIdToOpen);
   }, [location.search]);
+
+  const openMovieDetails = async (movieId) => {
+    try {
+      const res = await fetch(
+        `https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKey}&language=en-EN`
+      );
+      const fullMovie = await res.json();
+
+      fullMovie.overview = await translateText(fullMovie.overview, "sq");
+
+      setSelectedMovie(fullMovie);
+    } catch {
+      toast.error("Nuk mund të hapet filmi.");
+    }
+  };
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -108,10 +112,10 @@ const MovieCard = ({
 
         const res = await fetch(url);
         const data = await res.json();
-
         const results = (data.results || []).filter((m) => m.poster_path);
 
         const details = {};
+
         await Promise.all(
           results.map(async (movie) => {
             try {
@@ -203,61 +207,24 @@ const MovieCard = ({
         <div className="relative w-60 select-none" ref={dropdownRef}>
           <div
             onClick={() => setOpen(!open)}
-            className="
-              bg-white/10 text-white
-              px-5 py-3
-              rounded-2xl shadow-xl
-              backdrop-blur-lg border border-white/30
-              cursor-pointer font-semibold
-              flex items-center justify-between
-              transition-all duration-300
-              hover:bg-white/20 hover:shadow-2xl
-            "
+            className="bg-white/10 text-white px-5 py-3 rounded-2xl cursor-pointer flex justify-between"
           >
             <span>
               {genres.find((g) => g.id === Number(selectedGenre))?.name ||
                 "Të gjithë filmat"}
             </span>
-
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className={`h-5 w-5 transition-transform duration-300 ${
-                open ? "rotate-180" : ""
-              }`}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
+            <span>▼</span>
           </div>
 
           {open && (
-            <div
-              className="
-                absolute top-full left-0 right-0 mt-2
-                bg-black/60 backdrop-blur-xl
-                border border-white/20
-                rounded-2xl shadow-2xl
-                overflow-hidden z-50
-              "
-            >
+            <div className="absolute top-full left-0 right-0 mt-2 bg-black/60 rounded-2xl shadow-2xl z-50">
               <div
                 onClick={() => {
                   setSelectedGenre("");
                   setPage(1);
                   setOpen(false);
                 }}
-                className="
-                  px-5 py-3 cursor-pointer
-                  hover:bg-white/20 text-white font-semibold
-                  transition-all duration-200
-                "
+                className="px-5 py-3 cursor-pointer hover:bg-white/20 text-white"
               >
                 Të gjithë filmat
               </div>
@@ -270,11 +237,7 @@ const MovieCard = ({
                     setPage(1);
                     setOpen(false);
                   }}
-                  className="
-                    px-5 py-3 cursor-pointer
-                    hover:bg-white/20 text-white font-semibold
-                    transition-all duration-200
-                  "
+                  className="px-5 py-3 cursor-pointer hover:bg-white/20 text-white"
                 >
                   {g.name}
                 </div>
@@ -290,7 +253,7 @@ const MovieCard = ({
         <input
           type="text"
           placeholder="Kërko filmin..."
-          className="w-full max-w-md px-4 py-2 rounded-lg border border-gray-300 bg-black/40 text-white"
+          className="w-full max-w-md px-4 py-2 rounded-lg bg-black/40 text-white"
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);
@@ -310,8 +273,8 @@ const MovieCard = ({
           {movies.map((movie) => (
             <div
               key={movie.id}
-              className="bg-black rounded-2xl text-white shadow-md hover:shadow-xl transition overflow-hidden cursor-pointer hover:scale-103"
-              onClick={() => setSelectedMovie(movie)}
+              className="bg-black rounded-2xl text-white shadow-md hover:scale-103 transition cursor-pointer"
+              onClick={() => openMovieDetails(movie.id)}
             >
               <img
                 src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -334,8 +297,12 @@ const MovieCard = ({
                 <p className="text-yellow-400 font-bold mt-1">
                   ⭐ {movie.vote_average.toFixed(1)}
                 </p>
+
                 <button
-                  onClick={() => setSelectedMovie(movie)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openMovieDetails(movie.id);
+                  }}
                   className="bg-gray-800 p-2 w-full mt-3 rounded-lg hover:bg-gray-900 cursor-pointer"
                 >
                   Shiko Detajet
@@ -348,7 +315,7 @@ const MovieCard = ({
 
       <div className="flex justify-center mt-6 gap-4">
         <button
-          className="bg-gray-800 text-white px-6 py-2 rounded-lg disabled:opacity-50 hover:bg-gray-900"
+          className="bg-gray-800 text-white px-6 py-2 rounded-lg disabled:opacity-50 cursor-pointer"
           disabled={page === 1}
           onClick={() => setPage(page - 1)}
         >
@@ -358,7 +325,7 @@ const MovieCard = ({
         <span className="text-white text-lg">Faqja {page}</span>
 
         <button
-          className="bg-gray-800 text-white px-6 py-2 rounded-lg hover:bg-gray-900"
+          className="bg-gray-800 text-white px-6 py-2 rounded-lg cursor-pointer"
           onClick={() => setPage(page + 1)}
         >
           Para

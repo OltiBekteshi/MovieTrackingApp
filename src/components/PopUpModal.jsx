@@ -9,6 +9,11 @@ import {
 } from "../utils/movieService";
 import { supabase } from "../utils/supabaseClient";
 import { Toaster, toast } from "sonner";
+import {
+  getUserMovieRating,
+  saveMovieRating,
+  getLastRatings,
+} from "../utils/movieVotes";
 
 const genres = [
   { id: 28, name: "Aksion" },
@@ -40,6 +45,11 @@ const MovieModal = ({
   const navigate = useNavigate();
 
   const [personalRating, setPersonalRating] = useState(0);
+  const [lastRatings, setLastRatings] = useState([]);
+
+  const [avgRating, setAvgRating] = useState(null);
+  const [totalVotes, setTotalVotes] = useState(null);
+  const [showAverageBox, setShowAverageBox] = useState(false);
 
   const loadUsers = async () => {
     const { data, error } = await supabase.from("users").select("*");
@@ -78,6 +88,7 @@ const MovieModal = ({
 
   const handleBackgroundClick = (e) => {
     if (e.target.id === "modal-background") {
+      setShowAverageBox(false);
       setSelectedMovie(null);
       setTrailerKey(null);
       navigate("/movies", { replace: true });
@@ -133,6 +144,49 @@ const MovieModal = ({
     return () => supabase.removeChannel(subscription);
   }, [selectedMovie]);
 
+  useEffect(() => {
+    if (!selectedMovie || !user) return;
+
+    const loadRatingData = async () => {
+      const r = await getUserMovieRating(selectedMovie.id, user.id);
+      setPersonalRating(r || 0);
+
+      const recent = await getLastRatings(selectedMovie.id);
+      setLastRatings(recent);
+    };
+
+    loadRatingData();
+  }, [selectedMovie, user]);
+
+  useEffect(() => {
+    if (!selectedMovie) return;
+    setShowAverageBox(false);
+  }, [selectedMovie]);
+
+  const fetchAverage = async () => {
+    const { data, error } = await supabase
+      .from("movie_votes")
+      .select("rating, movie_id", { count: "exact" })
+      .eq("movie_id", selectedMovie.id);
+
+    if (error) {
+      console.error("Error fetching avg:", error);
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      setAvgRating(0);
+      setTotalVotes(0);
+      return;
+    }
+
+    const total = data.reduce((sum, r) => sum + r.rating, 0);
+    const avg = total / data.length;
+
+    setAvgRating(avg);
+    setTotalVotes(data.length);
+  };
+
   const handleSendPublicComment = async () => {
     if (!commentInput.trim()) return;
 
@@ -148,9 +202,25 @@ const MovieModal = ({
 
   if (!selectedMovie) return null;
 
-  const handleRatingClick = (rating) => {
+  const handleRatingClick = async (rating) => {
+    if (!user) {
+      return toast.error("Kyqu për të vlerësuar filmin.");
+    }
+
     setPersonalRating(rating);
+
+    const saved = await saveMovieRating(selectedMovie.id, user.id, rating);
+
+    if (!saved) {
+      return toast.error("Gabim gjatë ruajtjes së vlerësimit.");
+    }
+
     toast.success(`Ju vlerësuat filmin me ${rating} yje!`);
+
+    const recent = await getLastRatings(selectedMovie.id);
+    setLastRatings(recent);
+
+    await fetchAverage();
   };
 
   return (
@@ -171,7 +241,6 @@ const MovieModal = ({
           &times;
         </button>
 
-        {/* 🔥 ADDED BACK BUTTON FOR TRAILER VIEW */}
         {trailerKey && (
           <button
             onClick={() => setTrailerKey(null)}
@@ -191,7 +260,7 @@ const MovieModal = ({
             <div className="flex justify-between items-start mb-2">
               <h2 className="text-2xl font-bold flex">
                 {selectedMovie.title}{" "}
-                <p className="text-yellow-500 font-bold flex">
+                <p className="text-yellow-500 font-bold flex ml-2">
                   ⭐ {selectedMovie.vote_average.toFixed(1)}
                 </p>
               </h2>
@@ -240,12 +309,37 @@ const MovieModal = ({
               </div>
 
               <button
-                className="text-blue-600 underline text-sm hover:cursor-pointer"
-                onClick={() => toast.info("")}
+                className="text-blue-600  text-sm hover:cursor-pointer"
+                onClick={async () => {
+                  await fetchAverage();
+                  setShowAverageBox(!showAverageBox);
+                }}
               >
-                Shiko 3 vlerësimet e fundit
+                Shiko mesataren e vleresimeve ↓
               </button>
             </div>
+
+            {showAverageBox && (
+              <div className="p-3 mb-4 bg-gray-100 rounded-lg shadow-inner">
+                <p className="font-bold">
+                  Mesatarja: ⭐ {avgRating?.toFixed(1)}
+                </p>
+                <p className="text-sm text-gray-700">
+                  Votat totale: {totalVotes}
+                </p>
+
+                <p className="mt-2 font-semibold"></p>
+                {lastRatings.length === 0 ? (
+                  <p className="text-sm text-gray-500"></p>
+                ) : (
+                  lastRatings.map((r, i) => (
+                    <p key={i} className="text-sm">
+                      ⭐ {r.rating}
+                    </p>
+                  ))
+                )}
+              </div>
+            )}
 
             <div className="flex flex-wrap gap-3">
               <button
