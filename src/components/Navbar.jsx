@@ -220,7 +220,7 @@ const Navbar = () => {
                 onClick={() => setShowNotif((p) => !p)}
               >
                 <FiBell size={24} />
-                <span>Notifikimet</span>
+                <span>Njoftimet</span>
               </div>
 
               {notifications.length > 0 && (
