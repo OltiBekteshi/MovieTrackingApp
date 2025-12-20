@@ -61,6 +61,12 @@ const WatchLater = ({ watchlater, setWatchlater, userId }) => {
             />
             <div className="p-4 flex flex-col grow">
               <h3 className="font-semibold text-lg truncate">{movie.title}</h3>
+                    <p className="text-sm text-gray-300 mb-2">
+                ⏱ Kohezgjatja:{" "}
+                {movie.runtime
+                  ? `${Math.floor(movie.runtime / 60)}h ${movie.runtime % 60}m`
+                  : "N/A"}
+              </p>
               <p className="grow text-sm text-white line-clamp-3 sm:line-clamp-none">
                 {movie.description || movie.overview}
               </p>
