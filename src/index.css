@@ -773,3 +773,10 @@ a.cl-footerActionLink[data-localization-key="signIn.password.actionLink"]::after
   opacity: 1 !important;
 }
 
+.cl-socialButtonsIconButton{
+  display: none;
+}
+
+.cl-dividerRow{
+  display: none;
+}
