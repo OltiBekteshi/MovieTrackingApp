@@ -1,18 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "sonner";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import Home from "./pages/Home";
 import MovieCard from "./components/MovieCard";
 import Watchlist from "./pages/Watchlist";
 import WatchLater from "./pages/WatchLater";
+import AddFriends from "./pages/AddFriends";
+import Friends from "./pages/Friends";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
 import Page from "./pages/Page";
 import { useUser } from "@clerk/clerk-react";
 import { supabase } from "./utils/supabaseClient";
 import { getWatchlist, getWatchLater } from "./utils/movieService";
+
+// Protected Route Wrapper
+const ProtectedRoute = ({ children, user }) => {
+  if (!user) {
+    return <Navigate to="/sign-in" replace />;
+  }
+  return children;
+};
 
 function App() {
   const { user } = useUser();
@@ -64,7 +73,18 @@ function App() {
       <BrowserRouter>
         <Navbar />
         <Routes>
-          <Route path="/" element={<Home watchlist={watchlist} setWatchlist={setWatchlist} />} />
+          <Route
+            path="/"
+            element={
+              <MovieCard
+                watchlist={watchlist}
+                setWatchlist={setWatchlist}
+                watchlater={watchlater}
+                setWatchlater={setWatchlater}
+                userId={userId}
+              />
+            }
+          />
 
           <Route
             path="/movies"
@@ -112,6 +132,23 @@ function App() {
                 setWatchlater={setWatchlater}
                 userId={userId}
               />
+            }
+          />
+
+          <Route
+            path="/add-friends"
+            element={
+              <ProtectedRoute user={user}>
+                <AddFriends />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/friends"
+            element={
+              <ProtectedRoute user={user}>
+                <Friends />
+              </ProtectedRoute>
             }
           />
 

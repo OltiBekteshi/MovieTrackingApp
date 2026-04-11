@@ -42,10 +42,10 @@ export default function Notifications() {
 
   return (
     <div className="p-4 bg-white rounded-xl shadow">
-      <h2 className="text-xl font-bold mb-3">Rekomandimet</h2>
+      <h2 className="text-xl font-bold mb-3">Notifications</h2>
 
       {notifications.length === 0 ? (
-        <p className="text-gray-500">Nuk ke rekomandime.</p>
+        <p className="text-gray-500">You have no notifications.</p>
       ) : (
         notifications.map((n) => (
           <div key={n.id} className="p-2 border-b">

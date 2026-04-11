@@ -111,15 +111,15 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
 
   if (!watchlist || watchlist.length === 0) {
     return (
-      <div className="bg-linear-to-r from-blue-500  to-green-900 shadow-md min-h-screen text-white flex flex-col items-center justify-center">
+      <div className="bg-[#293333] shadow-md min-h-screen text-white flex flex-col items-center justify-center">
         <h1 className="text-3xl font-bold mb-4">
-          Lista e filmave të shikuar është bosh
+          Watchlist is empty
         </h1>
         <button
           className="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 cursor-pointer"
           onClick={() => navigate("/movies")}
         >
-          Shfleto filma
+          Browse Movies
         </button>
       </div>
     );

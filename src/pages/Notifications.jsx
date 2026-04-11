@@ -48,10 +48,10 @@ const Notifications = () => {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Njoftimet</h2>
+      <h2 className="text-2xl font-bold mb-4">Notifications</h2>
 
       {notifications.length === 0 && (
-        <p className="text-gray-500">Nuk ke njoftime.</p>
+        <p className="text-gray-500">You have no notifications.</p>
       )}
 
       {notifications.map((n) => (

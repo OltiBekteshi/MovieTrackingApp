@@ -28,12 +28,12 @@ const MovieCard = ({
   const dropdownRef = useRef(null);
 
   const genres = [
-    { id: 28, name: "Aksion" },
-    { id: 35, name: "Komedi" },
+    { id: 28, name: "Action" },
+    { id: 35, name: "Comedy" },
     { id: 53, name: "Thriller" },
     { id: 27, name: "Horror" },
-    { id: 99, name: "Dokumentar" },
-    { id: 9648, name: "Mister" },
+    { id: 99, name: "Documentary" },
+    { id: 9648, name: "Mystery" },
   ];
 
   useEffect(() => {
@@ -49,6 +49,10 @@ const MovieCard = ({
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
   }, [open]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0 });
+  }, [location.pathname]);
 
   const translateText = async (text, targetLang = "sq") => {
     if (!text) return "";
@@ -85,7 +89,8 @@ const MovieCard = ({
       );
       const fullMovie = await res.json();
 
-      fullMovie.overview = await translateText(fullMovie.overview, "sq");
+      // keep English overview by disabling auto-translation to Albanian
+      // fullMovie.overview = await translateText(fullMovie.overview, "sq");
 
       setSelectedMovie(fullMovie);
     } catch {
@@ -134,8 +139,10 @@ const MovieCard = ({
 
         const translatedMovies = await Promise.all(
           results.map(async (movie) => {
-            const translated = await translateText(movie.overview, "sq");
-            return { ...movie, overview: translated };
+            // Keep movie overviews in English; disable auto-translation to Albanian
+            // const translated = await translateText(movie.overview, "sq");
+            // return { ...movie, overview: translated };
+            return movie;
           })
         );
 
@@ -202,31 +209,31 @@ const MovieCard = ({
   };
 
   return (
-    <div className="bg-linear-to-r from-blue-500 to-green-900 min-h-screen p-6">
+    <div className="bg-[#D3CBC0] min-h-screen p-6">
       <div className="w-full flex justify-start mb-6 mt-20">
         <div className="relative w-60 select-none" ref={dropdownRef}>
           <div
             onClick={() => setOpen(!open)}
-            className="bg-white/10 text-white px-5 py-3 rounded-2xl cursor-pointer flex justify-between"
+            className="bg-[#293333] text-white border border-gray-300 px-4 py-3 rounded-2xl cursor-pointer flex justify-between items-center shadow-sm hover:shadow-md transition-all duration-200"
           >
-            <span>
+            <span className="font-medium">
               {genres.find((g) => g.id === Number(selectedGenre))?.name ||
-                "Të gjithë filmat"}
+                "All movies"}
             </span>
-            <span>▼</span>
+            <span className="text-sm text-white">▼</span>
           </div>
 
           {open && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-black/60 rounded-2xl shadow-2xl z-50">
+            <div className="absolute top-full left-0 right-0 mt-2 bg-[#293333] border border-gray-700 rounded-2xl shadow-xl z-50 overflow-hidden">
               <div
                 onClick={() => {
                   setSelectedGenre("");
                   setPage(1);
                   setOpen(false);
                 }}
-                className="px-5 py-3 cursor-pointer hover:bg-white/20 text-white"
+                className={`px-4 py-3 cursor-pointer transition-colors ${selectedGenre === "" ? "bg-[#2F4F4F] text-white font-semibold" : "text-white hover:bg-[#2f4f4f]"}`}
               >
-                Të gjithë filmat
+                All movies
               </div>
 
               {genres.map((g) => (
@@ -237,7 +244,7 @@ const MovieCard = ({
                     setPage(1);
                     setOpen(false);
                   }}
-                  className="px-5 py-3 cursor-pointer hover:bg-white/20 text-white"
+                  className={`px-4 py-3 cursor-pointer transition-colors ${selectedGenre === g.id ? "bg-[#2F4F4F] text-white font-semibold" : "text-white hover:bg-[#2f4f4f]"}`}
                 >
                   {g.name}
                 </div>
@@ -247,13 +254,13 @@ const MovieCard = ({
         </div>
       </div>
 
-      <h1 className="text-3xl font-bold text-center text-white mb-6">Filmat</h1>
+      <h1 className="text-3xl font-bold text-center text-black mb-6">Movies</h1>
 
       <div className="flex justify-center mb-6">
         <input
           type="text"
-          placeholder="Kërko filmin..."
-          className="w-full max-w-md px-4 py-2 rounded-lg bg-black/40 text-white"
+          placeholder="Search for a movie..."
+          className="w-full max-w-md px-4 py-2 rounded-lg bg-white text-black border-2 border-black"
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);
@@ -273,8 +280,7 @@ const MovieCard = ({
           {movies.map((movie) => (
             <div
               key={movie.id}
-              className="bg-black rounded-2xl text-white shadow-md hover:scale-103 transition cursor-pointer"
-              onClick={() => openMovieDetails(movie.id)}
+              className="bg-[#293333] rounded-2xl text-white shadow-md transition"
             >
               <img
                 src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -287,7 +293,7 @@ const MovieCard = ({
                 <p className="truncate">{movie.overview}</p>
                 <p className="text-sm mt-1">{movie.release_date}</p>
                 <p className="text-white text-sm mt-1 font-bold">
-                  Kohezgjatja:{" "}
+                  Runtime:{" "}
                   {movieDetails[movie.id]
                     ? `${Math.floor(movieDetails[movie.id] / 60)}h ${
                         movieDetails[movie.id] % 60
@@ -303,9 +309,9 @@ const MovieCard = ({
                     e.stopPropagation();
                     openMovieDetails(movie.id);
                   }}
-                  className="bg-gray-800 p-2 w-full mt-3 rounded-lg hover:bg-gray-900 cursor-pointer"
+                  className="bg-white text-black p-2 w-full mt-3 rounded-lg hover:scale-103 hover:opacity-[0.8] cursor-pointer"
                 >
-                  Shiko Detajet
+                  See details
                 </button>
               </div>
             </div>
@@ -315,20 +321,20 @@ const MovieCard = ({
 
       <div className="flex justify-center mt-6 gap-4">
         <button
-          className="bg-gray-800 text-white px-6 py-2 rounded-lg disabled:opacity-50 cursor-pointer"
+          className="bg-[#293333] hover:bg-[#1F2626] text-white px-6 py-2 rounded-lg disabled:opacity-50 cursor-pointer"
           disabled={page === 1}
           onClick={() => setPage(page - 1)}
         >
-          Pas
+          Prev
         </button>
 
-        <span className="text-white text-lg">Faqja {page}</span>
+        <span className="text-bg-[#293333] text-lg">Page {page}</span>
 
         <button
-          className="bg-gray-800 text-white px-6 py-2 rounded-lg cursor-pointer"
+          className="bg-[#293333] hover:bg-[#1F2626] text-white px-6 py-2 rounded-lg cursor-pointer"
           onClick={() => setPage(page + 1)}
         >
-          Para
+          Next
         </button>
       </div>
 

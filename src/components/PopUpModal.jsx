@@ -41,6 +41,7 @@ const MovieModal = ({
 
   const [showUsersModal, setShowUsersModal] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
+  const [sentRecommendations, setSentRecommendations] = useState([]); // Track sent recommendations for this movie
 
   const navigate = useNavigate();
 
@@ -52,9 +53,54 @@ const MovieModal = ({
   const [showAverageBox, setShowAverageBox] = useState(false);
 
   const loadUsers = async () => {
-    const { data, error } = await supabase.from("users").select("*");
-    if (!error) {
-      setAllUsers(data.filter((u) => u.clerk_user_id !== user.id));
+    try {
+      // Get friendships
+      const { data: friendships, error: friendshipsError } = await supabase
+        .from("friendships")
+        .select("*")
+        .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
+
+      if (friendshipsError) throw friendshipsError;
+
+      if (!friendships || friendships.length === 0) {
+        setAllUsers([]);
+        return;
+      }
+
+      // Get friend details
+      const friendIds = friendships.flatMap(f =>
+        f.user1_id === user.id ? [f.user2_id] : [f.user1_id]
+      );
+
+      const { data: friendsData, error: friendsError } = await supabase
+        .from("users")
+        .select("*")
+        .in("clerk_user_id", friendIds);
+
+      if (friendsError) throw friendsError;
+
+      setAllUsers(friendsData || []);
+    } catch (error) {
+      console.error("Error loading friends:", error);
+      toast.error("Gabim gjatë ngarkimit të shokëve");
+    }
+  };
+
+  const loadSentRecommendations = async () => {
+    try {
+      if (!selectedMovie) return;
+
+      const { data, error } = await supabase
+        .from("recommendations")
+        .select("receiver_id")
+        .eq("sender_id", user.id)
+        .eq("movie_id", selectedMovie.id);
+
+      if (error) throw error;
+
+      setSentRecommendations(data ? data.map((r) => r.receiver_id) : []);
+    } catch (error) {
+      console.error("Error loading sent recommendations:", error);
     }
   };
 
@@ -77,7 +123,9 @@ const MovieModal = ({
 
     await sendNotification(receiverId);
 
-    setShowUsersModal(false);
+    // Update sentRecommendations to include this user
+    setSentRecommendations((prev) => [...prev, receiverId]);
+
     toast.success("Rekomandimi u dërgua me sukses!");
   };
 
@@ -125,6 +173,12 @@ const MovieModal = ({
   }, [selectedMovie]);
 
   useEffect(() => {
+    if (!selectedMovie || !user) return;
+
+    loadSentRecommendations();
+  }, [selectedMovie, user]);
+
+  useEffect(() => {
     if (!selectedMovie) return;
 
     const subscription = subscribeToPublicComments(
@@ -161,6 +215,15 @@ const MovieModal = ({
   useEffect(() => {
     if (!selectedMovie) return;
     setShowAverageBox(false);
+  }, [selectedMovie]);
+
+  useEffect(() => {
+    if (!selectedMovie) return;
+
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [selectedMovie]);
 
   const fetchAverage = async () => {
@@ -280,11 +343,11 @@ const MovieModal = ({
             <p className="mb-4">{selectedMovie.overview}</p>
 
             <p className="text-sm text-gray-600 mb-2">
-              Data publikimit: {selectedMovie.release_date}
+              Release date: {selectedMovie.release_date}
             </p>
 
             <p className="text-sm text-gray-600 mb-2">
-              Kohezgjatja:{" "}
+              Runtime:{" "}
               {runtime
                 ? `${Math.floor(runtime / 60)}h ${runtime % 60}m`
                 : "N/A"}
@@ -292,7 +355,7 @@ const MovieModal = ({
 
             <div className="flex items-center justify-between mt-4 mb-4">
               <div className="flex items-center gap-2">
-                <p className="font-bold">Vlerësimi personal:</p>
+                <p className="font-bold">Personal rating:</p>
                 {[1, 2, 3, 4, 5].map((star) => (
                   <span
                     key={star}
@@ -315,17 +378,17 @@ const MovieModal = ({
                   setShowAverageBox(!showAverageBox);
                 }}
               >
-                Shiko mesataren e vleresimeve ↓
+                See average ratings ↓
               </button>
             </div>
 
             {showAverageBox && (
               <div className="p-3 mb-4 bg-gray-100 rounded-lg shadow-inner">
                 <p className="font-bold">
-                  Mesatarja: ⭐ {avgRating?.toFixed(1)}
+                  Average: ⭐ {avgRating?.toFixed(1)}
                 </p>
                 <p className="text-sm text-gray-700">
-                  Votat totale: {totalVotes}
+                  Total votes: {totalVotes}
                 </p>
 
                 <p className="mt-2 font-semibold"></p>
@@ -346,14 +409,14 @@ const MovieModal = ({
                 onClick={() => handleAddToWatchlist(selectedMovie)}
                 className="bg-gray-600 p-3 text-white font-bold rounded-xl flex-1 hover:bg-gray-800 hover:cursor-pointer"
               >
-                Shto në listë
+                Add to watchlist
               </button>
 
               <button
                 onClick={() => handleAddToWatchLater(selectedMovie)}
                 className="bg-gray-600 p-3 text-white font-bold rounded-xl flex-1 hover:bg-gray-800 hover:cursor-pointer"
               >
-                Shiko më vonë
+                Watch later
               </button>
             </div>
 
@@ -361,25 +424,26 @@ const MovieModal = ({
               onClick={() => handleWatchTrailer(selectedMovie.id)}
               className="bg-red-600 p-3 w-full mt-3 text-white font-bold rounded-xl hover:bg-red-700 hover:cursor-pointer"
             >
-              Shiko trailerin
+              Watch trailer
             </button>
 
             <button
-              onClick={() => {
-                loadUsers();
+              onClick={async () => {
+                await loadUsers();
+                await loadSentRecommendations();
                 setShowUsersModal(true);
               }}
               className="bg-green-600 p-3 w-full mt-3 text-white font-bold rounded-xl hover:bg-green-700 hover:cursor-pointer"
             >
-              Rekomando filmin te një shok/shoqe
+              Rekomando filmin te një shok
             </button>
 
             <div className="mt-6">
-              <h3 className="text-xl font-bold mb-3">Komentet e shikuesve</h3>
+              <h3 className="text-xl font-bold mb-3">Public Comments</h3>
 
               <div className="border-t border-black pt-3 pb-3 max-h-48 overflow-y-auto">
                 {publicComments.length === 0 ? (
-                  <p className="text-gray-400 text-sm">Nuk ka komente ende.</p>
+                  <p className="text-gray-400 text-sm">No comments yet</p>
                 ) : (
                   publicComments.map((c) => (
                     <div
@@ -435,35 +499,45 @@ const MovieModal = ({
       {showUsersModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-60">
           <div className="bg-white w-96 p-5 rounded-xl shadow-lg">
-            <h2 className="text-xl font-bold mb-4">Zgjidh një përdorues</h2>
+            <h2 className="text-xl font-bold mb-4">Zgjidh një Shok</h2>
 
             {allUsers.length === 0 && (
               <p className="text-gray-500 text-center mb-4">
-                Nuk u gjet asnjë përdorues.
+                Nuk keni shokë. Shtoni shokë nga faqja "Shto Shokë".
               </p>
             )}
 
             <div className="max-h-60 overflow-y-auto">
-              {allUsers.map((u) => (
-                <div
-                  key={u.id}
-                  onClick={() => sendRecommendation(u.clerk_user_id)}
-                  className="flex items-center gap-3 p-2 hover:bg-gray-200 rounded cursor-pointer"
-                >
-                  <img
-                    src={u.image_url}
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                  <p className="font-bold">{u.full_name}</p>
-                </div>
-              ))}
+              {allUsers.map((u) => {
+                const isRecommended = sentRecommendations.includes(u.clerk_user_id);
+                return (
+                  <div
+                    key={u.id}
+                    onClick={() => !isRecommended && sendRecommendation(u.clerk_user_id)}
+                    className={`flex items-center gap-3 p-2 rounded ${
+                      isRecommended
+                        ? "bg-gray-100 cursor-not-allowed opacity-60"
+                        : "hover:bg-gray-200 cursor-pointer"
+                    }`}
+                  >
+                    <img
+                      src={u.image_url}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                    <p className="font-bold flex-1">{u.full_name}</p>
+                    {isRecommended && (
+                      <span className="text-green-600 font-bold text-lg">✓</span>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             <button
               onClick={() => setShowUsersModal(false)}
               className="mt-4 w-full py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-800 hover:cursor-pointer"
             >
-              Mbyll
+                Close
             </button>
           </div>
         </div>
