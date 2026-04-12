@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -10,19 +10,118 @@ import {
 import { supabase } from "../utils/supabaseClient";
 import { Toaster, toast } from "sonner";
 import {
+  deleteUserMovieRating,
   getUserMovieRating,
   saveMovieRating,
-  getLastRatings,
 } from "../utils/movieVotes";
+import {
+  FiBookmark,
+  FiClock,
+  FiMessageCircle,
+  FiPlay,
+  FiSend,
+  FiTrash2,
+  FiUserPlus,
+} from "react-icons/fi";
 
 const genres = [
-  { id: 28, name: "Aksion" },
-  { id: 35, name: "Komedi" },
+  { id: 28, name: "Action" },
+  { id: 35, name: "Comedy" },
   { id: 53, name: "Thriller" },
   { id: 27, name: "Horror" },
-  { id: 99, name: "Dokumentar" },
-  { id: 9648, name: "Mister" },
+  { id: 99, name: "Documentary" },
+  { id: 9648, name: "Mystery" },
 ];
+
+/** Build a tree of { ...row, replies } from flat rows with optional parent_id */
+function nestDiscussionComments(items) {
+  if (!items?.length) return [];
+  const byParent = new Map();
+  for (const c of items) {
+    const p = c.parent_id ?? null;
+    if (!byParent.has(p)) byParent.set(p, []);
+    byParent.get(p).push(c);
+  }
+  for (const list of byParent.values()) {
+    list.sort(
+      (a, b) =>
+        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    );
+  }
+  const build = (parentId) =>
+    (byParent.get(parentId) || []).map((c) => ({
+      ...c,
+      replies: build(c.id),
+    }));
+  return build(null);
+}
+
+function DiscussionComment({ node, user, onReply, onDelete, isNested }) {
+  const initial =
+    node.username && node.username.length > 0
+      ? node.username.trim()[0].toUpperCase()
+      : "?";
+
+  return (
+    <li
+      className={
+        isNested
+          ? "pt-2 first:pt-0"
+          : "border-b border-slate-100/80 px-3 py-3 last:border-b-0"
+      }
+    >
+      <div className="flex gap-3">
+        <div
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-slate-100 to-slate-200 text-xs font-bold text-slate-600"
+          aria-hidden
+        >
+          {initial}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-2">
+            <span className="text-sm font-medium text-gray-900">
+              {node.username}
+            </span>
+            {user?.id === node.user_id && (
+              <button
+                type="button"
+                onClick={() => onDelete(node.id)}
+                className="shrink-0 rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                aria-label="Delete comment"
+              >
+                <FiTrash2 className="h-3.5 w-3.5" aria-hidden />
+              </button>
+            )}
+          </div>
+          <p className="mt-0.5 text-sm leading-relaxed text-gray-600">
+            {node.comment}
+          </p>
+          <button
+            type="button"
+            onClick={() => onReply(node)}
+            className="mt-2 text-xs font-medium text-slate-500 hover:text-slate-900"
+          >
+            Reply
+          </button>
+        </div>
+      </div>
+      {node.replies?.length > 0 && (
+        <ul className="mt-3 ml-2 list-none space-y-0 border-l border-slate-200 pl-3">
+          {node.replies.map((r) => (
+            <DiscussionComment
+              key={r.id}
+              node={r}
+              user={user}
+              onReply={onReply}
+              onDelete={onDelete}
+              isNested
+            />
+          ))}
+        </ul>
+      )}
+    </li>
+  );
+}
 
 const MovieModal = ({
   selectedMovie,
@@ -38,6 +137,8 @@ const MovieModal = ({
   const { user } = useUser();
   const [publicComments, setPublicComments] = useState([]);
   const [commentInput, setCommentInput] = useState("");
+  /** When set, the next post is a reply to this comment id */
+  const [replyingTo, setReplyingTo] = useState(null);
 
   const [showUsersModal, setShowUsersModal] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
@@ -46,11 +147,6 @@ const MovieModal = ({
   const navigate = useNavigate();
 
   const [personalRating, setPersonalRating] = useState(0);
-  const [lastRatings, setLastRatings] = useState([]);
-
-  const [avgRating, setAvgRating] = useState(null);
-  const [totalVotes, setTotalVotes] = useState(null);
-  const [showAverageBox, setShowAverageBox] = useState(false);
 
   const loadUsers = async () => {
     try {
@@ -74,7 +170,7 @@ const MovieModal = ({
 
       const { data: friendsData, error: friendsError } = await supabase
         .from("users")
-        .select("*")
+        .select("id, clerk_user_id, full_name, image_url")
         .in("clerk_user_id", friendIds);
 
       if (friendsError) throw friendsError;
@@ -82,7 +178,7 @@ const MovieModal = ({
       setAllUsers(friendsData || []);
     } catch (error) {
       console.error("Error loading friends:", error);
-      toast.error("Gabim gjatë ngarkimit të shokëve");
+      toast.error("Failed to load friends");
     }
   };
 
@@ -107,8 +203,8 @@ const MovieModal = ({
   const sendNotification = async (receiverId) => {
     await supabase.from("notifications").insert({
       receiver_id: receiverId,
-      title: "Rekomandim i ri filmi",
-      message: `${user.fullName} ju rekomandoi filmin "${selectedMovie.title}".`,
+      title: "New movie recommendation",
+      message: `${user.fullName} recommended the movie "${selectedMovie.title}".`,
       movie_id: selectedMovie.id,
     });
   };
@@ -118,7 +214,7 @@ const MovieModal = ({
       sender_id: user.id,
       receiver_id: receiverId,
       movie_id: selectedMovie.id,
-      message: `${user.fullName} ju rekomandoi filmin "${selectedMovie.title}".`,
+      message: `${user.fullName} recommended the movie "${selectedMovie.title}".`,
     });
 
     await sendNotification(receiverId);
@@ -126,7 +222,7 @@ const MovieModal = ({
     // Update sentRecommendations to include this user
     setSentRecommendations((prev) => [...prev, receiverId]);
 
-    toast.success("Rekomandimi u dërgua me sukses!");
+    toast.success("Recommendation sent!");
   };
 
   const getGenresForMovie = () => {
@@ -136,7 +232,6 @@ const MovieModal = ({
 
   const handleBackgroundClick = (e) => {
     if (e.target.id === "modal-background") {
-      setShowAverageBox(false);
       setSelectedMovie(null);
       setTrailerKey(null);
       navigate("/movies", { replace: true });
@@ -173,6 +268,10 @@ const MovieModal = ({
   }, [selectedMovie]);
 
   useEffect(() => {
+    setReplyingTo(null);
+  }, [selectedMovie?.id]);
+
+  useEffect(() => {
     if (!selectedMovie || !user) return;
 
     loadSentRecommendations();
@@ -188,9 +287,25 @@ const MovieModal = ({
           setPublicComments((prev) => [...prev, payload.new]);
         }
         if (payload.eventType === "DELETE") {
-          setPublicComments((prev) =>
-            prev.filter((c) => c.id !== payload.old.id)
-          );
+          const removedId = payload.old.id;
+          setPublicComments((prev) => {
+            const drop = new Set([removedId]);
+            let growing = true;
+            while (growing) {
+              growing = false;
+              for (const c of prev) {
+                if (
+                  c.parent_id != null &&
+                  drop.has(c.parent_id) &&
+                  !drop.has(c.id)
+                ) {
+                  drop.add(c.id);
+                  growing = true;
+                }
+              }
+            }
+            return prev.filter((c) => !drop.has(c.id));
+          });
         }
       }
     );
@@ -204,18 +319,10 @@ const MovieModal = ({
     const loadRatingData = async () => {
       const r = await getUserMovieRating(selectedMovie.id, user.id);
       setPersonalRating(r || 0);
-
-      const recent = await getLastRatings(selectedMovie.id);
-      setLastRatings(recent);
     };
 
     loadRatingData();
   }, [selectedMovie, user]);
-
-  useEffect(() => {
-    if (!selectedMovie) return;
-    setShowAverageBox(false);
-  }, [selectedMovie]);
 
   useEffect(() => {
     if (!selectedMovie) return;
@@ -226,48 +333,65 @@ const MovieModal = ({
     };
   }, [selectedMovie]);
 
-  const fetchAverage = async () => {
-    const { data, error } = await supabase
-      .from("movie_votes")
-      .select("rating, movie_id", { count: "exact" })
-      .eq("movie_id", selectedMovie.id);
-
-    if (error) {
-      console.error("Error fetching avg:", error);
-      return;
-    }
-
-    if (!data || data.length === 0) {
-      setAvgRating(0);
-      setTotalVotes(0);
-      return;
-    }
-
-    const total = data.reduce((sum, r) => sum + r.rating, 0);
-    const avg = total / data.length;
-
-    setAvgRating(avg);
-    setTotalVotes(data.length);
-  };
-
   const handleSendPublicComment = async () => {
     if (!commentInput.trim()) return;
+    if (!user) {
+      toast.error("Sign in to comment.");
+      return;
+    }
+
+    const parent = replyingTo;
 
     await addPublicComment(
       user.id,
       user.fullName || user.username || "Anon",
       selectedMovie.id,
-      commentInput
+      commentInput.trim(),
+      parent ? parent.id : null
     );
 
+    if (
+      parent?.userId &&
+      parent.userId !== user.id
+    ) {
+      const replierName = user.fullName || user.username || "Someone";
+      const { error: notifError } = await supabase.from("notifications").insert({
+        receiver_id: parent.userId,
+        title: "Reply to your comment",
+        message: `${replierName} replied to your comment on "${selectedMovie.title}".`,
+        movie_id: selectedMovie.id,
+      });
+      if (notifError) {
+        console.error("Failed to notify comment author:", notifError);
+      }
+    }
+
     setCommentInput("");
+    setReplyingTo(null);
   };
+
+  const handleReplyClick = (comment) => {
+    if (!user) {
+      toast.error("Sign in to reply.");
+      return;
+    }
+    setReplyingTo({
+      id: comment.id,
+      username: comment.username,
+      userId: comment.user_id,
+    });
+  };
+
+  const nestedDiscussion = useMemo(
+    () => nestDiscussionComments(publicComments),
+    [publicComments]
+  );
 
   if (!selectedMovie) return null;
 
   const handleRatingClick = async (rating) => {
     if (!user) {
-      return toast.error("Kyqu për të vlerësuar filmin.");
+      return toast.error("Sign in to rate this movie.");
     }
 
     setPersonalRating(rating);
@@ -275,15 +399,25 @@ const MovieModal = ({
     const saved = await saveMovieRating(selectedMovie.id, user.id, rating);
 
     if (!saved) {
-      return toast.error("Gabim gjatë ruajtjes së vlerësimit.");
+      return toast.error("Failed to save your rating.");
     }
 
-    toast.success(`Ju vlerësuat filmin me ${rating} yje!`);
+    toast.success(`You rated this movie ${rating} star${rating === 1 ? "" : "s"}!`);
+  };
 
-    const recent = await getLastRatings(selectedMovie.id);
-    setLastRatings(recent);
+  const handleClearRating = async () => {
+    if (!user) {
+      return toast.error("Sign in to change your rating.");
+    }
 
-    await fetchAverage();
+    const ok = await deleteUserMovieRating(selectedMovie.id, user.id);
+
+    if (!ok) {
+      return toast.error("Couldn't remove your rating.");
+    }
+
+    setPersonalRating(0);
+    toast.success("Rating removed");
   };
 
   return (
@@ -309,7 +443,7 @@ const MovieModal = ({
             onClick={() => setTrailerKey(null)}
             className="absolute top-6 left-3 font-bold text-red-500 cursor-pointer"
           >
-            ← Kthehu prapa
+            ← Back
           </button>
         )}
 
@@ -353,134 +487,175 @@ const MovieModal = ({
                 : "N/A"}
             </p>
 
-            <div className="flex items-center justify-between mt-4 mb-4">
-              <div className="flex items-center gap-2">
-                <p className="font-bold">Personal rating:</p>
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <span
-                    key={star}
-                    onClick={() => handleRatingClick(star)}
-                    className={`cursor-pointer text-2xl ${
-                      star <= personalRating
-                        ? "text-yellow-500"
-                        : "text-gray-400"
-                    }`}
+            <div className="mt-5 mb-5 border-b border-gray-100 pb-5">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+                <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-5">
+                  <span className="shrink-0 text-sm text-gray-500">Your rating</span>
+                  <div
+                    className="flex items-center gap-0.5"
+                    role="group"
+                    aria-label="Rate from 1 to 5 stars"
                   >
-                    ★
-                  </span>
-                ))}
-              </div>
-
-              <button
-                className="text-blue-600  text-sm hover:cursor-pointer"
-                onClick={async () => {
-                  await fetchAverage();
-                  setShowAverageBox(!showAverageBox);
-                }}
-              >
-                See average ratings ↓
-              </button>
-            </div>
-
-            {showAverageBox && (
-              <div className="p-3 mb-4 bg-gray-100 rounded-lg shadow-inner">
-                <p className="font-bold">
-                  Average: ⭐ {avgRating?.toFixed(1)}
-                </p>
-                <p className="text-sm text-gray-700">
-                  Total votes: {totalVotes}
-                </p>
-
-                <p className="mt-2 font-semibold"></p>
-                {lastRatings.length === 0 ? (
-                  <p className="text-sm text-gray-500"></p>
-                ) : (
-                  lastRatings.map((r, i) => (
-                    <p key={i} className="text-sm">
-                      ⭐ {r.rating}
-                    </p>
-                  ))
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => handleRatingClick(star)}
+                        className={`flex h-11 w-10 items-center justify-center rounded-md text-[1.65rem] leading-none transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2 ${
+                          star <= personalRating
+                            ? "text-amber-400"
+                            : "text-gray-300 hover:text-gray-400"
+                        }`}
+                        aria-label={`${star} star${star === 1 ? "" : "s"}`}
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {personalRating > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleClearRating}
+                    className="shrink-0 self-start text-sm text-gray-400 underline-offset-2 hover:text-gray-700 hover:underline sm:self-center"
+                  >
+                    Remove
+                  </button>
                 )}
               </div>
-            )}
+            </div>
 
             <div className="flex flex-wrap gap-3">
               <button
+                type="button"
                 onClick={() => handleAddToWatchlist(selectedMovie)}
-                className="bg-gray-600 p-3 text-white font-bold rounded-xl flex-1 hover:bg-gray-800 hover:cursor-pointer"
+                className="flex min-h-[48px] min-w-0 flex-1 items-center justify-center gap-2 rounded-xl bg-gray-600 px-3 py-2.5 text-sm font-medium text-white hover:bg-gray-800 hover:cursor-pointer"
               >
-                Add to watchlist
+                <FiBookmark className="h-5 w-5 shrink-0" aria-hidden />
+                <span className="text-center leading-tight">
+                  Add to watchlist
+                </span>
               </button>
 
               <button
+                type="button"
                 onClick={() => handleAddToWatchLater(selectedMovie)}
-                className="bg-gray-600 p-3 text-white font-bold rounded-xl flex-1 hover:bg-gray-800 hover:cursor-pointer"
+                className="flex min-h-[48px] min-w-0 flex-1 items-center justify-center gap-2 rounded-xl bg-gray-600 px-3 py-2.5 text-sm font-medium text-white hover:bg-gray-800 hover:cursor-pointer"
               >
-                Watch later
+                <FiClock className="h-5 w-5 shrink-0" aria-hidden />
+                <span className="text-center leading-tight">Watch later</span>
               </button>
             </div>
 
             <button
+              type="button"
               onClick={() => handleWatchTrailer(selectedMovie.id)}
-              className="bg-red-600 p-3 w-full mt-3 text-white font-bold rounded-xl hover:bg-red-700 hover:cursor-pointer"
+              className="mt-3 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-3 text-sm font-medium text-white hover:bg-red-700 hover:cursor-pointer"
             >
+              <FiPlay className="h-5 w-5 shrink-0" aria-hidden />
               Watch trailer
             </button>
 
             <button
+              type="button"
               onClick={async () => {
                 await loadUsers();
                 await loadSentRecommendations();
                 setShowUsersModal(true);
               }}
-              className="bg-green-600 p-3 w-full mt-3 text-white font-bold rounded-xl hover:bg-green-700 hover:cursor-pointer"
+              className="mt-3 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-3 text-sm font-medium text-white hover:bg-green-700 hover:cursor-pointer"
             >
-              Rekomando filmin te një shok
+              <FiUserPlus className="h-5 w-5 shrink-0" aria-hidden />
+              Recommend movie to a friend
             </button>
 
-            <div className="mt-6">
-              <h3 className="text-xl font-bold mb-3">Public Comments</h3>
+            <section
+              className="mt-8 rounded-2xl bg-gradient-to-br from-slate-200/70 via-slate-100/80 to-indigo-200/50 p-[1px] shadow-[0_4px_24px_-12px_rgba(15,23,42,0.15)]"
+              aria-label="Public comments"
+            >
+              <div className="rounded-[15px] bg-white p-4 sm:p-5">
+              <div className="mb-4 flex items-center gap-2.5">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+                  <FiMessageCircle className="h-4 w-4" aria-hidden />
+                </span>
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900">
+                    Discussion
+                  </h3>
+                  <p className="text-xs text-gray-500">Public to everyone</p>
+                </div>
+              </div>
 
-              <div className="border-t border-black pt-3 pb-3 max-h-48 overflow-y-auto">
-                {publicComments.length === 0 ? (
-                  <p className="text-gray-400 text-sm">No comments yet</p>
+              <ul className="max-h-48 list-none space-y-0 overflow-y-auto rounded-xl border border-slate-100/90 bg-slate-50/30">
+                {nestedDiscussion.length === 0 ? (
+                  <li className="px-3 py-10 text-center text-sm text-gray-400">
+                    No comments yet.
+                  </li>
                 ) : (
-                  publicComments.map((c) => (
-                    <div
-                      key={c.id}
-                      className="relative mb-3 p-2 bg-white rounded-lg shadow w-full"
-                    >
-                      <p className="text-xs text-gray-500 mb-1">{c.username}</p>
-                      <p className="text-sm text-black">{c.comment}</p>
-
-                      {user?.id === c.user_id && (
-                        <button
-                          onClick={() => deletePublicComment(c.id, user.id)}
-                          className="text-red-500 text-xs absolute top-5 right-2 hover:cursor-pointer"
-                        >
-                          ❌
-                        </button>
-                      )}
-                    </div>
+                  nestedDiscussion.map((node) => (
+                    <DiscussionComment
+                      key={node.id}
+                      node={node}
+                      user={user}
+                      onReply={handleReplyClick}
+                      onDelete={(id) => user && deletePublicComment(id, user.id)}
+                      isNested={false}
+                    />
                   ))
                 )}
-              </div>
+              </ul>
 
-              <div className="flex items-center gap-2 mt-3">
-                <input
-                  value={commentInput}
-                  onChange={(e) => setCommentInput(e.target.value)}
-                  placeholder="Shkruaj një koment publik..."
-                  className="flex-1 p-2 border rounded-lg"
-                />
-                <button
-                  onClick={handleSendPublicComment}
-                  className="text-black px-3 hover:cursor-pointer"
-                >
-                  ➤
-                </button>
+              <div className="mt-4 flex flex-col gap-2">
+                {replyingTo && (
+                  <div className="flex items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700">
+                    <span>
+                      Replying to{" "}
+                      <span className="font-semibold text-slate-900">
+                        {replyingTo.username}
+                      </span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setReplyingTo(null)}
+                      className="shrink-0 font-medium text-slate-500 hover:text-slate-900"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
+                  <label className="sr-only" htmlFor="public-comment-input">
+                    Write a public comment
+                  </label>
+                  <input
+                    id="public-comment-input"
+                    type="text"
+                    value={commentInput}
+                    onChange={(e) => setCommentInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleSendPublicComment();
+                    }}
+                    placeholder={
+                      replyingTo
+                        ? `Reply to ${replyingTo.username}…`
+                        : "Say something…"
+                    }
+                    className="min-h-[44px] w-full flex-1 rounded-xl border border-gray-200 bg-gray-50/80 px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition focus:border-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-gray-200"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSendPublicComment}
+                    disabled={!commentInput.trim()}
+                    className="inline-flex min-h-[44px] shrink-0 items-center justify-center gap-2 rounded-xl bg-slate-800 px-5 text-sm font-medium text-white transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400 sm:min-w-[7.5rem]"
+                    aria-label="Post comment"
+                  >
+                    <FiSend className="h-4 w-4 opacity-90" aria-hidden />
+                    Post
+                  </button>
+                </div>
               </div>
-            </div>
+              </div>
+            </section>
           </>
         ) : (
           <div className="aspect-video mt-10">
@@ -499,11 +674,11 @@ const MovieModal = ({
       {showUsersModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-60">
           <div className="bg-white w-96 p-5 rounded-xl shadow-lg">
-            <h2 className="text-xl font-bold mb-4">Zgjidh një Shok</h2>
+            <h2 className="text-xl font-bold mb-4">Choose a friend</h2>
 
             {allUsers.length === 0 && (
               <p className="text-gray-500 text-center mb-4">
-                Nuk keni shokë. Shtoni shokë nga faqja "Shto Shokë".
+                You don&apos;t have any friends yet. Add friends from the &quot;Add friends&quot; page.
               </p>
             )}
 

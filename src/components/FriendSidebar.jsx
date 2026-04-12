@@ -1,74 +1,123 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { FiX, FiCheck } from "react-icons/fi";
+import React, { useEffect, useState, useCallback } from "react";
+import { FiX, FiCheck, FiSearch, FiUserPlus } from "react-icons/fi";
 import { supabase } from "../utils/supabaseClient";
 import { toast } from "sonner";
+import { useDebouncedValue } from "../utils/useDebouncedValue";
+import {
+  MIN_USER_SEARCH_LEN,
+  USER_SEARCH_LIMIT,
+  USER_SEARCH_DEBOUNCE_MS,
+  sanitizeIlikePrefix,
+} from "../utils/userSearch";
 
 const FriendSidebar = ({ user, show, onClose }) => {
+  const [sidebarTab, setSidebarTab] = useState("friends");
   const [friends, setFriends] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
-  const [allUsers, setAllUsers] = useState([]);
+  const [senderById, setSenderById] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebouncedValue(searchTerm, USER_SEARCH_DEBOUNCE_MS);
+  const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searching, setSearching] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
 
-  const filteredUsers = useMemo(() => {
-    if (!searchTerm.trim()) return [];
-    const searchLower = searchTerm.toLowerCase();
-    return allUsers.filter((u) =>
-      u.full_name?.toLowerCase().includes(searchLower)
-    );
-  }, [searchTerm, allUsers]);
+  const loadData = useCallback(async () => {
+    if (!user) return;
+    try {
+      setLoading(true);
+
+      const { data: friendships, error: friendshipsError } = await supabase
+        .from("friendships")
+        .select("user1_id, user2_id")
+        .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
+      if (friendshipsError) throw friendshipsError;
+
+      const friendIds = (friendships || []).flatMap((f) =>
+        f.user1_id === user.id ? [f.user2_id] : [f.user1_id]
+      );
+
+      const { data: friendsData, error: friendsError } = friendIds.length
+        ? await supabase
+            .from("users")
+            .select("id, clerk_user_id, full_name, image_url")
+            .in("clerk_user_id", friendIds)
+        : { data: [], error: null };
+      if (friendsError) throw friendsError;
+
+      const { data: requests, error: requestsError } = await supabase
+        .from("friend_requests")
+        .select("id, sender_id, receiver_id, status")
+        .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+        .eq("status", "pending");
+      if (requestsError) throw requestsError;
+
+      const incoming = (requests || []).filter(
+        (r) => r.receiver_id === user.id && r.status === "pending"
+      );
+      const senderIds = [...new Set(incoming.map((r) => r.sender_id))];
+
+      let sendersMap = {};
+      if (senderIds.length > 0) {
+        const { data: senders, error: sendersError } = await supabase
+          .from("users")
+          .select("id, clerk_user_id, full_name, image_url")
+          .in("clerk_user_id", senderIds);
+        if (sendersError) throw sendersError;
+        sendersMap = Object.fromEntries(
+          (senders || []).map((s) => [s.clerk_user_id, s])
+        );
+      }
+
+      setFriends(friendsData || []);
+      setFriendRequests(requests || []);
+      setSenderById(sendersMap);
+    } catch (error) {
+      console.error("Error loading friend sidebar data:", error);
+      toast.error("Failed to load friend sidebar data.");
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!user || !show) return;
-    const loadData = async () => {
+    setSidebarTab("friends");
+    loadData();
+  }, [user, show, loadData]);
+
+  useEffect(() => {
+    if (!user || !show || sidebarTab !== "find") return;
+
+    const runSearch = async () => {
+      const safe = sanitizeIlikePrefix(debouncedSearch);
+      if (safe.length < MIN_USER_SEARCH_LEN) {
+        setSearchResults([]);
+        setSearching(false);
+        return;
+      }
+
+      setSearching(true);
       try {
-        setLoading(true);
-
-        const { data: friendships, error: friendshipsError } = await supabase
-          .from("friendships")
-          .select("*")
-          .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
-        if (friendshipsError) throw friendshipsError;
-
-        const friendIds = (friendships || []).flatMap((f) =>
-          f.user1_id === user.id ? [f.user2_id] : [f.user1_id]
-        );
-
-        const { data: friendsData, error: friendsError } = friendIds.length
-          ? await supabase
-              .from("users")
-              .select("*")
-              .in("clerk_user_id", friendIds)
-          : { data: [], error: null };
-        if (friendsError) throw friendsError;
-
-        const { data: requests, error: requestsError } = await supabase
-          .from("friend_requests")
-          .select("*")
-          .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
-          .eq("status", "pending");
-        if (requestsError) throw requestsError;
-
-        const { data: usersData, error: usersError } = await supabase
+        const { data, error } = await supabase
           .from("users")
-          .select("*")
-          .neq("clerk_user_id", user.id);
-        if (usersError) throw usersError;
+          .select("id, full_name, image_url, clerk_user_id")
+          .neq("clerk_user_id", user.id)
+          .ilike("full_name", `${safe}%`)
+          .limit(USER_SEARCH_LIMIT);
 
-        setFriends(friendsData || []);
-        setFriendRequests(requests || []);
-        setAllUsers(usersData || []);
+        if (error) throw error;
+        setSearchResults(data || []);
       } catch (error) {
-        console.error("Error loading friend sidebar data:", error);
-        toast.error("Failed to load friend sidebar data.");
+        console.error("Error searching users:", error);
+        setSearchResults([]);
       } finally {
-        setLoading(false);
+        setSearching(false);
       }
     };
 
-    loadData();
-  }, [user, show]);
+    runSearch();
+  }, [user, show, sidebarTab, debouncedSearch]);
 
   const getUserStatus = (targetId) => {
     if (friends.some((friend) => friend.clerk_user_id === targetId)) {
@@ -85,11 +134,12 @@ const FriendSidebar = ({ user, show, onClose }) => {
       (request) =>
         request.sender_id === targetId && request.receiver_id === user.id
     );
-    if (receivedRequest) return {
-      status: "received",
-      text: "Accept request",
-      requestId: receivedRequest.id,
-    };
+    if (receivedRequest)
+      return {
+        status: "received",
+        text: "Accept request",
+        requestId: receivedRequest.id,
+      };
 
     return { status: "none", text: "Send request" };
   };
@@ -136,11 +186,16 @@ const FriendSidebar = ({ user, show, onClose }) => {
       setFriendRequests((prev) => prev.filter((r) => r.id !== requestId));
       const { data: newFriend } = await supabase
         .from("users")
-        .select("*")
+        .select("id, clerk_user_id, full_name, image_url")
         .eq("clerk_user_id", senderId)
         .single();
       if (newFriend) {
         setFriends((prev) => [...prev, newFriend]);
+        setSenderById((prev) => {
+          const next = { ...prev };
+          delete next[senderId];
+          return next;
+        });
       }
     } catch (error) {
       console.error("Error accepting friend request:", error);
@@ -150,7 +205,7 @@ const FriendSidebar = ({ user, show, onClose }) => {
     }
   };
 
-  const rejectFriendRequest = async (requestId) => {
+  const rejectFriendRequest = async (requestId, senderId) => {
     try {
       setActionLoading(true);
       const { error } = await supabase
@@ -160,6 +215,11 @@ const FriendSidebar = ({ user, show, onClose }) => {
       if (error) throw error;
       toast.success("Friend request declined.");
       setFriendRequests((prev) => prev.filter((r) => r.id !== requestId));
+      setSenderById((prev) => {
+        const next = { ...prev };
+        delete next[senderId];
+        return next;
+      });
     } catch (error) {
       console.error("Error rejecting friend request:", error);
       toast.error("Failed to decline friend request.");
@@ -180,152 +240,333 @@ const FriendSidebar = ({ user, show, onClose }) => {
         className="fixed inset-0 bg-black/50 z-40"
         onClick={onClose}
       />
-      <aside className="fixed top-0 right-0 z-50 h-full w-full max-w-md bg-[#1f2a2a] text-white shadow-2xl overflow-y-auto">
-        <div className="flex items-center justify-between border-b border-white/10 p-4">
-          <div>
-            <h2 className="text-xl font-bold">Friends</h2>
-            <p className="text-sm text-gray-300">
-              Friends, requests, and search.
-            </p>
+      <aside className="fixed top-0 right-0 z-50 flex h-full w-full max-w-md flex-col bg-[#1f2a2a] text-white shadow-2xl">
+        <div className="shrink-0 border-b border-white/10 p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold">Friends</h2>
+              <p className="text-sm text-gray-300">
+                Your crew and new connections.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-2 rounded-full hover:bg-white/10 hover:cursor-pointer"
+              aria-label="Close"
+            >
+              <FiX size={20} />
+            </button>
           </div>
-          <button onClick={onClose} className="p-2 rounded-full hover:bg-white/10 hover:cursor-pointer">
-            <FiX size={20} />
-          </button>
         </div>
 
-        <div className="p-4 space-y-6">
-          <div className="rounded-3xl bg-white p-4 shadow-inner text-black">
-            <label className="block text-sm text-gray-700 mb-2">Search users</label>
-            <input
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Type a name..."
-              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-black outline-none focus:border-cyan-400"
-            />
-            {searchTerm && (
-              <div className="mt-4 space-y-3">
-                {filteredUsers.length === 0 ? (
-                  <p className="text-sm text-gray-500">No users found.</p>
-                ) : (
-                  filteredUsers.slice(0, 8).map((userResult) => {
-                    const status = getUserStatus(userResult.clerk_user_id);
-                    return (
-                      <div
-                        key={userResult.clerk_user_id}
-                        className="flex items-center justify-between rounded-2xl bg-white p-3 shadow-sm"
-                      >
+        <nav
+          className="grid shrink-0 grid-cols-3 border-b border-white/10"
+          aria-label="Friends sidebar sections"
+        >
+          <button
+            type="button"
+            onClick={() => setSidebarTab("friends")}
+            className={`px-1 py-2.5 text-center text-xs font-semibold transition-colors sm:text-sm ${
+              sidebarTab === "friends"
+                ? "text-white border-b-2 border-cyan-400"
+                : "text-gray-400 border-b-2 border-transparent hover:text-gray-200"
+            }`}
+          >
+            Your friends
+          </button>
+          <button
+            type="button"
+            onClick={() => setSidebarTab("find")}
+            className={`px-1 py-2.5 text-center text-xs font-semibold transition-colors sm:text-sm ${
+              sidebarTab === "find"
+                ? "text-white border-b-2 border-cyan-400"
+                : "text-gray-400 border-b-2 border-transparent hover:text-gray-200"
+            }`}
+          >
+            Find people
+          </button>
+          <button
+            type="button"
+            onClick={() => setSidebarTab("pending")}
+            className={`px-1 py-2.5 text-center text-xs font-semibold transition-colors sm:text-sm ${
+              sidebarTab === "pending"
+                ? "text-white border-b-2 border-cyan-400"
+                : "text-gray-400 border-b-2 border-transparent hover:text-gray-200"
+            }`}
+          >
+            <span className="inline-flex flex-wrap items-center justify-center gap-1">
+              <span>Pending</span>
+              {incomingRequests.length > 0 && (
+                <span className="inline-flex min-h-[1.25rem] min-w-[1.25rem] items-center justify-center rounded-full bg-red-600 px-1.5 text-[10px] font-bold leading-none text-white sm:text-xs">
+                  {incomingRequests.length}
+                </span>
+              )}
+            </span>
+          </button>
+        </nav>
+
+        <div className="min-h-0 flex-1 overflow-y-auto p-4">
+          {sidebarTab === "friends" && (
+            <div className="rounded-2xl border border-white/10 bg-[#273737]/80 p-4 shadow-inner backdrop-blur-sm">
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <div>
+                  <h3 className="text-lg font-semibold tracking-tight">
+                    Your friends
+                  </h3>
+                  <p className="text-sm text-gray-400">
+                    {friends.length}{" "}
+                    {friends.length === 1 ? "friend" : "friends"}
+                  </p>
+                </div>
+              </div>
+              {loading ? (
+                <p className="text-sm text-gray-400">Loading...</p>
+              ) : friends.length === 0 ? (
+                <p className="text-sm text-gray-400">
+                  No friends yet. Open the{" "}
+                  <button
+                    type="button"
+                    onClick={() => setSidebarTab("find")}
+                    className="font-medium text-cyan-400 underline decoration-cyan-400/50 underline-offset-2 hover:text-cyan-300"
+                  >
+                    Find people
+                  </button>{" "}
+                  tab to search and send requests.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {friends.map((friend) => (
+                    <div
+                      key={friend.clerk_user_id}
+                      className="flex items-center gap-3 rounded-xl bg-[#1c3232] p-3 ring-1 ring-white/5"
+                    >
+                      <img
+                        src={friend.image_url || "/default-avatar.png"}
+                        alt=""
+                        className="h-10 w-10 rounded-full object-cover"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-medium">
+                          {friend.full_name}
+                        </p>
+                        <p className="text-xs text-gray-400">Friend</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {sidebarTab === "find" && (
+            <div className="group relative overflow-hidden rounded-2xl ring-1 ring-white/10">
+                <div
+                  className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_80%_at_0%_0%,rgba(45,212,191,0.12),transparent_50%)]"
+                  aria-hidden
+                />
+                <div
+                  className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-teal-400 via-cyan-500/70 to-teal-600/50"
+                  aria-hidden
+                />
+
+                <div className="relative bg-gradient-to-br from-[#2d3d3d]/95 to-[#1a2424]/98 p-4 pl-5 backdrop-blur-sm">
+                  <div className="flex gap-3">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-500/25 to-cyan-600/10 ring-1 ring-teal-400/20">
+                      <FiUserPlus
+                        className="h-5 w-5 text-teal-200/90"
+                        aria-hidden
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1 pt-0.5">
+                      <h3 className="text-base font-semibold tracking-tight text-white">
+                        Find someone new
+                      </h3>
+                      <p className="mt-0.5 text-sm leading-snug text-gray-400">
+                        Look up by name, then send a request. Needs{" "}
+                        {MIN_USER_SEARCH_LEN}+ letters.
+                      </p>
+                    </div>
+                  </div>
+
+                  <label className="sr-only" htmlFor="friend-sidebar-search">
+                    Search by name
+                  </label>
+                  <div className="relative mt-4">
+                    <FiSearch
+                      className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-teal-300/40"
+                      aria-hidden
+                    />
+                    <input
+                      id="friend-sidebar-search"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      placeholder="Try a name…"
+                      className="w-full rounded-2xl border border-white/10 bg-black/25 py-3 pl-11 pr-4 text-sm text-white shadow-[inset_0_2px_8px_rgba(0,0,0,0.35)] placeholder:text-gray-500 transition focus:border-teal-400/40 focus:outline-none focus:ring-2 focus:ring-teal-500/25"
+                    />
+                  </div>
+
+                  {searchTerm.trim().length === 0 && (
+                    <p className="mt-2 text-center text-[11px] italic text-gray-500">
+                      Start typing to search
+                    </p>
+                  )}
+
+                  {searchTerm.trim().length > 0 &&
+                    searchTerm.trim().length < MIN_USER_SEARCH_LEN && (
+                      <p className="mt-2 text-xs text-teal-200/50">
+                        {MIN_USER_SEARCH_LEN - searchTerm.trim().length} more
+                        letter
+                        {MIN_USER_SEARCH_LEN - searchTerm.trim().length === 1
+                          ? ""
+                          : "s"}{" "}
+                        to search.
+                      </p>
+                    )}
+                  {searching && (
+                    <p className="mt-2 text-xs font-medium text-teal-300/70">
+                      Searching…
+                    </p>
+                  )}
+
+                  {searchTerm.trim().length >= MIN_USER_SEARCH_LEN &&
+                    !searching && (
+                      <div className="mt-4 space-y-2">
+                        {searchResults.length === 0 ? (
+                          <p className="rounded-xl border border-dashed border-white/10 bg-black/20 py-6 text-center text-sm text-gray-500">
+                            No matches — try another spelling.
+                          </p>
+                        ) : (
+                          searchResults.slice(0, 8).map((userResult) => {
+                            const status = getUserStatus(
+                              userResult.clerk_user_id
+                            );
+                            return (
+                              <div
+                                key={userResult.clerk_user_id}
+                                className="flex items-center justify-between gap-2 rounded-xl border border-white/5 bg-black/20 p-2.5 transition hover:border-teal-500/20 hover:bg-teal-950/20"
+                              >
+                                <div className="flex min-w-0 flex-1 items-center gap-2.5">
+                                  <img
+                                    src={
+                                      userResult.image_url ||
+                                      "/default-avatar.png"
+                                    }
+                                    alt=""
+                                    className="h-10 w-10 shrink-0 rounded-full object-cover ring-2 ring-teal-500/15"
+                                  />
+                                  <div className="min-w-0">
+                                    <p className="truncate text-sm font-medium text-white">
+                                      {userResult.full_name}
+                                    </p>
+                                    <p className="text-[11px] text-gray-500">
+                                      {status.text}
+                                    </p>
+                                  </div>
+                                </div>
+                                <button
+                                  type="button"
+                                  disabled={
+                                    status.status !== "none" || actionLoading
+                                  }
+                                  onClick={() =>
+                                    sendFriendRequest(userResult.clerk_user_id)
+                                  }
+                                  className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold shadow-sm transition ${
+                                    status.status === "none"
+                                      ? "bg-gradient-to-r from-teal-500 to-cyan-600 text-white hover:from-teal-400 hover:to-cyan-500"
+                                      : status.status === "pending"
+                                        ? "cursor-default bg-emerald-900/90 text-emerald-100"
+                                        : "cursor-not-allowed bg-white/5 text-gray-500"
+                                  }`}
+                                >
+                                  {status.status === "pending" ? (
+                                    <FiCheck className="h-3.5 w-3.5" />
+                                  ) : (
+                                    "Add"
+                                  )}
+                                </button>
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+                    )}
+                </div>
+              </div>
+          )}
+
+          {sidebarTab === "pending" && (
+            <div className="rounded-3xl bg-white p-4 shadow-inner text-black">
+              <h3 className="mb-1 text-lg font-semibold">Pending requests</h3>
+              <p className="mb-4 text-sm text-gray-600">
+                People who want to connect with you.
+              </p>
+              {loading ? (
+                <p className="text-sm text-gray-500">Loading...</p>
+              ) : incomingRequests.length === 0 ? (
+                <p className="text-sm text-gray-500">
+                  No pending requests at the moment.
+                </p>
+              ) : (
+                incomingRequests.map((request) => {
+                  const sender = senderById[request.sender_id];
+                  return (
+                    <div
+                      key={request.id}
+                      className="mb-3 rounded-2xl bg-slate-200 p-3 text-black last:mb-0"
+                    >
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-3">
                           <img
-                            src={userResult.image_url || "/default-avatar.png"}
-                            alt={`${userResult.full_name} avatar`}
+                            src={sender?.image_url || "/default-avatar.png"}
+                            alt=""
                             className="h-12 w-12 rounded-full object-cover"
                           />
                           <div>
-                            <p className="font-medium text-black">{userResult.full_name}</p>
-                            <p className="text-xs text-gray-500">{status.text}</p>
+                            <p className="font-medium">
+                              {sender?.full_name || "User"}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              Wants to be friends
+                            </p>
                           </div>
                         </div>
-                        <button
-                          disabled={status.status !== "none" || actionLoading}
-                          onClick={() => sendFriendRequest(userResult.clerk_user_id)}
-                          className={`rounded-full px-3 py-2 text-sm font-semibold border border-black transition duration-200 ease-in-out ${
-                            status.status === "none"
-                              ? "bg-white text-black border-black cursor-pointer"
-                              : status.status === "pending"
-                              ? "bg-green-700 text-white cursor-default"
-                              : "bg-slate-200 text-gray-500 cursor-not-allowed"
-                          }`}
-                        >
-                          {status.status === "pending" ? (
-                            <FiCheck size={16} />
-                          ) : (
-                            "+"
-                          )}
-                        </button>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="rounded-3xl bg-white p-4 shadow-inner text-black">
-            <h3 className="text-lg font-semibold mb-3">Pending requests</h3>
-            {incomingRequests.length === 0 ? (
-              <p className="text-sm text-gray-500">No requests at the moment.</p>
-            ) : (
-              incomingRequests.map((request) => {
-                const sender = allUsers.find(
-                  (u) => u.clerk_user_id === request.sender_id
-                );
-                return (
-                  <div
-                    key={request.id}
-                    className="mb-3 rounded-2xl bg-slate-300 p-3 text-black"
-                  >
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={sender?.image_url || "/default-avatar.png"}
-                          alt={`${sender?.full_name || "User"} avatar`}
-                          className="h-12 w-12 rounded-full object-cover"
-                        />
-                        <div>
-                          <p className="font-medium">{sender?.full_name || "User"}</p>
-                          <p className="text-sm text-gray-500">Friend request</p>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              acceptFriendRequest(
+                                request.id,
+                                request.sender_id
+                              )
+                            }
+                            className="rounded-full bg-green-700 px-3 py-2 text-sm font-semibold text-white hover:bg-green-900 hover:cursor-pointer disabled:opacity-50"
+                            disabled={actionLoading}
+                          >
+                            Accept
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              rejectFriendRequest(
+                                request.id,
+                                request.sender_id
+                              )
+                            }
+                            className="rounded-full bg-red-500 px-3 py-2 text-sm font-semibold text-white hover:bg-red-400 hover:cursor-pointer disabled:opacity-50"
+                            disabled={actionLoading}
+                          >
+                            Decline
+                          </button>
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => acceptFriendRequest(request.id, request.sender_id)}
-                          className="rounded-full bg-green-700 px-3 py-2 text-sm font-semibold text-white hover:bg-green-900 hover:cursor-pointer"
-                          disabled={actionLoading}
-                        >
-                          Accept
-                        </button>
-                        <button
-                          onClick={() => rejectFriendRequest(request.id)}
-                          className="rounded-full bg-red-500 px-3 py-2 text-sm font-semibold hover:bg-red-400 hover:cursor-pointer text-white"
-                          disabled={actionLoading}
-                        >
-                          Reject
-                        </button>
-                      </div>
                     </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-
-          <div className="rounded-3xl bg-[#273737] p-4 shadow-inner">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-lg font-semibold">Friends</h3>
-                <p className="text-sm text-gray-400">{friends.length} friends</p>
-              </div>
+                  );
+                })
+              )}
             </div>
-            {friends.length === 0 ? (
-              <p className="text-sm text-gray-400">You don’t have friends yet.</p>
-            ) : (
-              <div className="space-y-3">
-                {friends.map((friend) => (
-                  <div key={friend.clerk_user_id} className="flex items-center gap-3 rounded-2xl bg-[#1c3232] p-3">
-                    <img
-                      src={friend.image_url || "/default-avatar.png"}
-                      alt={`${friend.full_name} avatar`}
-                      className="h-10 w-10 rounded-full object-cover"
-                    />
-                    <div>
-                      <p className="font-medium">{friend.full_name}</p>
-                      <p className="text-xs text-gray-400">Friend</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          )}
         </div>
       </aside>
     </>

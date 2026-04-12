@@ -12,7 +12,7 @@ const Swipper = () => {
     <section className="w-full max-w-full lg:max-w-6xl mx-auto pt-28 md:pt-24 bg-black pb-5 ">
       <h3>
         <p className="font-oswald text-white flex justify-center font-bold text-4xl p-3">
-          Filmat më në trend
+          Trending movies
         </p>
       </h3>
       <Swiper
@@ -51,7 +51,7 @@ const Swipper = () => {
                       onClick={() => window.open(movie.trailer, "_blank")}
                       className="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition w-fit sm:w-auto hover:cursor-pointer mr-0"
                     >
-                      Shiko trailerin
+                      Watch trailer
                     </button>
                   </div>
                 </div>

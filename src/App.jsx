@@ -40,23 +40,31 @@ function App() {
           full_name: user.fullName,
           email: user.primaryEmailAddress?.emailAddress,
           image_url: user.imageUrl,
-          clerk_user_id: user.id
+          clerk_user_id: user.id,
         });
       } catch (error) {
-        console.error("Gabim gjate ruajtjes se user:", error);
+        console.error("Error saving user to database:", error);
       }
     };
 
-    saveUserToSupabase();
-  }, [user]);
+    const t = setTimeout(saveUserToSupabase, 800);
+    return () => clearTimeout(t);
+  }, [
+    user?.id,
+    user?.fullName,
+    user?.imageUrl,
+    user?.primaryEmailAddress?.emailAddress,
+  ]);
 
   useEffect(() => {
     if (!userId) return;
 
     const fetchLists = async () => {
       try {
-        const wl = await getWatchlist(userId);
-        const wlt = await getWatchLater(userId);
+        const [wl, wlt] = await Promise.all([
+          getWatchlist(userId),
+          getWatchLater(userId),
+        ]);
         setWatchlist(wl);
         setWatchlater(wlt);
       } catch (err) {

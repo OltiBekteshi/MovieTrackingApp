@@ -8,7 +8,7 @@ const WatchLater = ({ watchlater, setWatchlater, userId }) => {
 
   const handleRemove = async (movieId) => {
     if (!userId) {
-      toast.error("Kyqu për të fshirë filmin");
+      toast.error("Sign in to remove a movie");
       return;
     }
 
@@ -16,10 +16,10 @@ const WatchLater = ({ watchlater, setWatchlater, userId }) => {
       await removeFromWatchLater(userId, movieId);
       const updated = watchlater.filter((m) => m.movie_id !== movieId);
       setWatchlater(updated);
-      toast.success("Filmi u fshi me sukses");
+      toast.success("Movie removed successfully");
     } catch (err) {
       console.error(err);
-      toast.error("Fshirja e filmit dështoi");
+      toast.error("Failed to remove movie");
     }
   };
 
@@ -40,9 +40,9 @@ const WatchLater = ({ watchlater, setWatchlater, userId }) => {
   }
 
   return (
-    <div className="bg-linear-to-r from-blue-500  to-green-900 shadow-md  min-h-screen p-6">
+    <div className="bg-[#293333] shadow-md  min-h-screen p-6">
       <h1 className="text-3xl font-bold mb-6 text-white text-center mt-20">
-        Shiko më vonë
+        Watch later
       </h1>
 
       <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
@@ -62,7 +62,7 @@ const WatchLater = ({ watchlater, setWatchlater, userId }) => {
             <div className="p-4 flex flex-col grow">
               <h3 className="font-semibold text-lg truncate">{movie.title}</h3>
                     <p className="text-sm text-gray-300 mb-2">
-                ⏱ Kohezgjatja:{" "}
+                ⏱ Runtime:{" "}
                 {movie.runtime
                   ? `${Math.floor(movie.runtime / 60)}h ${movie.runtime % 60}m`
                   : "N/A"}
@@ -75,7 +75,7 @@ const WatchLater = ({ watchlater, setWatchlater, userId }) => {
                 className="bg-gray-700 p-2 text-white rounded-lg hover:bg-gray-800 mt-4 hover:cursor-pointer"
                 onClick={() => handleRemove(movie.movie_id)}
               >
-                Fshij
+                Remove
               </button>
             </div>
           </div>

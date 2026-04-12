@@ -42,7 +42,7 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
 
   const handleRemove = async (movieId) => {
     if (!userId) {
-      toast.error("Duhet të jeni të kycur për të fshirë filmin");
+      toast.error("You must be signed in to remove a movie");
       return;
     }
 
@@ -56,10 +56,10 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
       delete updatedComments[movieId];
       setComments(updatedComments);
 
-      toast.success("Filmi u fshi me sukses");
+      toast.success("Movie removed successfully");
     } catch (err) {
       console.error(err);
-      toast.error("Fshirja e filmit dështoi");
+      toast.error("Failed to remove movie");
     }
   };
 
@@ -69,7 +69,7 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
 
   const handleSaveComment = async (movieId) => {
     if (!newComment[movieId] || newComment[movieId].trim() === "") {
-      toast.error("Komenti nuk mund të jetë bosh");
+      toast.error("Comment cannot be empty");
       return;
     }
 
@@ -89,7 +89,7 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
       toast.success("Komenti u ruajt me sukses!");
     } catch (err) {
       console.error(err);
-      toast.error("Ruajtja e komentit dështoi");
+      toast.error("Failed to save comment");
     }
   };
 
@@ -102,10 +102,10 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
         [movieId]: (prev[movieId] || []).filter((c) => c.id !== commentId),
       }));
 
-      toast.success("Komenti u fshi me sukses!");
+      toast.success("Comment deleted!");
     } catch (err) {
       console.error(err);
-      toast.error("Fshirja e komentit dështoi");
+      toast.error("Failed to delete comment");
     }
   };
 
@@ -126,13 +126,13 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
   }
 
   return (
-    <div className="bg-linear-to-r from-blue-500 to-green-900 shadow-md min-h-screen p-6">
+    <div className="bg-[#293333] shadow-md min-h-screen p-6">
       <h1 className="text-3xl font-bold mb-6 text-white text-center mt-20">
-        Lista e filmave të shikuara
+        Watched movies
       </h1>
 
       <div className="text-white text-xl font-bold text-center mb-6">
-        Totali i orëve të shikuara: {totalHours}h {totalRemainingMinutes}m
+        Total watch time: {totalHours}h {totalRemainingMinutes}m
       </div>
 
       <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
@@ -154,7 +154,7 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
               <h3 className="font-semibold text-lg mb-2">{movie.title}</h3>
 
               <p className="text-sm text-gray-300 mb-2">
-                ⏱ Kohezgjatja:{" "}
+                ⏱ Runtime:{" "}
                 {movie.runtime
                   ? `${Math.floor(movie.runtime / 60)}h ${movie.runtime % 60}m`
                   : "N/A"}
@@ -179,7 +179,7 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
                             handleDeleteComment(movie.movie_id, c.id)
                           }
                         >
-                          Fshij
+                          Delete
                         </button>
                       </div>
                     ))}
@@ -196,14 +196,14 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
                         [movie.movie_id]: e.target.value,
                       }))
                     }
-                    placeholder="Shkruaj një koment..."
+                    placeholder="Write a comment..."
                     className="w-full p-2 rounded bg-gray-800 text-white text-sm"
                   />
                   <button
                     className="bg-green-700 p-2 rounded-lg mt-2 hover:bg-green-800 text-sm hover:cursor-pointer"
                     onClick={() => handleSaveComment(movie.movie_id)}
                   >
-                    Ruaj komentin
+                    Save comment
                   </button>
                 </div>
               )}
@@ -212,14 +212,14 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
                 className="bg-blue-700 p-2 text-white rounded-lg hover:bg-blue-800 mt-4 hover:cursor-pointer"
                 onClick={() => handleAddComment(movie.movie_id)}
               >
-                {showInput[movie.movie_id] ? "Anulo" : "Shto koment"}
+                {showInput[movie.movie_id] ? "Cancel" : "Add comment"}
               </button>
 
               <button
                 className="bg-gray-700 p-2 text-white rounded-lg hover:bg-gray-800 mt-2 hover:cursor-pointer"
                 onClick={() => handleRemove(movie.movie_id)}
               >
-                Fshij
+                Remove
               </button>
             </div>
           </div>

@@ -6,7 +6,7 @@ const TopRated = () => {
   return (
     <section className="bg-linear-to-r from-blue-500  to-green-900 shadow-md py-12 px-6">
       <h2 className="text-4xl font-bold text-white mb-8 text-center drop-shadow-lg">
-        Filmat më të vlerësuar
+        Highest-rated movies
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
         {topRatedMovies.map((movie, index) => (

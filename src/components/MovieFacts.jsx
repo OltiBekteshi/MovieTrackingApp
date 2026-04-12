@@ -16,7 +16,7 @@ const MovieFacts = () => {
       }}
     >
       <h1 className="text-4xl md:text-5xl font-bold mb-10 text-center text-white drop-shadow-lg tracking-wide">
-        Fakte rreth disa filmave
+        Facts about some movies
       </h1>
 
       <div className="w-full max-w-6xl space-y-4">

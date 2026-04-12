@@ -114,10 +114,19 @@ export const getPublicComments = async (movieId) => {
   return data;
 };
 
-export const addPublicComment = async (userId, username, movieId, comment) => {
+export const addPublicComment = async (
+  userId,
+  username,
+  movieId,
+  comment,
+  parentId = null
+) => {
+  const row = { user_id: userId, username, movie_id: movieId, comment };
+  if (parentId != null) row.parent_id = parentId;
+
   const { data, error } = await supabase
     .from("film_discussion")
-    .insert([{ user_id: userId, username, movie_id: movieId, comment }])
+    .insert([row])
     .select();
   if (error) throw error;
   return data;

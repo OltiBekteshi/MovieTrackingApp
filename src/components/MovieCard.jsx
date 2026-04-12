@@ -1,9 +1,17 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Toaster, toast } from "sonner";
 import PopUpModal from "./PopUpModal";
 import { addToWatchlist, addToWatchLater } from "./../utils/movieService";
 import { useLocation } from "react-router-dom";
 import ClipLoader from "react-spinners/ClipLoader";
+import { useDebouncedValue } from "../utils/useDebouncedValue";
+import {
+  fetchMovieRuntime,
+  fetchRuntimesInPools,
+} from "../utils/tmdbRuntime";
+
+const SEARCH_DEBOUNCE_MS = 400;
+const RUNTIME_POOL_SIZE = 5;
 
 const MovieCard = ({
   watchlist,
@@ -17,15 +25,16 @@ const MovieCard = ({
   const [page, setPage] = useState(1);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [trailerKey, setTrailerKey] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const debouncedSearch = useDebouncedValue(searchInput, SEARCH_DEBOUNCE_MS);
   const [selectedGenre, setSelectedGenre] = useState("");
   const [overviewCache, setOverviewCache] = useState({});
-  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const location = useLocation();
   const apiKey = import.meta.env.VITE_TMDB_API_KEY;
-  const dropdownRef = useRef(null);
+  const movieDetailsRef = useRef(movieDetails);
+  movieDetailsRef.current = movieDetails;
 
   const genres = [
     { id: 28, name: "Action" },
@@ -35,20 +44,6 @@ const MovieCard = ({
     { id: 99, name: "Documentary" },
     { id: 9648, name: "Mystery" },
   ];
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (
-        open &&
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target)
-      ) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, [open]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0 });
@@ -94,20 +89,35 @@ const MovieCard = ({
 
       setSelectedMovie(fullMovie);
     } catch {
-      toast.error("Nuk mund të hapet filmi.");
+      toast.error("Could not open movie.");
     }
   };
 
+  const ensureRuntime = useCallback(async (movie) => {
+    const cached = movieDetailsRef.current[movie.id];
+    if (cached !== undefined) return cached;
+    try {
+      const runtime = await fetchMovieRuntime(movie.id, apiKey);
+      setMovieDetails((prev) => ({ ...prev, [movie.id]: runtime }));
+      return runtime;
+    } catch {
+      setMovieDetails((prev) => ({ ...prev, [movie.id]: 0 }));
+      return 0;
+    }
+  }, [apiKey]);
+
   useEffect(() => {
+    let cancelled = false;
+
     const fetchMovies = async () => {
       try {
         setLoading(true);
 
         let url = "";
 
-        if (searchTerm.trim()) {
+        if (debouncedSearch.trim()) {
           url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&language=en-EN&query=${encodeURIComponent(
-            searchTerm
+            debouncedSearch
           )}&page=${page}`;
         } else if (selectedGenre !== "") {
           url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&language=en-EN&page=${page}&with_genres=${selectedGenre}`;
@@ -119,44 +129,40 @@ const MovieCard = ({
         const data = await res.json();
         const results = (data.results || []).filter((m) => m.poster_path);
 
-        const details = {};
+        if (cancelled) return;
 
-        await Promise.all(
-          results.map(async (movie) => {
-            try {
-              const r = await fetch(
-                `https://api.themoviedb.org/3/movie/${movie.id}?api_key=${apiKey}&language=en-EN`
-              );
-              const d = await r.json();
-              details[movie.id] = d.runtime || 0;
-            } catch {
-              details[movie.id] = 0;
+        setMovies(results);
+        setMovieDetails({});
+
+        if (!apiKey || results.length === 0) {
+          return;
+        }
+
+        fetchRuntimesInPools(
+          results.map((m) => m.id),
+          apiKey,
+          RUNTIME_POOL_SIZE,
+          (id, runtime) => {
+            if (!cancelled) {
+              setMovieDetails((prev) => ({ ...prev, [id]: runtime }));
             }
-          })
-        );
-
-        setMovieDetails(details);
-
-        const translatedMovies = await Promise.all(
-          results.map(async (movie) => {
-            // Keep movie overviews in English; disable auto-translation to Albanian
-            // const translated = await translateText(movie.overview, "sq");
-            // return { ...movie, overview: translated };
-            return movie;
-          })
-        );
-
-        setMovies(translatedMovies);
+          }
+        ).catch(() => {});
       } catch (err) {
         console.error("Error fetching movies:", err);
-        toast.error("Gabim gjatë ngarkimit të filmave");
+        toast.error("Failed to load movies");
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchMovies();
-  }, [page, searchTerm, selectedGenre]);
+    return () => {
+      cancelled = true;
+    };
+  }, [page, debouncedSearch, selectedGenre, apiKey]);
 
   const handleWatchTrailer = async (movieId) => {
     try {
@@ -168,102 +174,100 @@ const MovieCard = ({
         (vid) => vid.site === "YouTube" && vid.type === "Trailer"
       );
       if (trailer) setTrailerKey(trailer.key);
-      else toast("Nuk ka trailer për këtë film!");
+      else toast("No trailer available for this movie.");
     } catch {
-      toast.error("Gabim gjatë kërkimit të trailerit");
+      toast.error("Failed to load trailer");
     }
   };
 
   const handleAddToWatchlist = async (movie) => {
     if (!watchlist.find((m) => m.movie_id === movie.id)) {
       try {
-        await addToWatchlist(userId, movie, movieDetails[movie.id]);
+        const runtime = await ensureRuntime(movie);
+        await addToWatchlist(userId, movie, runtime);
         setWatchlist([
           ...watchlist,
-          { ...movie, movie_id: movie.id, runtime: movieDetails[movie.id] },
+          { ...movie, movie_id: movie.id, runtime },
         ]);
-        toast.success(`${movie.title} u shtua në listën e shikuar!`);
+        toast.success(`${movie.title} added to your watchlist!`);
       } catch {
-        toast.error("Kyqu për të shtuar filmin");
+        toast.error("Sign in to add movies");
       }
     } else {
-      toast(`${movie.title} është veç në listë`);
+      toast(`${movie.title} is already in your watchlist`);
     }
   };
 
   const handleAddToWatchLater = async (movie) => {
     if (!watchlater.find((m) => m.movie_id === movie.id)) {
       try {
-        await addToWatchLater(userId, movie, movieDetails[movie.id]);
+        const runtime = await ensureRuntime(movie);
+        await addToWatchLater(userId, movie, runtime);
         setWatchlater([
           ...watchlater,
-          { ...movie, movie_id: movie.id, runtime: movieDetails[movie.id] },
+          { ...movie, movie_id: movie.id, runtime },
         ]);
-        toast.success(`${movie.title} u shtua në Shiko më vonë!`);
+        toast.success(`${movie.title} added to Watch later!`);
       } catch {
-        toast.error("Kyqu për të shtuar filmin");
+        toast.error("Sign in to add movies");
       }
     } else {
-      toast(`${movie.title} është veç në Shiko më vonë`);
+      toast(`${movie.title} is already in Watch later`);
     }
   };
 
   return (
     <div className="bg-[#D3CBC0] min-h-screen p-6">
-      <div className="w-full flex justify-start mb-6 mt-20">
-        <div className="relative w-60 select-none" ref={dropdownRef}>
-          <div
-            onClick={() => setOpen(!open)}
-            className="bg-[#293333] text-white border border-gray-300 px-4 py-3 rounded-2xl cursor-pointer flex justify-between items-center shadow-sm hover:shadow-md transition-all duration-200"
+      <div className="w-full max-w-5xl mx-auto mt-20 mb-6">
+        
+
+      
+        <div className="flex flex-wrap justify-center gap-2 px-1">
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedGenre("");
+              setPage(1);
+            }}
+            className={`rounded-full border-2 border-[#293333] px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#293333] focus-visible:ring-offset-2 hover:cursor-pointer ${
+              selectedGenre === ""
+                ? "bg-[#293333] text-white shadow-md"
+                : "bg-white/90 text-[#293333] hover:bg-[#e8e4dc]"
+            }`}
           >
-            <span className="font-medium">
-              {genres.find((g) => g.id === Number(selectedGenre))?.name ||
-                "All movies"}
-            </span>
-            <span className="text-sm text-white">▼</span>
-          </div>
-
-          {open && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-[#293333] border border-gray-700 rounded-2xl shadow-xl z-50 overflow-hidden">
-              <div
+            All
+          </button>
+          {genres.map((g) => {
+            const isActive = Number(selectedGenre) === g.id;
+            return (
+              <button
+                key={g.id}
+                type="button"
                 onClick={() => {
-                  setSelectedGenre("");
+                  setSelectedGenre(g.id);
                   setPage(1);
-                  setOpen(false);
                 }}
-                className={`px-4 py-3 cursor-pointer transition-colors ${selectedGenre === "" ? "bg-[#2F4F4F] text-white font-semibold" : "text-white hover:bg-[#2f4f4f]"}`}
+                className={`rounded-full border-2 border-[#293333] px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#293333] focus-visible:ring-offset-2 hover:cursor-pointer ${
+                  isActive
+                    ? "bg-[#293333] text-white shadow-md"
+                    : "bg-white/90 text-[#293333] hover:bg-[#e8e4dc]"
+                }`}
               >
-                All movies
-              </div>
-
-              {genres.map((g) => (
-                <div
-                  key={g.id}
-                  onClick={() => {
-                    setSelectedGenre(g.id);
-                    setPage(1);
-                    setOpen(false);
-                  }}
-                  className={`px-4 py-3 cursor-pointer transition-colors ${selectedGenre === g.id ? "bg-[#2F4F4F] text-white font-semibold" : "text-white hover:bg-[#2f4f4f]"}`}
-                >
-                  {g.name}
-                </div>
-              ))}
-            </div>
-          )}
+                {g.name}
+              </button>
+            );
+          })}
         </div>
       </div>
-
-      <h1 className="text-3xl font-bold text-center text-black mb-6">Movies</h1>
 
       <div className="flex justify-center mb-6">
         <input
           type="text"
           placeholder="Search for a movie..."
           className="w-full max-w-md px-4 py-2 rounded-lg bg-white text-black border-2 border-black"
-          value={searchTerm}
+          value={searchInput}
           onChange={(e) => {
-            setSearchTerm(e.target.value);
+            setSearchInput(e.target.value);
             setPage(1);
           }}
         />

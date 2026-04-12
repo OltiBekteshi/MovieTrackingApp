@@ -37,7 +37,7 @@ body {
 }
 
 .cl-userButtonPopoverActionButton__manageAccount span::after {
-  content: "Menaxho llogarinë";
+  content: "Manage account";
   font-size: 14px;
   margin-left: 6px;
   text-wrap: nowrap;
@@ -48,7 +48,7 @@ body {
 }
 
 .cl-userButtonPopoverActionButton__signOut span::before {
-  content: "Qkyqu";
+  content: "Sign out";
   font-size: 14px;
   margin-left: 6px;
   text-wrap: nowrap;
@@ -76,7 +76,7 @@ body {
 }
 
 .cl-profileSectionPrimaryButton.cl-button__password::after {
-  content: "Ndrysho fjalekalimin";
+  content: "Change password";
   color: #000;
   position: absolute;
   left: 0;
@@ -92,7 +92,7 @@ body {
 }
 
 .cl-profileSectionPrimaryButton.cl-button__profile::after {
-  content: "Përditëso";
+  content: "Update";
   color: #000;
   position: absolute;
   top: 0;
@@ -108,7 +108,7 @@ body {
 }
 
 .cl-profileSectionPrimaryButton.cl-button__username::after {
-  content: "Përditëso";
+  content: "Update";
   color: #000;
   position: absolute;
   top: 0;
@@ -124,7 +124,7 @@ body {
 }
 
 .cl-profileSectionTitleText.cl-profileSectionTitleText__username::after {
-  content: "Përdoruesi";
+  content: "Username";
   color: #000;
   position: absolute;
   top: 0;
@@ -139,7 +139,7 @@ body {
 }
 
 .cl-profileSectionTitleText.cl-profileSectionTitleText__emailAddresses::after {
-  content: "Email adresa";
+  content: "Email addresses";
   color: #000;
   position: absolute;
   top: 0;
@@ -154,7 +154,7 @@ body {
 }
 
 .cl-profileSectionTitleText.cl-profileSectionTitleText__connectedAccounts::after {
-  content: "Llogari të lidhura";
+  content: "Connected accounts";
   color: #000;
   position: absolute;
   top: 0;
@@ -169,7 +169,7 @@ body {
 }
 
 .cl-profileSectionTitleText.cl-profileSectionTitleText__profile::after {
-  content: "Profili";
+  content: "Profile";
   color: #000;
   position: absolute;
   top: 0;
@@ -184,7 +184,7 @@ span.cl-internal-pz0ugf[data-localization-key="userProfile.start.emailAddressesS
 }
 
 span.cl-internal-pz0ugf[data-localization-key="userProfile.start.emailAddressesSection.primaryButton"]::after {
-  content: "Shto adresë emaili";
+  content: "Add email address";
   color: #000;
   position: absolute;
   top: 0;
@@ -199,7 +199,7 @@ span.cl-internal-pz0ugf[data-localization-key="userProfile.start.connectedAccoun
 }
 
 span.cl-internal-pz0ugf[data-localization-key="userProfile.start.connectedAccountsSection.primaryButton"]::after {
-  content: "Lidhu me llogari";
+  content: "Connect account";
   color: #000;
   position: absolute;
   top: 0;
@@ -214,7 +214,7 @@ label.cl-formFieldLabel.cl-formFieldLabel__emailAddress-field {
 }
 
 label.cl-formFieldLabel.cl-formFieldLabel__emailAddress-field::after {
-  content: "Adresa e emailit";
+  content: "Email address";
   color: #000;
   position: absolute;
   top: 0;
@@ -230,7 +230,7 @@ label.cl-formFieldLabel.cl-formFieldLabel__emailAddress-field::after {
 }
 
 .cl-formButtonReset.cl-button::after {
-  content: "Anulo";
+  content: "Cancel";
   color: #000;
   position: relative;
   top: 0;
@@ -252,7 +252,7 @@ label.cl-formFieldLabel.cl-formFieldLabel__emailAddress-field::after {
 .cl-formButtonPrimary.cl-button:hover::after,
 .cl-formButtonPrimary.cl-button:focus::after,
 .cl-formButtonPrimary.cl-button:active::after {
-  content: "Ruaj";
+  content: "Save";
   color: #fff;
   position: relative;
   top: 0;
@@ -268,7 +268,7 @@ label.cl-formFieldLabel.cl-formFieldLabel__username-field {
 }
 
 label.cl-formFieldLabel.cl-formFieldLabel__username-field::after {
-  content: "Emri i përdoruesit";
+  content: "Username";
   color: #000;
   position: absolute;
   top: 0;
@@ -284,7 +284,7 @@ label.cl-formFieldLabel.cl-formFieldLabel__username-field::after {
 }
 
 .cl-profileSectionTitleText.cl-profileSectionTitleText__danger::after {
-  content: "Fshi llogarinë";
+  content: "Delete account";
   color: #000;
   position: absolute;
   top: 0;
@@ -299,7 +299,7 @@ label.cl-formFieldLabel.cl-formFieldLabel__username-field::after {
 }
 
 .cl-profileSectionPrimaryButton.cl-button__danger::after {
-  content: "Fshi llogarinë";
+  content: "Delete account";
   color: #d32f2f;
   position: relative;
   top: 0;
@@ -319,7 +319,7 @@ span.cl-navbarButtonText.cl-navbarButtonText__security {
 }
 
 span.cl-navbarButtonText.cl-navbarButtonText__security::after {
-  content: "Siguria";
+  content: "Security";
   color: #000;
   position: absolute;
   top: 0;
@@ -335,7 +335,7 @@ span.cl-navbarButtonText.cl-navbarButtonText__account {
 }
 
 span.cl-navbarButtonText.cl-navbarButtonText__account::after {
-  content: "Profili";
+  content: "Profile";
   color: #000;
   position: absolute;
   top: 0;
@@ -351,7 +351,7 @@ label.cl-formFieldLabel.cl-formFieldLabel__newPassword-field {
 }
 
 label.cl-formFieldLabel.cl-formFieldLabel__newPassword-field::after {
-  content: "Fjalëkalim i ri";
+  content: "New password";
   color: #000;
   position: absolute;
   top: 0;
@@ -366,7 +366,7 @@ label.cl-formFieldLabel.cl-formFieldLabel__confirmPassword-field {
 }
 
 label.cl-formFieldLabel.cl-formFieldLabel__confirmPassword-field::after {
-  content: "Konfirmo fjalëkalimin";
+  content: "Confirm password";
   color: #000;
   position: absolute;
   top: 0;
@@ -382,7 +382,7 @@ label.cl-formFieldLabel.cl-formFieldLabel__confirmPassword-field::after {
 }
 
 .cl-formFieldRadioLabelTitle[data-localization-key="formFieldLabel__signOutOfOtherSessions"]::after {
-  content: "Dil nga të gjitha pajisjet e tjera";
+  content: "Sign out of all other devices";
   color: #000;
   position: absolute;
   top: 0;
@@ -401,7 +401,7 @@ h1.cl-internal-18jv961[data-localization-key="userProfile.navbar.title"] {
 }
 
 h1.cl-internal-18jv961[data-localization-key="userProfile.navbar.title"]::after {
-  content: "Llogaria";
+  content: "Account";
   color: #000;
   position: absolute;
   top: 0;
@@ -416,7 +416,7 @@ p.cl-internal-2z548n[data-localization-key="userProfile.navbar.description"] {
 }
 
 p.cl-internal-2z548n[data-localization-key="userProfile.navbar.description"]::after {
-  content: "Menaxho informacionin e llogarisë";
+  content: "Manage your account information";
   color: #000;
   position: absolute;
   top: 0;
@@ -442,7 +442,7 @@ button.cl-menuItem[data-localization-key="userProfile.start.emailAddressesSectio
 }
 
 button.cl-menuItem[data-localization-key="userProfile.start.emailAddressesSection.detailsAction__primary"]::after {
-  content: "Përfundo verifikimin";
+  content: "Complete verification";
   color: #000;
   position: absolute;
   top: 0;
@@ -458,7 +458,7 @@ button.cl-menuItem[data-localization-key="userProfile.start.emailAddressesSectio
 }
 
 button.cl-menuItem[data-localization-key="userProfile.start.emailAddressesSection.destructiveAction"]::after {
-  content: "Fshij email";
+  content: "Remove email";
   color: #e53e3e;
   position: absolute;
   top: 0;
@@ -478,7 +478,7 @@ p.cl-internal-2z548n[data-localization-key="userProfile.deletePage.messageLine1"
 }
 
 p.cl-internal-2z548n[data-localization-key="userProfile.deletePage.messageLine1"]::after {
-  content: "Jeni të sigurt që doni të fshini llogarinë tuaj? Disa të dhëna të lidhura mund të ruhen. Për të kërkuar fshirje të plotë të të dhënave, ju lutemi kontaktoni suportin.";
+  content: "Are you sure you want to delete your account? Some related data may be retained. To request full deletion of your data, please contact support.";
   color: #000;
   position: absolute;
   top: 0;
@@ -493,7 +493,7 @@ p.cl-internal-14vleju[data-localization-key="userProfile.deletePage.messageLine2
 }
 
 p.cl-internal-14vleju[data-localization-key="userProfile.deletePage.messageLine2"]::after {
-  content: "Kjo veprim është i përhershëm dhe i pakthyeshëm.";
+  content: "This action is permanent and cannot be undone.";
   color: red;
   position: absolute;
   top: 0;
@@ -508,7 +508,7 @@ label.cl-formFieldLabel[data-localization-key="userProfile.deletePage.actionDesc
 }
 
 label.cl-formFieldLabel[data-localization-key="userProfile.deletePage.actionDescription"]::after {
-  content: 'Shkruani "Delete account" më poshtë për të vazhduar.';
+  content: 'Type "Delete account" below to continue.';
   color: #000;
   position: absolute;
   top: 0;
@@ -524,7 +524,7 @@ input.cl-formFieldInput__deleteConfirmation::placeholder {
 }
 
 input.cl-formFieldInput__deleteConfirmation::after {
-  content: "Fshij llogarinë";
+  content: "Delete account";
   position: absolute;
   top: 0;
   left: 0;
@@ -540,7 +540,7 @@ p.cl-profileSectionTitleText__password[data-localization-key="userProfile.start.
 }
 
 p.cl-profileSectionTitleText__password[data-localization-key="userProfile.start.passwordSection.title"]::after {
-  content: "Fjalëkalimi";
+  content: "Password";
   color: #000;
   position: absolute;
   top: 0;
@@ -555,7 +555,7 @@ label.cl-formFieldLabel__firstName-field[data-localization-key="formFieldLabel__
 }
 
 label.cl-formFieldLabel__firstName-field[data-localization-key="formFieldLabel__firstName"]::after {
-  content: "Emri";
+  content: "First name";
   color: #000;
   position: absolute;
   top: 0;
@@ -570,7 +570,7 @@ label.cl-formFieldLabel__lastName-field[data-localization-key="formFieldLabel__l
 }
 
 label.cl-formFieldLabel__lastName-field[data-localization-key="formFieldLabel__lastName"]::after {
-  content: "Mbiemri";
+  content: "Last name";
   color: #000;
   position: absolute;
   top: 0;
@@ -585,7 +585,7 @@ button.cl-avatarImageActionsUpload[data-localization-key="userProfile.profilePag
 }
 
 button.cl-avatarImageActionsUpload[data-localization-key="userProfile.profilePage.imageFormSubtitle"]::after {
-  content: "Ngarko";
+  content: "Upload";
   color: #000;
   position: absolute;
   top: 0;
@@ -601,7 +601,7 @@ p.cl-internal-159eg0a[data-localization-key="userProfile.profilePage.fileDropAre
 }
 
 p.cl-internal-159eg0a[data-localization-key="userProfile.profilePage.fileDropAreaHint"]::after {
-  content: "Madhësia e rekomanduar 1:1, deri në 10MB.";
+  content: "Recommended size 1:1, up to 10MB.";
   color: #000;
   position: absolute;
   top: 0;
@@ -617,7 +617,7 @@ label.cl-formFieldLabel__identifier-field[data-localization-key="formFieldLabel_
 }
 
 label.cl-formFieldLabel__identifier-field[data-localization-key="formFieldLabel__username"]::after {
-  content: "Emri i përdoruesit";
+  content: "Username";
   color: #000;
   position: absolute;
   top: 0;
@@ -637,7 +637,7 @@ span.cl-footerActionText[data-localization-key="signIn.start.actionText"] {
 }
 
 span.cl-footerActionText[data-localization-key="signIn.start.actionText"]::after {
-  content: "Nuk keni një llogari?";
+  content: "Don't have an account?";
   color: #000;
   position: absolute;
   top: 0;
@@ -652,7 +652,7 @@ a.cl-footerActionLink[data-localization-key="signIn.start.actionLink"] {
 }
 
 a.cl-footerActionLink[data-localization-key="signIn.start.actionLink"]::after {
-  content: "Regjistrohu";
+  content: "Sign up";
   color: #1d4ed8;
   position: absolute;
   top: 0;
@@ -667,7 +667,7 @@ span.cl-footerActionText[data-localization-key="signUp.start.actionText"] {
 }
 
 span.cl-footerActionText[data-localization-key="signUp.start.actionText"]::after {
-  content: "Tashmë keni një llogari?";
+  content: "Already have an account?";
   color: #000;
   position: absolute;
   top: 0;
@@ -682,7 +682,7 @@ a.cl-footerActionLink[data-localization-key="signUp.start.actionLink"] {
 }
 
 a.cl-footerActionLink[data-localization-key="signUp.start.actionLink"]::after {
-  content: "Hyr";
+  content: "Sign in";
   color: #1d4ed8;
   position: absolute;
   top: 0;
@@ -697,7 +697,7 @@ label.cl-formFieldLabel.cl-formFieldLabel__password-field {
 }
 
 label.cl-formFieldLabel.cl-formFieldLabel__password-field::after {
-  content: "Fjalëkalimi";
+  content: "Password";
   color: #000;
   position: absolute;
   top: 0;
@@ -713,7 +713,7 @@ a.cl-formFieldAction.cl-formFieldAction__password[data-localization-key="formFie
 }
 
 a.cl-formFieldAction.cl-formFieldAction__password[data-localization-key="formFieldAction__forgotPassword"]::after {
-  content: "Ke harruar fjalëkalimin?";
+  content: "Forgot password?";
   color: #1d4ed8;
   position: absolute;
   top: 0;
@@ -729,7 +729,7 @@ a.cl-footerActionLink[data-localization-key="signIn.password.actionLink"] {
 }
 
 a.cl-footerActionLink[data-localization-key="signIn.password.actionLink"]::after {
-  content: "Përdor një metodë tjetër";
+  content: "Use another method";
   color: #1d4ed8;
   position: absolute;
   top: 0;
@@ -755,7 +755,7 @@ a.cl-footerActionLink[data-localization-key="signIn.password.actionLink"]::after
 
 
 .cl-formButtonPrimary.cl-button::after {
-  content: "Ruaj";
+  content: "Save";
   color: #fff;
   position: absolute;
   inset: 0;

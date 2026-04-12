@@ -34,6 +34,21 @@ export async function saveMovieRating(movieId, userId, rating) {
   return data;
 }
 
+export async function deleteUserMovieRating(movieId, userId) {
+  const { error } = await supabase
+    .from("movie_votes")
+    .delete()
+    .eq("movie_id", movieId)
+    .eq("user_id", userId);
+
+  if (error) {
+    console.error("Error deleting movie rating:", error);
+    return false;
+  }
+
+  return true;
+}
+
 export async function getLastRatings(movieId) {
   const { data, error } = await supabase
     .from("movie_votes")
@@ -59,7 +74,7 @@ export async function getLastRatings(movieId) {
   return data.map((r) => ({
     id: r.id,
     rating: r.rating,
-    user_full_name: r.users?.full_name || "Përdorues anonim",
+    user_full_name: r.users?.full_name || "Anonymous user",
   }));
 }
 

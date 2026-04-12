@@ -37,7 +37,7 @@ const Friends = () => {
 
         const { data: friendsData, error: friendsError } = await supabase
           .from("users")
-          .select("*")
+          .select("id, clerk_user_id, full_name, image_url")
           .in("clerk_user_id", friendIds);
 
         if (friendsError) throw friendsError;
@@ -61,7 +61,7 @@ const Friends = () => {
         const senderIds = requests.map(r => r.sender_id);
         const { data: sendersData, error: sendersError } = await supabase
           .from("users")
-          .select("*")
+          .select("id, clerk_user_id, full_name, image_url")
           .in("clerk_user_id", senderIds);
 
         if (sendersError) throw sendersError;
@@ -71,7 +71,7 @@ const Friends = () => {
       }
     } catch (error) {
       console.error("Error loading friends:", error);
-      toast.error("Gabim gjatë ngarkimit të shokëve");
+      toast.error("Failed to load friends");
     } finally {
       setLoading(false);
     }
@@ -87,11 +87,11 @@ const Friends = () => {
 
       if (error) throw error;
 
-      toast.success("Shoku u hoq nga lista");
+      toast.success("Friend removed from your list");
       loadFriends(); // Refresh the list
     } catch (error) {
       console.error("Error removing friend:", error);
-      toast.error("Gabim gjatë heqjes së shokut");
+      toast.error("Failed to remove friend");
     }
   };
 
@@ -115,11 +115,11 @@ const Friends = () => {
 
       if (friendshipError) throw friendshipError;
 
-      toast.success("Kërkesa për miqësi u pranua!");
+      toast.success("Friend request accepted!");
       loadFriends(); // Refresh data
     } catch (error) {
       console.error("Error accepting friend request:", error);
-      toast.error("Gabim gjatë pranimit të kërkesës");
+      toast.error("Failed to accept friend request");
     }
   };
 
@@ -132,18 +132,18 @@ const Friends = () => {
 
       if (error) throw error;
 
-      toast.success("Kërkesa për miqësi u refuzua");
+      toast.success("Friend request declined");
       loadFriends(); // Refresh data
     } catch (error) {
       console.error("Error rejecting friend request:", error);
-      toast.error("Gabim gjatë refuzimit të kërkesës");
+      toast.error("Failed to decline friend request");
     }
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F5F5F5] flex items-center justify-center">
-        <div className="text-xl">Duke ngarkuar...</div>
+        <div className="text-xl">Loading...</div>
       </div>
     );
   }
@@ -151,12 +151,12 @@ const Friends = () => {
   return (
     <div className="min-h-screen bg-[#F5F5F5] p-6">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-center text-black mb-8">Shokët e Mi</h1>
+        <h1 className="text-3xl font-bold text-center text-black mb-8">My friends</h1>
 
         {/* Pending Friend Requests Section */}
         {friendRequests.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-4">Kërkesa për Miqësi në Pritje</h2>
+            <h2 className="text-2xl font-bold text-black mb-4">Pending friend requests</h2>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {requestsUsers.map((requester) => {
                 const request = friendRequests.find(r => r.sender_id === requester.clerk_user_id);
@@ -178,13 +178,13 @@ const Friends = () => {
                         onClick={() => acceptFriendRequest(request.id, requester.clerk_user_id)}
                         className="flex-1 bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700"
                       >
-                        Prano
+                        Accept
                       </button>
                       <button
                         onClick={() => rejectFriendRequest(request.id)}
                         className="flex-1 bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700"
                       >
-                        Refuzo
+                        Decline
                       </button>
                     </div>
                   </div>
@@ -196,11 +196,11 @@ const Friends = () => {
 
         {/* Friends List Section */}
         <div>
-          <h2 className="text-2xl font-bold text-black mb-4">Shokët</h2>
+          <h2 className="text-2xl font-bold text-black mb-4">Friends</h2>
           {friends.length === 0 ? (
             <div className="text-center text-gray-500 mt-8">
-              <p className="text-xl mb-4">Nuk keni shokë ende</p>
-              <p>Vazhdoni në faqen "Shto Shokë" për të shtuar shokë të rinj</p>
+              <p className="text-xl mb-4">You don&apos;t have any friends yet</p>
+              <p>Go to &quot;Add friends&quot; to add new friends</p>
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -221,7 +221,7 @@ const Friends = () => {
                     onClick={() => removeFriend(friend.clerk_user_id)}
                     className="w-full bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700"
                   >
-                    Hiq nga shokët
+                    Remove friend
                   </button>
                 </div>
               ))}

@@ -33,7 +33,8 @@ const Navbar = () => {
         .from("notifications")
         .select("*")
         .eq("receiver_id", user.id)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .range(0, 99);
 
       setNotifications(data || []);
     };
@@ -286,7 +287,7 @@ const Navbar = () => {
                 : "hover:bg-[#3a4a4a] hover:text-white"
             }`}
           >
-            Ballina
+            Home
           </Link>
           <Link
             to="/movies"
@@ -331,7 +332,7 @@ const Navbar = () => {
               }}
               className="w-full text-left px-3 py-2 rounded-2xl bg-[#3a4a4a] hover:bg-[#4e5d5d] transition-colors"
             >
-              Miqtë / Shto
+              Friends / Add
             </button>
           </SignedIn>
 
@@ -342,7 +343,7 @@ const Navbar = () => {
                 onClick={() => setShowNotif((p) => !p)}
               >
                 <FiBell size={24} />
-                <span>Njoftimet</span>
+                <span>Notifications</span>
               </div>
 
               {notifications.length > 0 && (
@@ -374,7 +375,7 @@ const Navbar = () => {
                           onClick={() => setShowAll(true)}
                           className="text-blue-600 text-sm font-bold hover:underline"
                         >
-                          Shiko më shumë...
+                          Show more...
                         </button>
                       )}
 
@@ -383,7 +384,7 @@ const Navbar = () => {
                           onClick={() => setShowAll(false)}
                           className="text-blue-600 text-sm font-bold hover:underline mt-2"
                         >
-                          Shiko më pak
+                          Show less
                         </button>
                       )}
                     </>
