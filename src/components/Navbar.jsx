@@ -279,17 +279,6 @@ const Navbar = () => {
       {isOpen && (
         <div className="md:hidden bg-[#293333] text-white px-6 py-4 space-y-4">
           <Link
-            to="/"
-            onClick={() => setIsOpen(false)}
-            className={`block px-3 py-2 rounded-2xl transition-colors ${
-              isActive("/")
-                ? "bg-[#3a4a4a] text-white"
-                : "hover:bg-[#3a4a4a] hover:text-white"
-            }`}
-          >
-            Home
-          </Link>
-          <Link
             to="/movies"
             onClick={() => setIsOpen(false)}
             className={`block px-3 py-2 rounded-2xl transition-colors ${
