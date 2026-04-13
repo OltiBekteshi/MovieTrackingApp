@@ -11,7 +11,7 @@ import Friends from "./pages/Friends";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
 import Page from "./pages/Page";
-import { useAuth, useClerk, useUser } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
 import { supabase } from "./utils/supabaseClient";
 import { getWatchlist, getWatchLater } from "./utils/movieService";
 
@@ -27,28 +27,10 @@ const ProtectedRoute = ({ children, isLoaded, isSignedIn }) => {
 function App() {
   const { user } = useUser();
   const { isLoaded, isSignedIn } = useAuth();
-  const { signOut } = useClerk();
   const userId = user?.id;
-  const [isFreshTabLoad, setIsFreshTabLoad] = useState(null);
-  const [initialAuthChecked, setInitialAuthChecked] = useState(false);
 
   const [watchlist, setWatchlist] = useState([]);
   const [watchlater, setWatchlater] = useState([]);
-
-  useEffect(() => {
-    const tabKey = "movie-tracker-tab-open";
-    const wasOpenInThisTab = sessionStorage.getItem(tabKey) === "1";
-    sessionStorage.setItem(tabKey, "1");
-    setIsFreshTabLoad(!wasOpenInThisTab);
-  }, []);
-
-  useEffect(() => {
-    if (!isLoaded || isFreshTabLoad === null || initialAuthChecked) return;
-    if (isFreshTabLoad && isSignedIn) {
-      signOut({ redirectUrl: "/sign-in" });
-    }
-    setInitialAuthChecked(true);
-  }, [isLoaded, isFreshTabLoad, isSignedIn, signOut, initialAuthChecked]);
 
   useEffect(() => {
     const url = new URL(window.location.href);
