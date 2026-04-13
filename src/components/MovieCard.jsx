@@ -227,7 +227,7 @@ const MovieCard = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#D3CBC0]">
+    <div className="min-h-screen bg-white">
       <div className="w-full">
         <TopMoviesThisMonth
           apiKey={apiKey}
@@ -235,19 +235,19 @@ const MovieCard = ({
         />
       </div>
 
-      <div className="p-6">
-        <div className="mx-auto mb-6 w-full max-w-5xl">
-        <div className="flex flex-wrap justify-center gap-2 px-1">
+      <div className="border-t border-gray-200 bg-white p-6">
+        <div className="mx-auto mb-10 w-full max-w-5xl">
+        <div className="flex flex-wrap justify-center gap-x-4 gap-y-3 px-2 sm:gap-x-5 sm:px-4">
           <button
             type="button"
             onClick={() => {
               setSelectedGenre("");
               setPage(1);
             }}
-            className={`rounded-full border-2 border-[#293333] px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#293333] focus-visible:ring-offset-2 hover:cursor-pointer ${
+            className={`rounded-full border-2 px-4 py-2 text-sm font-medium shadow-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 hover:cursor-pointer ${
               selectedGenre === ""
-                ? "bg-[#293333] text-white shadow-md"
-                : "bg-white/90 text-[#293333] hover:bg-[#e8e4dc]"
+                ? "border-gray-900 bg-gray-900 text-white shadow-md"
+                : "border-gray-300 bg-white text-gray-800 hover:border-gray-400 hover:bg-gray-50"
             }`}
           >
             All
@@ -262,10 +262,10 @@ const MovieCard = ({
                   setSelectedGenre(g.id);
                   setPage(1);
                 }}
-                className={`rounded-full border-2 border-[#293333] px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#293333] focus-visible:ring-offset-2 hover:cursor-pointer ${
+                className={`rounded-full border-2 px-4 py-2 text-sm font-medium shadow-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 hover:cursor-pointer ${
                   isActive
-                    ? "bg-[#293333] text-white shadow-md"
-                    : "bg-white/90 text-[#293333] hover:bg-[#e8e4dc]"
+                    ? "border-gray-900 bg-gray-900 text-white shadow-md"
+                    : "border-gray-300 bg-white text-gray-800 hover:border-gray-400 hover:bg-gray-50"
                 }`}
               >
                 {g.name}
@@ -274,11 +274,11 @@ const MovieCard = ({
           })}
         </div>
 
-        <div className="flex justify-center mb-6">
+        <div className="mt-8 flex justify-center sm:mt-10">
           <input
             type="text"
             placeholder="Search for a movie..."
-            className="w-full max-w-md px-4 py-2 rounded-lg bg-white text-black border-2 border-black"
+            className="w-full max-w-md rounded-lg border-2 border-gray-300 bg-white px-4 py-2.5 text-gray-900 shadow-sm placeholder:text-gray-500 focus:border-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/15"
             value={searchInput}
             onChange={(e) => {
               setSearchInput(e.target.value);
@@ -290,14 +290,14 @@ const MovieCard = ({
 
         {loading ? (
           <div className="flex justify-center items-center py-20">
-            <ClipLoader size={79} color="white" />
+            <ClipLoader size={79} color="#293333" aria-label="Loading movies" />
           </div>
         ) : (
-          <div className="grid w-full gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          <div className="grid w-full grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {movies.map((movie) => (
               <div
                 key={movie.id}
-                className="bg-[#293333] rounded-2xl text-white shadow-md transition"
+                className="rounded-2xl bg-[#293333] text-white shadow-md ring-1 ring-black/10 transition hover:shadow-lg"
               >
                 <img
                   src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -339,17 +339,21 @@ const MovieCard = ({
 
         <div className="mt-6 flex justify-center gap-4">
           <button
-            className="bg-[#293333] hover:bg-[#1F2626] text-white px-6 py-2 rounded-lg disabled:opacity-50 cursor-pointer"
+            type="button"
+            className="cursor-pointer rounded-lg bg-gray-900 px-6 py-2 text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40"
             disabled={page === 1}
             onClick={() => setPage(page - 1)}
           >
             Prev
           </button>
 
-          <span className="text-bg-[#293333] text-lg">Page {page}</span>
+          <span className="flex items-center text-lg font-medium text-gray-800">
+            Page {page}
+          </span>
 
           <button
-            className="bg-[#293333] hover:bg-[#1F2626] text-white px-6 py-2 rounded-lg cursor-pointer"
+            type="button"
+            className="cursor-pointer rounded-lg bg-gray-900 px-6 py-2 text-white hover:bg-gray-800"
             onClick={() => setPage(page + 1)}
           >
             Next

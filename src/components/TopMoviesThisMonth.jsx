@@ -76,23 +76,23 @@ export default function TopMoviesThisMonth({
   if (status === "loading" && movies.length === 0) {
     return (
       <section
-        className="flex min-h-[50vh] w-full items-center justify-center bg-[#D3CBC0]"
+        className="flex min-h-[50vh] w-full items-center justify-center bg-white"
         aria-busy="true"
         aria-label="Top movies this month"
       >
-        <ClipLoader size={48} color="#e50914" aria-label="Loading" />
+        <ClipLoader size={48} color="#293333" aria-label="Loading" />
       </section>
     );
   }
 
   if (status === "error" && movies.length === 0) {
     return (
-      <section className="flex min-h-[40vh] w-full flex-col items-center justify-center bg-[#D3CBC0] px-4 py-12 text-center">
-        <p className="text-sm text-red-800">{errorMessage}</p>
+      <section className="flex min-h-[40vh] w-full flex-col items-center justify-center bg-white px-4 py-12 text-center">
+        <p className="text-sm text-red-700">{errorMessage}</p>
         <button
           type="button"
           onClick={load}
-          className="mt-4 rounded bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-neutral-200"
+          className="mt-4 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-50"
         >
           Try again
         </button>
@@ -106,7 +106,7 @@ export default function TopMoviesThisMonth({
 
   return (
     <section
-      className="top-movies-hero relative w-full overflow-hidden bg-[#D3CBC0]"
+      className="top-movies-hero relative w-full overflow-hidden bg-white"
       aria-label="Top 10 movies this month"
     >
       <button
@@ -145,7 +145,7 @@ export default function TopMoviesThisMonth({
           clickable: true,
           dynamicBullets: true,
         }}
-        className="hero-swiper bg-[#D3CBC0]"
+        className="hero-swiper bg-white"
       >
         {movies.map((movie) => {
           const rank = rankById.get(movie.id) ?? 0;
@@ -220,20 +220,20 @@ export default function TopMoviesThisMonth({
       <style>{`
         .top-movies-hero .hero-swiper,
         .top-movies-hero .hero-swiper .swiper-wrapper {
-          background-color: #d3cbc0;
+          background-color: #ffffff;
         }
         .top-movies-hero .hero-swiper .swiper-pagination {
           bottom: 0.75rem !important;
           z-index: 25;
         }
         .top-movies-hero .swiper-pagination-bullet {
-          background: rgba(255, 255, 255, 0.45);
+          background: rgba(0, 0, 0, 0.2);
           opacity: 1;
           width: 10px;
           height: 10px;
         }
         .top-movies-hero .swiper-pagination-bullet-active {
-          background: #fff;
+          background: #0d9488;
           transform: scale(1.15);
         }
       `}</style>
