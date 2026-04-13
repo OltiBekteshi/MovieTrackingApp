@@ -780,3 +780,102 @@ a.cl-footerActionLink[data-localization-key="signIn.password.actionLink"]::after
 .cl-dividerRow{
   display: none;
 }
+
+/* Auth pages: undo global Clerk profile hacks so Sign in / Sign up show real labels & buttons */
+.clerk-auth-page .cl-formButtonPrimary.cl-button,
+.clerk-auth-page .cl-formButtonPrimary.cl-button:hover,
+.clerk-auth-page .cl-formButtonPrimary.cl-button:focus,
+.clerk-auth-page .cl-formButtonPrimary.cl-button:active {
+  color: inherit !important;
+}
+
+.clerk-auth-page .cl-formButtonPrimary.cl-button::after,
+.clerk-auth-page .cl-formButtonPrimary.cl-button:hover::after,
+.clerk-auth-page .cl-formButtonPrimary.cl-button:focus::after,
+.clerk-auth-page .cl-formButtonPrimary.cl-button:active::after {
+  content: none !important;
+  display: none !important;
+}
+
+.clerk-auth-page .cl-formButtonReset.cl-button {
+  color: inherit !important;
+}
+
+.clerk-auth-page .cl-formButtonReset.cl-button::after {
+  content: none !important;
+  display: none !important;
+}
+
+.clerk-auth-page label.cl-formFieldLabel.cl-formFieldLabel__identifier-field,
+.clerk-auth-page label.cl-formFieldLabel.cl-formFieldLabel__emailAddress-field,
+.clerk-auth-page label.cl-formFieldLabel.cl-formFieldLabel__username-field,
+.clerk-auth-page label.cl-formFieldLabel.cl-formFieldLabel__password-field {
+  color: inherit !important;
+}
+
+.clerk-auth-page label.cl-formFieldLabel.cl-formFieldLabel__identifier-field::after,
+.clerk-auth-page label.cl-formFieldLabel.cl-formFieldLabel__emailAddress-field::after,
+.clerk-auth-page label.cl-formFieldLabel.cl-formFieldLabel__username-field::after,
+.clerk-auth-page label.cl-formFieldLabel.cl-formFieldLabel__password-field::after {
+  content: none !important;
+  display: none !important;
+}
+
+.clerk-auth-page .cl-socialButtonsRoot,
+.clerk-auth-page .cl-dividerRow {
+  display: none !important;
+}
+
+.clerk-auth-page .cl-headerTitle {
+  font-size: unset !important;
+}
+
+.clerk-auth-page .cl-headerSubtitle {
+  display: block !important;
+}
+
+.clerk-auth-page .cl-formFieldHintText {
+  display: block !important;
+}
+
+.clerk-auth-page label.cl-formFieldLabel__identifier-field[data-localization-key="formFieldLabel__username"] {
+  color: inherit !important;
+}
+
+.clerk-auth-page label.cl-formFieldLabel__identifier-field[data-localization-key="formFieldLabel__username"]::after {
+  content: none !important;
+  display: none !important;
+}
+
+.clerk-auth-page span.cl-footerActionText[data-localization-key="signIn.start.actionText"],
+.clerk-auth-page span.cl-footerActionText[data-localization-key="signUp.start.actionText"] {
+  color: inherit !important;
+}
+
+.clerk-auth-page span.cl-footerActionText[data-localization-key="signIn.start.actionText"]::after,
+.clerk-auth-page span.cl-footerActionText[data-localization-key="signUp.start.actionText"]::after {
+  content: none !important;
+  display: none !important;
+}
+
+.clerk-auth-page a.cl-footerActionLink[data-localization-key="signIn.start.actionLink"],
+.clerk-auth-page a.cl-footerActionLink[data-localization-key="signUp.start.actionLink"],
+.clerk-auth-page a.cl-footerActionLink[data-localization-key="signIn.password.actionLink"] {
+  color: inherit !important;
+}
+
+.clerk-auth-page a.cl-footerActionLink[data-localization-key="signIn.start.actionLink"]::after,
+.clerk-auth-page a.cl-footerActionLink[data-localization-key="signUp.start.actionLink"]::after,
+.clerk-auth-page a.cl-footerActionLink[data-localization-key="signIn.password.actionLink"]::after {
+  content: none !important;
+  display: none !important;
+}
+
+.clerk-auth-page a.cl-formFieldAction.cl-formFieldAction__password[data-localization-key="formFieldAction__forgotPassword"] {
+  color: inherit !important;
+}
+
+.clerk-auth-page a.cl-formFieldAction.cl-formFieldAction__password[data-localization-key="formFieldAction__forgotPassword"]::after {
+  content: none !important;
+  display: none !important;
+}

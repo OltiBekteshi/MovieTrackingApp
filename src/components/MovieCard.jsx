@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 import PopUpModal from "./PopUpModal";
+import TopMoviesThisMonth from "./TopMoviesThisMonth";
 import { addToWatchlist, addToWatchLater } from "./../utils/movieService";
 import { useLocation } from "react-router-dom";
 import ClipLoader from "react-spinners/ClipLoader";
@@ -166,6 +167,15 @@ const MovieCard = ({
 
   const handleWatchTrailer = async (movieId) => {
     try {
+      // Ensure modal has a selected movie when trailer is opened from hero section.
+      if (!selectedMovie || selectedMovie.id !== movieId) {
+        const movieRes = await fetch(
+          `https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKey}&language=en-EN`
+        );
+        const fullMovie = await movieRes.json();
+        setSelectedMovie(fullMovie);
+      }
+
       const res = await fetch(
         `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${apiKey}&language=en-EN`
       );
@@ -217,11 +227,16 @@ const MovieCard = ({
   };
 
   return (
-    <div className="bg-[#D3CBC0] min-h-screen p-6">
-      <div className="w-full max-w-5xl mx-auto mt-20 mb-6">
-        
+    <div className="min-h-screen bg-[#D3CBC0]">
+      <div className="w-full">
+        <TopMoviesThisMonth
+          apiKey={apiKey}
+          onMovieClick={(movieId) => openMovieDetails(movieId)}
+        />
+      </div>
 
-      
+      <div className="p-6">
+        <div className="mx-auto mb-6 w-full max-w-5xl">
         <div className="flex flex-wrap justify-center gap-2 px-1">
           <button
             type="button"
@@ -258,88 +273,88 @@ const MovieCard = ({
             );
           })}
         </div>
-      </div>
 
-      <div className="flex justify-center mb-6">
-        <input
-          type="text"
-          placeholder="Search for a movie..."
-          className="w-full max-w-md px-4 py-2 rounded-lg bg-white text-black border-2 border-black"
-          value={searchInput}
-          onChange={(e) => {
-            setSearchInput(e.target.value);
-            setPage(1);
-          }}
-        />
-      </div>
-
-      <Toaster position="top-right" />
-
-      {loading ? (
-        <div className="flex justify-center items-center py-20">
-          <ClipLoader size={79} color="white" />
+        <div className="flex justify-center mb-6">
+          <input
+            type="text"
+            placeholder="Search for a movie..."
+            className="w-full max-w-md px-4 py-2 rounded-lg bg-white text-black border-2 border-black"
+            value={searchInput}
+            onChange={(e) => {
+              setSearchInput(e.target.value);
+              setPage(1);
+            }}
+          />
         </div>
-      ) : (
-        <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {movies.map((movie) => (
-            <div
-              key={movie.id}
-              className="bg-[#293333] rounded-2xl text-white shadow-md transition"
-            >
-              <img
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                className="w-full h-72 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="font-semibold text-lg truncate">
-                  {movie.title}
-                </h3>
-                <p className="truncate">{movie.overview}</p>
-                <p className="text-sm mt-1">{movie.release_date}</p>
-                <p className="text-white text-sm mt-1 font-bold">
-                  Runtime:{" "}
-                  {movieDetails[movie.id]
-                    ? `${Math.floor(movieDetails[movie.id] / 60)}h ${
-                        movieDetails[movie.id] % 60
-                      }m`
-                    : "N/A"}
-                </p>
-                <p className="text-yellow-400 font-bold mt-1">
-                  ⭐ {movie.vote_average.toFixed(1)}
-                </p>
+        </div>
 
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openMovieDetails(movie.id);
-                  }}
-                  className="bg-white text-black p-2 w-full mt-3 rounded-lg hover:scale-103 hover:opacity-[0.8] cursor-pointer"
-                >
-                  See details
-                </button>
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <ClipLoader size={79} color="white" />
+          </div>
+        ) : (
+          <div className="grid w-full gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            {movies.map((movie) => (
+              <div
+                key={movie.id}
+                className="bg-[#293333] rounded-2xl text-white shadow-md transition"
+              >
+                <img
+                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                  className="w-full h-72 object-cover"
+                  alt={movie.title}
+                />
+                <div className="p-4">
+                  <h3 className="font-semibold text-lg truncate">
+                    {movie.title}
+                  </h3>
+                  <p className="truncate">{movie.overview}</p>
+                  <p className="text-sm mt-1">{movie.release_date}</p>
+                  <p className="text-white text-sm mt-1 font-bold">
+                    Runtime:{" "}
+                    {movieDetails[movie.id]
+                      ? `${Math.floor(movieDetails[movie.id] / 60)}h ${
+                          movieDetails[movie.id] % 60
+                        }m`
+                      : "N/A"}
+                  </p>
+                  <p className="text-yellow-400 font-bold mt-1">
+                    ⭐ {movie.vote_average.toFixed(1)}
+                  </p>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openMovieDetails(movie.id);
+                    }}
+                    className="bg-white text-black p-2 w-full mt-3 rounded-lg hover:scale-103 hover:opacity-[0.8] cursor-pointer"
+                  >
+                    See details
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+        )}
+
+        <div className="mt-6 flex justify-center gap-4">
+          <button
+            className="bg-[#293333] hover:bg-[#1F2626] text-white px-6 py-2 rounded-lg disabled:opacity-50 cursor-pointer"
+            disabled={page === 1}
+            onClick={() => setPage(page - 1)}
+          >
+            Prev
+          </button>
+
+          <span className="text-bg-[#293333] text-lg">Page {page}</span>
+
+          <button
+            className="bg-[#293333] hover:bg-[#1F2626] text-white px-6 py-2 rounded-lg cursor-pointer"
+            onClick={() => setPage(page + 1)}
+          >
+            Next
+          </button>
         </div>
-      )}
-
-      <div className="flex justify-center mt-6 gap-4">
-        <button
-          className="bg-[#293333] hover:bg-[#1F2626] text-white px-6 py-2 rounded-lg disabled:opacity-50 cursor-pointer"
-          disabled={page === 1}
-          onClick={() => setPage(page - 1)}
-        >
-          Prev
-        </button>
-
-        <span className="text-bg-[#293333] text-lg">Page {page}</span>
-
-        <button
-          className="bg-[#293333] hover:bg-[#1F2626] text-white px-6 py-2 rounded-lg cursor-pointer"
-          onClick={() => setPage(page + 1)}
-        >
-          Next
-        </button>
       </div>
 
       <PopUpModal
