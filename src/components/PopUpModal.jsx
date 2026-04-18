@@ -7,6 +7,7 @@ import {
   deletePublicComment,
   subscribeToPublicComments,
 } from "../utils/movieService";
+import { formatTimeAgo } from "../utils/timeAgo";
 import { supabase } from "../utils/supabaseClient";
 import { Toaster, toast } from "sonner";
 import {
@@ -79,9 +80,14 @@ function DiscussionComment({ node, user, onReply, onDelete, isNested }) {
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
-            <span className="text-sm font-medium text-gray-900">
-              {node.username}
-            </span>
+            <div className="min-w-0">
+              <span className="text-sm font-medium text-gray-900">
+                {node.username}
+              </span>
+              {node.created_at && (
+                <p className="text-xs text-gray-400">{formatTimeAgo(node.created_at)}</p>
+              )}
+            </div>
             {user?.id === node.user_id && (
               <button
                 type="button"

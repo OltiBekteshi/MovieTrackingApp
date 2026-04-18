@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { supabase } from "../utils/supabaseClient";
+import { formatTimeAgo } from "../utils/timeAgo";
 
 const Notifications = () => {
   const { user } = useUser();
@@ -61,6 +62,9 @@ const Notifications = () => {
         >
           <h3 className="font-bold">{n.title}</h3>
           <p className="text-gray-700 font-bold">{n.message}</p>
+          {n.created_at && (
+            <p className="mt-1 text-xs text-gray-500">{formatTimeAgo(n.created_at)}</p>
+          )}
         </div>
       ))}
     </div>

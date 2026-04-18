@@ -4,6 +4,7 @@ import { FiMenu, FiX, FiBell, FiUsers } from "react-icons/fi";
 import { SignedIn, SignedOut, UserButton, useUser } from "@clerk/clerk-react";
 import { supabase } from "../utils/supabaseClient";
 import FriendSidebar from "./FriendSidebar";
+import { formatTimeAgo } from "../utils/timeAgo";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -226,7 +227,12 @@ const Navbar = () => {
                           onClick={() => openRecommended(n)}
                           className="bg-gray-100 shadow p-2 rounded-lg mb-2 text-sm cursor-pointer hover:bg-gray-200"
                         >
-                          {n.message}
+                          <p>{n.message}</p>
+                          {n.created_at && (
+                            <p className="mt-1 text-xs text-gray-500">
+                              {formatTimeAgo(n.created_at)}
+                            </p>
+                          )}
                         </div>
                       ))}
 
@@ -255,10 +261,18 @@ const Navbar = () => {
           )}
 
           <SignedOut>
-            <Link to="/sign-in" className="border px-4 py-2 rounded-2xl">
+            <Link
+              to="/sign-in"
+              state={{ backgroundLocation: location }}
+              className="border px-4 py-2 rounded-2xl"
+            >
               Log in
             </Link>
-            <Link to="/sign-up" className="border px-4 py-2 rounded-2xl">
+            <Link
+              to="/sign-up"
+              state={{ backgroundLocation: location }}
+              className="border px-4 py-2 rounded-2xl"
+            >
               Sign up
             </Link>
           </SignedOut>
@@ -355,7 +369,12 @@ const Navbar = () => {
                           onClick={() => openRecommended(n)}
                           className="bg-gray-100 shadow p-2 rounded-lg mb-2 text-sm cursor-pointer hover:bg-gray-200"
                         >
-                          {n.message}
+                          <p>{n.message}</p>
+                          {n.created_at && (
+                            <p className="mt-1 text-xs text-gray-500">
+                              {formatTimeAgo(n.created_at)}
+                            </p>
+                          )}
                         </div>
                       ))}
 
@@ -386,6 +405,7 @@ const Navbar = () => {
           <SignedOut>
             <Link
               to="/sign-in"
+              state={{ backgroundLocation: location }}
               onClick={() => setIsOpen(false)}
               className="block"
             >
@@ -393,6 +413,7 @@ const Navbar = () => {
             </Link>
             <Link
               to="/sign-up"
+              state={{ backgroundLocation: location }}
               onClick={() => setIsOpen(false)}
               className="block"
             >

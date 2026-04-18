@@ -7,6 +7,7 @@ import {
   getComments,
   deleteComment,
 } from "../utils/movieService";
+import { formatTimeAgo } from "../utils/timeAgo";
 
 const Watchlist = ({ watchlist, setWatchlist, userId }) => {
   const navigate = useNavigate();
@@ -172,7 +173,14 @@ const Watchlist = ({ watchlist, setWatchlist, userId }) => {
                         key={c.id}
                         className="bg-gray-800 p-2 rounded text-sm text-gray-200 flex justify-between items-center gap-2"
                       >
-                        <span>{c.comment}</span>
+                        <div className="min-w-0">
+                          <p>{c.comment}</p>
+                          {c.created_at && (
+                            <p className="mt-1 text-xs text-gray-400">
+                              {formatTimeAgo(c.created_at)}
+                            </p>
+                          )}
+                        </div>
                         <button
                           className="text-xs bg-red-600 px-2 py-1 rounded hover:bg-red-700 hover:cursor-pointer"
                           onClick={() =>
